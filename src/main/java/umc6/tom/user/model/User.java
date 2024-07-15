@@ -1,10 +1,7 @@
 package umc6.tom.user.model;
 
 import jakarta.persistence.*;
-import umc6.tom.constant.model.BaseEntity;
-import umc6.tom.user.model.enums.Gender;
-import umc6.tom.user.model.enums.Major;
-import umc6.tom.user.model.enums.SocialType;
+import umc6.tom.common.BaseEntity;
 
 @Entity
 public class User extends BaseEntity {

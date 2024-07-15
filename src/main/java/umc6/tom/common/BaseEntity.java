@@ -1,4 +1,4 @@
-package umc6.tom.constant.model;
+package umc6.tom.common;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
