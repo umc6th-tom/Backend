@@ -6,16 +6,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.common.BaseEntity;
-import umc6.tom.user.model.enums.Gender;
-import umc6.tom.user.model.enums.Major;
 import umc6.tom.user.model.enums.Role;
-import umc6.tom.user.model.enums.SocialType;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
