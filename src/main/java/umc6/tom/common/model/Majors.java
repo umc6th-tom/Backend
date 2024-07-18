@@ -27,7 +27,7 @@ public class Majors extends BaseEntity {
     @JoinColumn(name = "college_id")
     private College college;
 
-    @OneToMany(mappedBy = "major", cascade = CascadeType.ALL)
-    private List<User> userList = new ArrayList<>();
+//    @OneToMany(mappedBy = "major", cascade = CascadeType.ALL)
+//    private List<User> userList = new ArrayList<>();
 
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.Comment.model.Pin;
 import umc6.tom.common.BaseEntity;
-import umc6.tom.common.enums.Status;
+import umc6.tom.common.model.enums.Status;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
