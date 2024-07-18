@@ -3,6 +3,7 @@ package umc6.tom.common.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.common.model.enums.Major;
 import umc6.tom.user.model.User;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class Majors extends BaseEntity {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private umc6.tom.user.model.enums.Major major;
+    private Major major;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")

@@ -3,7 +3,7 @@ package umc6.tom.common.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
-import umc6.tom.user.model.enums.Colleges;
+import umc6.tom.common.model.enums.Colleges;
 
 import java.util.ArrayList;
 import java.util.List;
