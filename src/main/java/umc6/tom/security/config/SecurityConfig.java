@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/user/login").permitAll()    //
                         .requestMatchers("/user/test").hasRole("USER")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()   // 임시로 다 열어놓음
                 )
                 // JWT 인증 필터 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

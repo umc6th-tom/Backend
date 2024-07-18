@@ -7,6 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import umc6.tom.security.JwtToken;
 import umc6.tom.security.config.JwtTokenProvider;
+import umc6.tom.user.converter.UserConverter;
+import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
@@ -17,6 +19,23 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
+
+
+    @Override
+    public User join(UserDtoReq.JoinDto request) {
+
+        // 닉네임 중복 확인
+
+
+        // 아이디 중복 확인
+
+        // 비밀번호, 비밀번호확인 동일
+
+        User user = UserConverter.toUser(request);
+
+        userRepository.save(user);
+        return user;
+    }
 
     @Override
     public User loadUserByUsername(String username) {
@@ -40,4 +59,20 @@ public class UserServiceImpl implements UserService {
 
         return jwtToken;
     }
+
+    @Override
+    public boolean duplicatedNickName(String nickName) {
+        return false;
+    }
+
+    @Override
+    public boolean duplicatedAccount(String account) {
+        return false;
+    }
+
+    // 닉네임 중복 확인
+
+    // 아이디 중복 확인
+
+
 }
