@@ -84,14 +84,14 @@ public class JwtTokenProvider {
         }
 
         // 클래임에서 권한 정보 가져오기
-        Collection<? extends GrantedAuthority> authories = Arrays.stream(claims.get("auth").toString().split(","))
+        Collection<? extends GrantedAuthority> authorities = Arrays.stream(claims.get("auth").toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
         // UserDetails 객체를 만들어서 Authentication return
         // UserDetails : interface, User : UserDetails를 구현한 class
-        UserDetails principal = new User(claims.getSubject(), "", authories);
-        return new UsernamePasswordAuthenticationToken(principal, "", authories);
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     // 토큰 정보를 검증하는 메서드

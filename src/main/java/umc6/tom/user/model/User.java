@@ -3,14 +3,19 @@ package umc6.tom.user.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.enums.Gender;
 import umc6.tom.user.model.enums.Major;
+import umc6.tom.user.model.enums.Role;
 import umc6.tom.user.model.enums.SocialType;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -21,27 +26,31 @@ public class User extends BaseEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name") // nullable = false 추가
+    @Column(length = 20) // nullable = false 추가
     private String name;
 
-    @Column(name = "email") // nullable = false 추가
-    private String email;
+    @Column(length = 20) // nullable = false 추가
+    private String account;
 
-    @Column(name = "password") // nullable = false 추가
+    @Column(length = 50) // nullable = false 추가
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(15) DEFAULT 'USER'")
+    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.name;
     }
+
 /*
 
     @Column(name = "pic")
@@ -62,5 +71,4 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "major")
     private Major major;
 */
-
 }
