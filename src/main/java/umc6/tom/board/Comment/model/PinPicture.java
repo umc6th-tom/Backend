@@ -8,7 +8,7 @@ import umc6.tom.common.BaseEntity;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinPicture extends BaseEntity {
+public class PinPicture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
