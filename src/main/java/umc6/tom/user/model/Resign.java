@@ -22,6 +22,7 @@ public class Resign extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String reason;
 
-    @OneToOne(mappedBy = "resign", fetch = FetchType.LAZY) //즐겨 찾기가 하위
+    @OneToOne(fetch = FetchType.LAZY)   //즐겨 찾기가 하위
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 }

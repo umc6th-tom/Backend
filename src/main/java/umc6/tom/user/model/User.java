@@ -6,7 +6,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.common.model.Majors;
+import umc6.tom.common.model.enums.Status;
+import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.Role;
+import umc6.tom.user.model.enums.Open;
+import umc6.tom.user.model.enums.SocialType;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,15 +30,52 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 20) // nullable = false 추가
     private String name;
 
-    @Column(length = 20) // nullable = false 추가
+    @Column(length = 20, nullable = false)
+    private String nickName;
+
+    @Column(length = 20, nullable = false) // nullable = false 추가
     private String account;
 
-    @Column(length = 50) // nullable = false 추가
-    private String password;
+    @Column(length = 11)
+    private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(15) DEFAULT 'USER'")
+    @Column(columnDefinition = "VARCHAR(10) DEFAULT 'disagree'")
+    private Agreement agreement;
+
+    @Column(length = 50)
+    private String pic;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(10) DEFAULT 'disagree'")
+    private Open open;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "socialType") // nullable = false 추가
+    private SocialType socialType;
+
+    private String description; // 디폴트 길이 255
+
+    @Column(nullable = false) // nullable = false 추가
+    private String password;
+
+    @Column(length = 5)
+    private Integer report;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(15) DEFAULT 'USER'", length = 15)
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'inactive'")
+    private Status status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "majorId", nullable = false)
+    private Majors majors;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Resign resign;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -44,25 +86,4 @@ public class User extends BaseEntity implements UserDetails {
     public String getUsername() {
         return this.name;
     }
-
-/*
-
-    @Column(name = "pic")
-    private String pic;
-
-    @Column(name = "point")
-    private Integer point;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "socialType") // nullable = false 추가
-    private SocialType socialType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
-    private Gender gender;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "major")
-    private Major major;
-*/
 }
