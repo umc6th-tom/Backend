@@ -2,6 +2,7 @@ package umc6.tom.user.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import umc6.tom.user.model.User;
+import umc6.tom.user.model.enums.UserStatus;
 
 import java.util.Optional;
 
@@ -9,4 +10,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByName(String name);
 
+    Optional<User> findByAccountAndStatus(String account, UserStatus status);
+
+    Optional<User> findByNickName(String nickName);
+
+    Optional<User> findByAccount(String account);
+
+    Optional<User> findByPhone(String phone);
 }

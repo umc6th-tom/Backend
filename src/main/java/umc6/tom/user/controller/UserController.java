@@ -2,12 +2,8 @@ package umc6.tom.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
-import umc6.tom.security.JwtToken;
 import umc6.tom.security.SecurityUtil;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.UserDtoReq;
@@ -23,6 +19,7 @@ public class UserController {
 
     private final UserService userService;
 
+
     /**
      * 24.07.18 작성자 : 류기현
      * 회원가입
@@ -34,20 +31,41 @@ public class UserController {
         return ApiResponse.onSuccess(UserConverter.joinRes(user));
     }
 
+    /**
+     * 24.07.19 작성자 : 류기현
+     * 닉네임 중복 확인
+     */
+    @GetMapping("/user/nickname")
+    public ApiResponse<Boolean> checkNickName(@RequestParam String nickname) {
+
+        return ApiResponse.onSuccess(userService.duplicatedNickName(nickname));
+    }
+
+    /**
+     * 24.07.19 작성자 : 류기현
+     * 아이디 중복 확인
+     */
+    @GetMapping("/user/account")
+    public ApiResponse<Boolean> checkAccount(@RequestParam String account) {
+
+        return ApiResponse.onSuccess(userService.duplicatedAccount(account));
+    }
 
     /**
      * 24.07.18 작성자 : 류기현
      * 로그인
      */
     @PostMapping("/login")
-    public JwtToken join(@RequestBody UserDtoReq.SignInDto request) {
-        String name = request.getName();
-        String password = request.getPassword();
-        JwtToken jwtToken = userService.signIn(name, password);
-        log.info("request name : {}, password : {}", name, password);
-        log.info("jwtToken accessToken: {}, refreshToken : {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
-        return jwtToken;
+    public ApiResponse<UserDtoRes.signInDto> login(@RequestBody UserDtoReq.SignInDto request) {
+
+        return ApiResponse.onSuccess(userService.signIn(request));
     }
+
+    /**
+     * 24.07.19 작성자 : 류기현
+     * 회원 탈퇴
+     */
+    @PatchMapping("/")
 
     @PostMapping("/test")
     public String test() {

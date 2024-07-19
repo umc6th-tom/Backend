@@ -24,10 +24,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    private Key key;  // String 형식보다는 Key 형식이 안전
-
-    @Value("${jwt.secret}")
-    private String secretKey;
+    private final Key key;  // String 형식보다는 Key 형식이 안전
 
     // 토큰의 유효시간
     public static final long TOKEN_VALID_TIME = 1000L * 60 * 5; // 5분(밀리초)

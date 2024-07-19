@@ -28,11 +28,19 @@ public class UserConverter {
     // 회원가입 응답
     public static UserDtoRes.JoinDto joinRes(User user) {
 
-        return UserDtoRes.JoinDto
-                .builder()
+        return UserDtoRes.JoinDto.builder()
                 .id(user.getId())
                 .nickName(user.getUsername())
                 .build();
     }
 
+    public static UserDtoRes.signInDto signInRes(User user, String accessToken, String refreshToken) {
+
+        return UserDtoRes.signInDto.builder()
+                .userId(user.getId())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
 }
