@@ -15,7 +15,7 @@ public class NoticePicture {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String title;
+    private String pic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notice_id")
