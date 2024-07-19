@@ -11,6 +11,7 @@ import umc6.tom.notice.repository.NoticeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,9 +24,18 @@ public class NoticeService {
     public List<NoticeDto> findAll(Pageable pageable) {
         Page<Notice> noticePage = noticeRepository.findAll(pageable);
         List<NoticeDto> noticeDTOList = noticePage.stream()
-                .map(NoticeDto::toNoticeDTO)
+                .map(NoticeDto::toNoticeListDTO)
                 .collect(Collectors.toList());
 
         return noticeDTOList;
+    }
+
+    //공지사항 글 보기
+    @Transactional
+    public NoticeDto findId(long id) {
+        Optional<Notice> optionalNotice = noticeRepository.findById(id);
+        return optionalNotice
+                .map(NoticeDto::toNoticeDTO)
+                .orElse(null);
     }
 }

@@ -22,11 +22,23 @@ public class NoticeDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
-    //공지사항 리스트 조회
+    //공지사항 리스트 조회 content 제외
+    public static NoticeDto toNoticeListDTO(Notice notice) {
+        NoticeDto dto = new NoticeDto();
+        dto.setId(notice.getId());
+        dto.setTitle(notice.getTitle());
+        dto.setCreatedAt(notice.getCreatedAt());
+        dto.setUpdatedAt(notice.getUpdatedAt());
+
+        return dto;
+    }
+
+    //공지사항 글 조회 content 추가
     public static NoticeDto toNoticeDTO(Notice notice) {
         NoticeDto dto = new NoticeDto();
         dto.setId(notice.getId());
         dto.setTitle(notice.getTitle());
+        dto.setContent(notice.getContent());
         dto.setCreatedAt(notice.getCreatedAt());
         dto.setUpdatedAt(notice.getUpdatedAt());
 
