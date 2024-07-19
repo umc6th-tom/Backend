@@ -3,10 +3,6 @@ package umc6.tom.common.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.model.Board;
-import umc6.tom.board.model.BoardLike;
-import umc6.tom.common.BaseEntity;
-import umc6.tom.common.model.enums.Major;
-import umc6.tom.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +18,8 @@ public class Majors {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Major major;
+    @Column(nullable = false, unique = true, length = 30)
+    private String major;
 
     @OneToMany(mappedBy = "majors", cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();

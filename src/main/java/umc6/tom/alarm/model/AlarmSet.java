@@ -36,6 +36,7 @@ public class AlarmSet {
     @Enumerated(EnumType.STRING)
     private AlarmOnOff noticeSet;
 
-    @OneToOne(mappedBy = "alarmSet", fetch = FetchType.LAZY) //알람셋이 하위
+    @OneToOne(fetch = FetchType.LAZY)   //알람셋이 하위
+    @JoinColumn(name = "userId", nullable = false)
     private User user;
 }
