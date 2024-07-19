@@ -38,6 +38,17 @@ public class UserDtoReq {
     @Getter
     @ToString
     public static class JoinNickNameDto {
+
         private String nickName;
+    }
+
+    @Getter
+    @ToString
+    public static class WithDrawDto {
+
+        @Size(message = "작성해주시면 사용자의 경험 향상에 도움이 됩니다.", max = 50)
+        private String reason;
+        @NotBlank(message = "탈퇴를 위해 비밀번호는 필수 입력 항목입니다.")
+        private String password;
     }
 }
