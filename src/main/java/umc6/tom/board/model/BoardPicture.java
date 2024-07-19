@@ -8,7 +8,7 @@ import umc6.tom.common.BaseEntity;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class BoardPicture extends BaseEntity {
+public class BoardPicture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

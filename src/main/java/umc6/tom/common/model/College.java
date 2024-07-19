@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class College extends BaseEntity {
+public class College {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

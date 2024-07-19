@@ -10,7 +10,7 @@ import umc6.tom.user.model.User;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinCommentLike extends BaseEntity {
+public class PinCommentLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
