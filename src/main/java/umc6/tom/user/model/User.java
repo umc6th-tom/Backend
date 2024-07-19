@@ -8,10 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.enums.Status;
-import umc6.tom.user.model.enums.Agreement;
-import umc6.tom.user.model.enums.Role;
-import umc6.tom.user.model.enums.Open;
-import umc6.tom.user.model.enums.SocialType;
+import umc6.tom.user.model.enums.*;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -68,7 +65,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'inactive'")
-    private Status status;
+    private UserStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "majorId", nullable = false)
