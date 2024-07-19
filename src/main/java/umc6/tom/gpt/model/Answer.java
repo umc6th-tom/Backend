@@ -3,6 +3,8 @@ package umc6.tom.gpt.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.common.model.College;
+import umc6.tom.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +29,8 @@ public class Answer {
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @OneToOne(fetch = FetchType.LAZY) //답변이 주체(주인)이고 즐겨찾기가 하위개념
-    @JoinColumn(name = "favorite_id")
-    private Favorite favorite;
-
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL)
-    private List<Example> exampleList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }
