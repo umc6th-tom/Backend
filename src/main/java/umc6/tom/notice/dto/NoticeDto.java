@@ -6,6 +6,7 @@ import lombok.*;
 import umc6.tom.notice.model.Notice;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +22,7 @@ public class NoticeDto {
     private LocalDateTime createdAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
+    private List<NoticePictureDto> pictures;
 
     //공지사항 리스트 조회 content 제외
     public static NoticeDto toNoticeListDTO(Notice notice) {
@@ -34,11 +36,12 @@ public class NoticeDto {
     }
 
     //공지사항 글 조회 content 추가
-    public static NoticeDto toNoticeDTO(Notice notice) {
+    public static NoticeDto toNoticeDTO(Notice notice, List<NoticePictureDto> pictureDtos) {
         NoticeDto dto = new NoticeDto();
         dto.setId(notice.getId());
         dto.setTitle(notice.getTitle());
         dto.setContent(notice.getContent());
+        dto.setPictures(pictureDtos);
         dto.setCreatedAt(notice.getCreatedAt());
         dto.setUpdatedAt(notice.getUpdatedAt());
 

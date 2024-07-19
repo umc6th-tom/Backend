@@ -38,7 +38,8 @@ public class NoticeController {
     //공지사항 글보기
     @GetMapping("/{id}")
     public ApiResponse<NoticeDto> findById(@PathVariable long id) {
-        return ApiResponse.onSuccess(noticeService.findId(id));
+
+        return ApiResponse.onSuccess(noticeService.findNotice(id));
     }
 
 
