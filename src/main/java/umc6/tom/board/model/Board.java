@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.Comment.model.Pin;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.common.model.Majors;
+import umc6.tom.common.model.enums.Major;
 import umc6.tom.common.model.enums.Status;
 import umc6.tom.user.model.User;
 
@@ -28,9 +30,6 @@ public class Board extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    @Column(nullable = false, length = 20)
-    private String birthday;
-
     private LocalDateTime popularAt;
 
     @Enumerated(EnumType.STRING)
@@ -51,4 +50,8 @@ public class Board extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "majors_id")
+    private Majors majors;
 }

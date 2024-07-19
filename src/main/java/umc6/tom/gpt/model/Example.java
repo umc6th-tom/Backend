@@ -3,6 +3,8 @@ package umc6.tom.gpt.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.user.model.User;
+
 @Entity
 @Getter
 @Builder
@@ -24,5 +26,8 @@ public class Example {
     @JoinColumn(name = "answer_id")
     private Answer answer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }
