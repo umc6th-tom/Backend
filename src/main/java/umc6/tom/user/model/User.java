@@ -48,7 +48,7 @@ public class User extends BaseEntity implements UserDetails {
     private String pic;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "NON") // nullable = false 추가
+    @Column(columnDefinition = "VARCHAR(10) DEFAULT 'NON'")
     private SocialType socialType;
 
     private String description; // 디폴트 길이 255
