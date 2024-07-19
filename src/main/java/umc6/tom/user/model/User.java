@@ -7,7 +7,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
-import umc6.tom.common.model.enums.Status;
 import umc6.tom.user.model.enums.*;
 
 import java.util.Collection;
@@ -15,6 +14,7 @@ import java.util.Collections;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -64,7 +64,7 @@ public class User extends BaseEntity implements UserDetails {
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'inactive'")
+    @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'INACTIVE'")
     private UserStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
