@@ -1,7 +1,6 @@
 package umc6.tom.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -11,7 +10,6 @@ import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.PhoneHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
-import umc6.tom.common.model.enums.Major;
 import umc6.tom.security.JwtToken;
 import umc6.tom.security.KeyUtil;
 import umc6.tom.security.RedisUtil;
