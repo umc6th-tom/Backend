@@ -32,7 +32,7 @@ public class JwtTokenProvider {
     // 토큰의 유효시간
     public static final long TOKEN_VALID_TIME = 1000L * 60 * 5; // 5분(밀리초)
     public static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7;   // 일주일(밀리초)
-    public static final long REFRESH_TOKEN_REFRESH_TIME = 60 * 60 * 24 * 7; // 일주일(초)
+    public static final long REFRESH_TOKEN_VALID_TIME_IN_REDIS = 60 * 60 * 24 * 7; // 일주일(초)
 
 
     public JwtTokenProvider(@Value("${jwt.secret}")
@@ -54,11 +54,12 @@ public class JwtTokenProvider {
 
         // AccessToken 생성
         Date accessTokenExpiration = new Date(now + TOKEN_VALID_TIME);
+        Long userId = (Long) authentication.getPrincipal(); // userId를 principal에서 가져옴
         String accessToken = Jwts.builder()
-                .setSubject(authentication.getName())
+                .setSubject(userId.toString()) // userId를 subject로 설정
                 .claim("auth", authorities)
                 .setExpiration(accessTokenExpiration)
-                .signWith(key, SignatureAlgorithm.HS256)    // key와 알고리즘
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         // Refresh Token 생성
@@ -125,5 +126,18 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    // 토큰에서 userId 추출
+    public Long getUserIdFromToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        // subject에서 userId를 추출
+        String userIdStr = claims.getSubject();
+        return Long.parseLong(userIdStr);
     }
 }
