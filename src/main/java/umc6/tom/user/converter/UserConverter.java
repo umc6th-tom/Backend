@@ -3,6 +3,7 @@ package umc6.tom.user.converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
@@ -14,12 +15,15 @@ import umc6.tom.user.model.enums.Role;
 public class UserConverter {
 
     // 회원 객체 생성
-    public static User toUser(UserDtoReq.JoinDto request) {
+    public static User toUser(UserDtoReq.JoinDto request, Majors major) {
 
         return User.builder()
                 .name(request.getName())
+                .nickName(request.getNickName())
                 .account(request.getAccount())
                 .password(request.getPassword())
+                .phone(request.getPhone())
+                .majors(major)
                 .role(Role.USER)
                 .build();
     }

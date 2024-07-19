@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
+import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.security.SecurityUtil;
+import umc6.tom.security.config.JwtTokenProvider;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
@@ -18,6 +20,7 @@ import umc6.tom.user.service.UserService;
 public class UserController {
 
     private final UserService userService;
+    private final JwtTokenProvider jwtTokenProvider;
 
 
     /**
@@ -26,6 +29,7 @@ public class UserController {
      */
     @PostMapping("/join")
     public ApiResponse<UserDtoRes.JoinDto> join(@RequestBody UserDtoReq.JoinDto request) {
+
         User user = userService.join(request);
 
         return ApiResponse.onSuccess(UserConverter.joinRes(user));
@@ -35,7 +39,7 @@ public class UserController {
      * 24.07.19 작성자 : 류기현
      * 닉네임 중복 확인
      */
-    @GetMapping("/user/nickname")
+    @GetMapping("/nickname")
     public ApiResponse<Boolean> checkNickName(@RequestParam String nickname) {
 
         return ApiResponse.onSuccess(userService.duplicatedNickName(nickname));
@@ -45,7 +49,7 @@ public class UserController {
      * 24.07.19 작성자 : 류기현
      * 아이디 중복 확인
      */
-    @GetMapping("/user/account")
+    @GetMapping("/account")
     public ApiResponse<Boolean> checkAccount(@RequestParam String account) {
 
         return ApiResponse.onSuccess(userService.duplicatedAccount(account));
@@ -63,9 +67,14 @@ public class UserController {
 
     /**
      * 24.07.19 작성자 : 류기현
-     * 회원 탈퇴
+     * 회원 탈퇴 : userId(토큰) + 비밀번호
      */
-    @PatchMapping("/")
+    @PatchMapping("/{user_id}")
+    public ApiResponse<SuccessStatus> withdraw(@RequestBody UserDtoReq.WithDrawDto request, @PathVariable String user_id) {
+
+        userService.withDraw(1L, request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
 
     @PostMapping("/test")
     public String test() {

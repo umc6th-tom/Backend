@@ -2,8 +2,6 @@ package umc6.tom.common.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.common.BaseEntity;
-import umc6.tom.common.model.enums.Colleges;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +17,8 @@ public class College {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Colleges college;
+    @Column(nullable = false, unique = false, length = 30)
+    private String college;
 
     @OneToMany(mappedBy = "college", cascade = CascadeType.ALL)
     private List<Majors> majorsList = new ArrayList<>();
