@@ -18,23 +18,14 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // 멤버 관려 에러
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
-    NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "MEMBER4002", "닉네임은 필수 입니다."),
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "사용자가 없습니다."),
+    USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "USER4002", "사용자는 활성 상태가 아닙니다."),
+    USER_NICKNAME_DUPLICATED(HttpStatus.IM_USED, "USER4003", "닉네임이 이미 존재합니다."),
+    USER_ACCOUNT_DUPLICATED(HttpStatus.IM_USED, "USER4004", "이미 가입된 아이디입니다."),
 
-    // 예시,,,
-    ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "ARTICLE4001", "게시글이 없습니다."),
 
-    // Ror test
-    TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트"),
-
-    // FoodCategory Error
-    FOOD_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "FOOD_CATEGORY4001", "음식 카테고리가 없습니다."),
-
-    // Store Error
-
-    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_4001","가게가 없습니다."),
-
-    ITEM_NOTFOUND(HttpStatus.NOT_FOUND, "ITEM_4001", "아이템이 없습니다.");
+    // 휴대폰 인증 관련 에러
+    USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "PHONE4001", "휴대폰 인증이 필요합니다.");
 
 
     private final HttpStatus httpStatus;
