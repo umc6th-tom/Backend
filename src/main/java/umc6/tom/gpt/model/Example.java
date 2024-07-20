@@ -20,14 +20,9 @@ public class Example {
     private String problem;
 
     @Column(nullable = false, length = 1000)
-    private String answerProblem;
+    private String answer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answer_id")
-    private Answer answer;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(nullable = false, length = 40)
+    private String tag;
 
 }
