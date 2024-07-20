@@ -3,9 +3,7 @@ package umc6.tom.user.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -13,10 +11,7 @@ import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.PhoneHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
-import umc6.tom.security.JwtToken;
-import umc6.tom.security.KeyUtil;
-import umc6.tom.security.RedisUtil;
-import umc6.tom.security.config.JwtTokenProvider;
+import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.converter.ResignConverter;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
@@ -29,7 +24,6 @@ import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 
-import java.security.Key;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,7 +40,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisUtil redisUtil;
     private final ResignRepository resignRepository;
     private final MajorsRepository majorsRepository;
     private final PasswordEncoder passwordEncoder;
@@ -102,23 +95,11 @@ public class UserServiceImpl implements UserService {
             user.setStatus(UserStatus.ACTIVE);
         }
 
-        // userId + password 를 기반으로 Authentication 객체 생성
-        Long userId = user.getId();
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, password);
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        // 인증 정보 검증 - authenticate() 메서드를 통해 등록된 User 에 대한 검증
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        // RefreshToken 을 cookie 에 저장 - 작성해야함
 
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
-
-        String accessToken = jwtToken.getAccessToken();
-        String refreshToken = jwtToken.getRefreshToken();
-
-        // 키 생성
-        Key redisKey = KeyUtil.generateKey("RT:" + user.getId());
-
-        // RefreshToken 을 redis 에 저장
-        redisUtil.setDataExpire(redisKey, refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
 
         return UserConverter.signInRes(user, accessToken, refreshToken);
     }

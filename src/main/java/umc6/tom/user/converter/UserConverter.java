@@ -7,7 +7,10 @@ import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
+import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.Role;
+import umc6.tom.user.model.enums.SocialType;
+import umc6.tom.user.model.enums.UserStatus;
 
 @Slf4j
 @Component
@@ -23,8 +26,12 @@ public class UserConverter {
                 .account(request.getAccount())
                 .password(request.getPassword())
                 .phone(request.getPhone())
+                .agreement(Agreement.AGREE)
+                .socialType(SocialType.NON)
                 .majors(major)
                 .role(Role.USER)
+                .report(0)
+                .status(UserStatus.INACTIVE)
                 .build();
     }
 

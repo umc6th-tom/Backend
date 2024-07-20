@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import umc6.tom.security.JwtAuthenticationFilter;
+import umc6.tom.security.JwtTokenProvider;
 
 @Configuration
 @EnableWebSecurity

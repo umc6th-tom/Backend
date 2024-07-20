@@ -23,14 +23,16 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4003", "닉네임이 이미 존재합니다."),
     USER_ACCOUNT_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4004", "이미 가입된 아이디입니다."),
     USER_PASSWORD_NOT_EQUAL(HttpStatus.BAD_REQUEST, "USER4005", "비밀번호가 일치하지 않습니다."),
-
     USER_ALREADY_DELETED(HttpStatus.NOT_FOUND, "USER4006", "이미 삭제된 사용자입니다."),
 
     // 휴대폰 인증 관련 에러
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "PHONE4001", "휴대폰 인증이 필요합니다."),
 
     // 전공 관련 에러
-    MAJORS_NOR_FOUND(HttpStatus.NOT_FOUND, "MAJORS", "해당하는 전공이 없습니다.");
+    MAJORS_NOR_FOUND(HttpStatus.NOT_FOUND, "MAJORS4001", "해당하는 전공이 없습니다."),
+
+    // 토큰 관련 에러
+    JWT_AUTHORIZATION_FAILED(HttpStatus.UNAUTHORIZED, "JWT4001", "권한이 없습니다.");
 
 
     private final HttpStatus httpStatus;
