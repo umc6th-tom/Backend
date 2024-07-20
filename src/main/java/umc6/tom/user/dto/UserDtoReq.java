@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 public class UserDtoReq {
@@ -18,6 +19,7 @@ public class UserDtoReq {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class JoinDto {
 

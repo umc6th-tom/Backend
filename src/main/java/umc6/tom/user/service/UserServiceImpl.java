@@ -1,9 +1,12 @@
 package umc6.tom.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
@@ -39,12 +42,14 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisUtil redisUtil;
     private final ResignRepository resignRepository;
     private final MajorsRepository majorsRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     // 회원 가입
@@ -56,10 +61,16 @@ public class UserServiceImpl implements UserService {
         }   // 닉네임 중복 확인
         if (duplicatedAccount(request.getAccount())) {
             throw new UserHandler(ErrorStatus.USER_ACCOUNT_DUPLICATED);
-        }   // 아이디 중복 확인 - 에러 핸들러 작성
+        }   // 아이디 중복 확인
+        if (!request.getPassword().equals(request.getPasswordCheck())) {
+            throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
+        }
 
         Majors major = majorsRepository.findById(request.getMajor())
                 .orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
+
+        // 비밀번호 암호화 후 저장
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
         User user = UserConverter.toUser(request, major);
 
         userRepository.save(user);
@@ -77,6 +88,11 @@ public class UserServiceImpl implements UserService {
                 .or(() -> userRepository.findByAccountAndStatus(account, UserStatus.INACTIVE))
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        // 비밀번호 불일치
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
+        }
+
         if (user.getStatus() == UserStatus.INACTIVE) {
             throw new PhoneHandler(ErrorStatus.USER_NOT_AUTHORIZED);
         }
@@ -86,8 +102,7 @@ public class UserServiceImpl implements UserService {
             user.setStatus(UserStatus.ACTIVE);
         }
 
-        // userId + password 기반 토큰 생성
-        // 유저 id + password 를 기반으로 Authentication 객체 생성
+        // userId + password 를 기반으로 Authentication 객체 생성
         Long userId = user.getId();
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, password);
 
@@ -102,6 +117,7 @@ public class UserServiceImpl implements UserService {
         // 키 생성
         Key redisKey = KeyUtil.generateKey("RT:" + user.getId());
 
+        // RefreshToken 을 redis 에 저장
         redisUtil.setDataExpire(redisKey, refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
 
         return UserConverter.signInRes(user, accessToken, refreshToken);
@@ -126,7 +142,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         // 기존 비밀번호와 일치하는지 확인
-        if (!user.getPassword().equals(request.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
         }
 
@@ -159,7 +175,9 @@ public class UserServiceImpl implements UserService {
                 users.add(resign.getUser());
             }
             resignRepository.deleteAll(resigns);
+            log.info("Withdraw User's Resign deleted.");
             userRepository.deleteAll(users);
+            log.info("Withdraw User deleted.");
         }
     }
 
