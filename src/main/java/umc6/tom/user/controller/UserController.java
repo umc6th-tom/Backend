@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
-import umc6.tom.security.SecurityUtil;
-import umc6.tom.security.config.JwtTokenProvider;
+import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
@@ -69,15 +68,12 @@ public class UserController {
      * 24.07.19 작성자 : 류기현
      * 회원 탈퇴 : userId(토큰) + 비밀번호
      */
-    @PatchMapping("/{user_id}")
-    public ApiResponse<SuccessStatus> withdraw(@RequestBody UserDtoReq.WithDrawDto request, @PathVariable String user_id) {
+    @PatchMapping("/widthdraw")
+    public ApiResponse<SuccessStatus> withdraw(@RequestBody UserDtoReq.WithDrawDto request) {
 
-        userService.withDraw(1L, request);
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.withDraw(userId, request);
         return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
-    }
-
-    @PostMapping("/test")
-    public String test() {
-        return SecurityUtil.getCurrentUserName();
     }
 }

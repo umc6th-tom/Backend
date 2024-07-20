@@ -68,9 +68,6 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "majorId", nullable = false)
     private Majors majors;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Resign resign;
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AlarmSet alarmSet;
 

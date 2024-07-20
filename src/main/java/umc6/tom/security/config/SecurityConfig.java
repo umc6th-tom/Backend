@@ -3,14 +3,22 @@ package umc6.tom.security.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import umc6.tom.security.ExceptionHandlerFilter;
 import umc6.tom.security.JwtAuthenticationFilter;
+import umc6.tom.security.JwtTokenProvider;
+import umc6.tom.security.handler.CustomAccessDeniedHandler;
+import umc6.tom.security.handler.CustomAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -33,10 +41,30 @@ public class SecurityConfig {
                         .anyRequest().permitAll()   // 임시로 다 열어놓음
                 )
                 // JWT 인증 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+    JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtTokenProvider);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+    @Bean // 추가 빈으로 등록
+    public AccessDeniedHandler accessDeniedHandler(){
+        return new CustomAccessDeniedHandler();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint(){return new CustomAuthenticationEntryPoint();
+    }
+
+    @Bean
+    public ExceptionHandlerFilter exceptionHandlerFilter(){return new ExceptionHandlerFilter();}
 
     @Bean
     public PasswordEncoder passwordEncoder() {

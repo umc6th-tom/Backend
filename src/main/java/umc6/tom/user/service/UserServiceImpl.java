@@ -1,11 +1,10 @@
 package umc6.tom.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -13,10 +12,7 @@ import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.PhoneHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
-import umc6.tom.security.JwtToken;
-import umc6.tom.security.KeyUtil;
-import umc6.tom.security.RedisUtil;
-import umc6.tom.security.config.JwtTokenProvider;
+import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.converter.ResignConverter;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
@@ -29,7 +25,6 @@ import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 
-import java.security.Key;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -40,13 +35,13 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisUtil redisUtil;
     private final ResignRepository resignRepository;
     private final MajorsRepository majorsRepository;
     private final PasswordEncoder passwordEncoder;
@@ -84,41 +79,35 @@ public class UserServiceImpl implements UserService {
         String account = request.getAccount();
         String password = request.getPassword();
 
-        User user = userRepository.findByAccountAndStatus(account, UserStatus.ACTIVE)
-                .or(() -> userRepository.findByAccountAndStatus(account, UserStatus.INACTIVE))
+        List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW);
+
+        User user = userRepository.findByAccountAndStatusIn(account, statuses)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        log.info("로그인 유저 : {} {}", user.getUsername(), user.getStatus());
 
         // 비밀번호 불일치
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
         }
+        log.info("비밀번호 검증 통과 user : {}", user.getUsername());
 
         if (user.getStatus() == UserStatus.INACTIVE) {
             throw new PhoneHandler(ErrorStatus.USER_NOT_AUTHORIZED);
         }
 
+        log.info("탈퇴 유저 확인");
         // 탈퇴된 유저는 기간내 로그인 할 시 WITHDRAW to ACTIVE, 로그인
         if (user.getStatus() == UserStatus.WITHDRAW) {
+            resignRepository.deleteByUser(user);
             user.setStatus(UserStatus.ACTIVE);
+            log.info("탈퇴한 유저 {} 재가입", user.getId());
         }
+        log.info("탈퇴 유저 확인완료");
 
-        // userId + password 를 기반으로 Authentication 객체 생성
-        Long userId = user.getId();
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, password);
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        // 인증 정보 검증 - authenticate() 메서드를 통해 등록된 User 에 대한 검증
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication);
-
-        String accessToken = jwtToken.getAccessToken();
-        String refreshToken = jwtToken.getRefreshToken();
-
-        // 키 생성
-        Key redisKey = KeyUtil.generateKey("RT:" + user.getId());
-
-        // RefreshToken 을 redis 에 저장
-        redisUtil.setDataExpire(redisKey, refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
+        // RefreshToken 을 cookie 에 저장 - 작성해야함
 
         return UserConverter.signInRes(user, accessToken, refreshToken);
     }
@@ -144,6 +133,11 @@ public class UserServiceImpl implements UserService {
         // 기존 비밀번호와 일치하는지 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
+        }
+
+        // 기존 UserStatus.WITHDRAW, resign 존재시
+        if (user.getStatus() == UserStatus.WITHDRAW || resignRepository.findByUser(user).isPresent()) {
+            throw new UserHandler(ErrorStatus.USER_ALREADY_WITHDRAW);
         }
 
         // 회원 탈퇴시 탈퇴 정보 저장
@@ -181,6 +175,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // 밀리초를 LocalDateTime 으로 변환하는 메서드
     @Override
     public LocalDateTime convertToLocalDateTime(long timestampMillis) {
 
