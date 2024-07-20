@@ -12,12 +12,15 @@ import umc6.tom.security.JwtAuthenticationFilter;
 import java.io.IOException;
 
 @Slf4j
-public class TokenHandler implements AccessDeniedHandler {
+
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.info("[Access Denied] {}", request.getRequestURI());
+        log.error("[ACCESS DENIED]");
 
-        JwtAuthenticationFilter.setErrorResponse(response, ErrorStatus.JWT_AUTHORIZATION_FAILED);
+        JwtAuthenticationFilter.setErrorResponse(response, ErrorStatus.JWT_AUTHORIZATION_FAILED); //권한이 없음.
+        return;
     }
 }

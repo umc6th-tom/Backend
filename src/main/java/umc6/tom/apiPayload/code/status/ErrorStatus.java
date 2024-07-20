@@ -24,6 +24,7 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_ACCOUNT_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4004", "이미 가입된 아이디입니다."),
     USER_PASSWORD_NOT_EQUAL(HttpStatus.BAD_REQUEST, "USER4005", "비밀번호가 일치하지 않습니다."),
     USER_ALREADY_DELETED(HttpStatus.NOT_FOUND, "USER4006", "이미 삭제된 사용자입니다."),
+    USER_ALREADY_WITHDRAW(HttpStatus.BAD_REQUEST, "USER4007", "이미 탈퇴 요청한 사용자입니다."),
 
     // 휴대폰 인증 관련 에러
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "PHONE4001", "휴대폰 인증이 필요합니다."),
@@ -32,7 +33,10 @@ public enum ErrorStatus implements BaseErrorCode {
     MAJORS_NOR_FOUND(HttpStatus.NOT_FOUND, "MAJORS4001", "해당하는 전공이 없습니다."),
 
     // 토큰 관련 에러
-    JWT_AUTHORIZATION_FAILED(HttpStatus.UNAUTHORIZED, "JWT4001", "권한이 없습니다.");
+    JWT_AUTHORIZATION_FAILED(HttpStatus.UNAUTHORIZED, "JWT4001", "권한이 없습니다."),
+    JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT4002", "다시 로그인 해주세요."),
+    JWT_EMPTY(HttpStatus.UNAUTHORIZED, "JWT4003", "JWT 토큰을 넣어주세요."),
+    JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT4004", "만료된 토큰입니다.");
 
 
     private final HttpStatus httpStatus;

@@ -1,5 +1,6 @@
 package umc6.tom.user.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -77,29 +79,35 @@ public class UserServiceImpl implements UserService {
         String account = request.getAccount();
         String password = request.getPassword();
 
-        User user = userRepository.findByAccountAndStatus(account, UserStatus.ACTIVE)
-                .or(() -> userRepository.findByAccountAndStatus(account, UserStatus.INACTIVE))
+        List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW);
+
+        User user = userRepository.findByAccountAndStatusIn(account, statuses)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        log.info("로그인 유저 : {} {}", user.getUsername(), user.getStatus());
 
         // 비밀번호 불일치
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
         }
+        log.info("비밀번호 검증 통과 user : {}", user.getUsername());
 
         if (user.getStatus() == UserStatus.INACTIVE) {
             throw new PhoneHandler(ErrorStatus.USER_NOT_AUTHORIZED);
         }
 
+        log.info("탈퇴 유저 확인");
         // 탈퇴된 유저는 기간내 로그인 할 시 WITHDRAW to ACTIVE, 로그인
         if (user.getStatus() == UserStatus.WITHDRAW) {
+            resignRepository.deleteByUser(user);
             user.setStatus(UserStatus.ACTIVE);
+            log.info("탈퇴한 유저 {} 재가입", user.getId());
         }
+        log.info("탈퇴 유저 확인완료");
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
         // RefreshToken 을 cookie 에 저장 - 작성해야함
-
 
         return UserConverter.signInRes(user, accessToken, refreshToken);
     }
@@ -125,6 +133,11 @@ public class UserServiceImpl implements UserService {
         // 기존 비밀번호와 일치하는지 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
+        }
+
+        // 기존 UserStatus.WITHDRAW, resign 존재시
+        if (user.getStatus() == UserStatus.WITHDRAW || resignRepository.findByUser(user).isPresent()) {
+            throw new UserHandler(ErrorStatus.USER_ALREADY_WITHDRAW);
         }
 
         // 회원 탈퇴시 탈퇴 정보 저장
@@ -162,6 +175,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // 밀리초를 LocalDateTime 으로 변환하는 메서드
     @Override
     public LocalDateTime convertToLocalDateTime(long timestampMillis) {
 

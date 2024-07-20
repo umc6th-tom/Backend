@@ -68,7 +68,7 @@ public class UserController {
      * 24.07.19 작성자 : 류기현
      * 회원 탈퇴 : userId(토큰) + 비밀번호
      */
-    @PatchMapping("/{user_id}")
+    @PatchMapping("/widthdraw")
     public ApiResponse<SuccessStatus> withdraw(@RequestBody UserDtoReq.WithDrawDto request) {
 
         Long userId = jwtTokenProvider.getUserIdFromToken();

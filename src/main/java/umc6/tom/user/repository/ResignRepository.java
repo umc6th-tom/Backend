@@ -13,4 +13,6 @@ public interface ResignRepository extends JpaRepository<Resign, Long> {
     Optional<Resign> findByUser(User user);
 
     List<Resign> findByTimerBefore(LocalDateTime timer);
+
+    void deleteByUser(User user);
 }
