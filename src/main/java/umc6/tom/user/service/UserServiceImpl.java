@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -25,7 +24,6 @@ import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -41,7 +39,6 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     private final UserRepository userRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final ResignRepository resignRepository;
     private final MajorsRepository majorsRepository;
@@ -59,7 +56,11 @@ public class UserServiceImpl implements UserService {
             throw new UserHandler(ErrorStatus.USER_ACCOUNT_DUPLICATED);
         }   // 아이디 중복 확인
         if (!request.getPassword().equals(request.getPasswordCheck())) {
-            throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
+            throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCHED);
+        }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            log.info("이미 사용중인 휴대폰 번호 등록");
+            throw new UserHandler(ErrorStatus.USER_PHONE_IS_USED);
         }
 
         Majors major = majorsRepository.findById(request.getMajor())
@@ -75,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     // 로그인
     @Override
-    public UserDtoRes.signInDto signIn(UserDtoReq.SignInDto request) {
+    public UserDtoRes.SignInDto signIn(UserDtoReq.SignInDto request) {
 
         String account = request.getAccount();
         String password = request.getPassword();
@@ -94,6 +95,10 @@ public class UserServiceImpl implements UserService {
 
         if (user.getStatus() == UserStatus.INACTIVE) {
             throw new PhoneHandler(ErrorStatus.USER_NOT_AUTHORIZED);
+        }
+
+        if (userRepository.findByPhone(user.getPhone()).isPresent()) {
+            log.info("중복된 사용자입니다.");
         }
 
         log.info("탈퇴 유저 확인");
@@ -191,5 +196,120 @@ public class UserServiceImpl implements UserService {
         long now = new Date().getTime();
         Instant instant = Instant.ofEpochMilli(now + timestampMillis);
         return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());  // Instant 와 ZoneId를 사용하여 LocalDateTime 객체 생성
+    }
+
+    // 아이디 찾기
+    @Override
+    public UserDtoRes.FindAccountDto findAccount(UserDtoReq.FindAccountDto request) {
+        User user = userRepository.findByPhone(request.getPhone())
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        return UserConverter.findAccountRes(user);
+    }
+
+    // 비밀번호 찾기
+    @Override
+    public UserDtoRes.FindPasswordDto findPassword(UserDtoReq.FindPasswordDto request) {
+        User user = userRepository.findByPhone(request.getPhone())
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (!user.getAccount().equals(request.getAccount())) {
+            throw new UserHandler(ErrorStatus.USER_ACCOUNT_NOT_MATCHED);
+        }
+        if (!user.getName().equals(request.getName())) {
+            throw new UserHandler(ErrorStatus.USER_NAME_NOT_MATCHED);
+        }
+
+        return UserConverter.findPasswordRes(user);
+    }
+
+    // 비밀번호 찾기 후 재설정
+    @Override
+    public void findRestorePassword(UserDtoReq.FindRestorePasswordDto request) {
+        User user = userRepository.findById(request.getId())
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (!request.getPassword().equals(request.getPasswordCheck())) {
+            throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCHED);
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+    }
+
+    // 아이디 재설정
+    @Override
+    public void restoreAccount(Long userId, UserDtoReq.RestoreAccountDto request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (user.getAccount().equals(request.getAccount())) {   // 본인이 사용중인 아이디 확인
+            throw new UserHandler(ErrorStatus.USER_ACCOUNT_IS_YOURS);
+        } else if (duplicatedAccount(request.getAccount())) {   // 아이디 중복 확인
+            throw new UserHandler(ErrorStatus.USER_ACCOUNT_DUPLICATED);
+        }
+        user.setAccount(request.getAccount());
+    }
+
+    // 비밀번호 재설정
+    @Override
+    public void restorePassword(Long userId, UserDtoReq.RestorePasswordDto request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (!passwordEncoder.matches(user.getPassword(), request.getUsedPassword())) {
+            throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
+        }
+
+        if (!request.getPassword().equals(request.getPasswordCheck())) {
+            throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCHED);
+        }
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+    }
+
+    // 닉네임 재설정
+    @Override
+    public void restoreNickName(Long userId, UserDtoReq.RestoreNickNameDto request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (user.getNickName().equals(request.getNickName())) {
+            throw new UserHandler(ErrorStatus.USER_NICKNAME_IS_YOURS);
+        }
+
+        if (duplicatedNickName(request.getNickName())) {
+            throw new UserHandler(ErrorStatus.USER_NICKNAME_DUPLICATED);
+        }
+        user.setNickName(request.getNickName());
+    }
+
+    // 휴대폰 번호 재설정
+    @Override
+    public void restorePhone(Long userId, UserDtoReq.RestorePhoneDto request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (!user.getPhone().equals(request.getPhone())) {
+            throw new UserHandler(ErrorStatus.USER_PHONE_IS_YOURS);
+        }
+        if (userRepository.findByPhone(request.getPhone()).isPresent()) {
+            log.info("이미 사용중인 휴대폰 번호 등록");
+            throw new UserHandler(ErrorStatus.USER_PHONE_IS_USED);
+        }
+    }
+
+    // 전공 재설정
+    @Override
+    public void restoreMajor(Long userId, UserDtoReq.RestoreMajorDto request) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        Majors majors = majorsRepository.findById(request.getMajorId())
+                        .orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
+
+        user.setMajors(majors);
     }
 }

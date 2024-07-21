@@ -5,13 +5,12 @@ import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface UserService {
 
     User join(UserDtoReq.JoinDto request);
 
-    UserDtoRes.signInDto signIn(UserDtoReq.SignInDto request);
+    UserDtoRes.SignInDto signIn(UserDtoReq.SignInDto request);
 
     boolean duplicatedNickName(String nickName);
 
@@ -24,4 +23,20 @@ public interface UserService {
     void logout(String accessToken);
 
     LocalDateTime convertToLocalDateTime(long timestampMillis);
+
+    UserDtoRes.FindAccountDto findAccount(UserDtoReq.FindAccountDto request);
+
+    UserDtoRes.FindPasswordDto findPassword(UserDtoReq.FindPasswordDto request);
+
+    void findRestorePassword(UserDtoReq.FindRestorePasswordDto request);
+
+    void restoreAccount(Long userId, UserDtoReq.RestoreAccountDto request);
+
+    void restorePassword(Long userId, UserDtoReq.RestorePasswordDto request);
+
+    void restoreNickName(Long userId, UserDtoReq.RestoreNickNameDto request);
+
+    void restorePhone(Long userId, UserDtoReq.RestorePhoneDto request);
+
+    void restoreMajor(Long userId, UserDtoReq.RestoreMajorDto request);
 }
