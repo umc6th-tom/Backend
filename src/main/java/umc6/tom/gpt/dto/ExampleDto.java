@@ -7,6 +7,7 @@ import lombok.*;
 @ToString //필드값학인
 @NoArgsConstructor //기본생성자
 @AllArgsConstructor
+@Builder
 public class ExampleDto {
 
     private Long id;

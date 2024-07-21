@@ -42,8 +42,4 @@ public class NoticeController {
         return ApiResponse.onSuccess(noticeService.findNotice(id));
     }
 
-
-
-
-
 }
