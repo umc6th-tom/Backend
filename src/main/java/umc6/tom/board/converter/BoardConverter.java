@@ -8,7 +8,9 @@ import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.PinCommentRepositoryBoard;
+import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,6 +61,20 @@ public class BoardConverter {
                 .totalElements(boardList.getTotalElements())
                 .listSize(boardListViewDtoList.size())
                 .boardList(boardListViewDtoList)
+                .build();
+    }
+
+    public static BoardLike toBoardLike(User user, Board board) {
+        return BoardLike.builder()
+                .board(board)
+                .user(user)
+                .build();
+    }
+
+    public static BoardResponseDto.BoardLikeAddDto toAddBoardLike(BoardLike boardLike){
+        return BoardResponseDto.BoardLikeAddDto.builder()
+                .boardId(boardLike.getBoard().getId())
+                .userId(boardLike.getUser().getId())
                 .build();
     }
 

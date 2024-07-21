@@ -16,8 +16,5 @@ public class BoardRequestDto {
         @NotBlank
         Long major;
         //사진 구현 필요
-
-
-
     }
 }

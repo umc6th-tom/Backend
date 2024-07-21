@@ -47,5 +47,13 @@ public class BoardResponseDto {
         Boolean isLast;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardLikeAddDto{
+        Long boardId;
+        Long userId;
+    }
 
 }
