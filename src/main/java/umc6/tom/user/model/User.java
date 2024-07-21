@@ -2,6 +2,8 @@ package umc6.tom.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ import java.util.Collections;
 @Entity
 @Getter
 @Setter
+@DynamicUpdate
+@DynamicInsert
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -57,7 +61,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "VARCHAR(15) DEFAULT 'USER'", length = 15)
     private Role role;
 
-    @Column(length = 5)
+    @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
     private Integer report;
 
     @Enumerated(EnumType.STRING)

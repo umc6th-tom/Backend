@@ -26,12 +26,7 @@ public class UserConverter {
                 .account(request.getAccount())
                 .password(request.getPassword())
                 .phone(request.getPhone())
-                .agreement(Agreement.AGREE)
-                .socialType(SocialType.NON)
                 .majors(major)
-                .role(Role.USER)
-                .report(0)
-                .status(UserStatus.INACTIVE)
                 .build();
     }
 
