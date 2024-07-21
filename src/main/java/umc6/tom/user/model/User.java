@@ -32,10 +32,10 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 20, nullable = false)  // 수정된 부분
     private String name;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 20, nullable = false, unique = true)
     private String nickName;
 
-    @Column(length = 20, nullable = false)
+    @Column(length = 20, nullable = false, unique = true)
     private String account;
 
     @Column(length = 20, nullable = false)  // 수정된 부분

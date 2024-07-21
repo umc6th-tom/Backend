@@ -36,13 +36,32 @@ public class UserConverter {
                 .build();
     }
 
-    public static UserDtoRes.signInDto signInRes(User user, String accessToken, String refreshToken) {
+    // 로그인 응답
+    public static UserDtoRes.SignInDto signInRes(User user, String accessToken, String refreshToken) {
 
-        return UserDtoRes.signInDto.builder()
+        return UserDtoRes.SignInDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .createdAt(user.getCreatedAt())
                 .build();
     }
+
+    // 아이디 찾기 응답
+    public static UserDtoRes.FindAccountDto findAccountRes(User user) {
+
+        return UserDtoRes.FindAccountDto.builder()
+                .account(user.getAccount())
+                .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    // 비밀번호 찾기 응답
+    public static UserDtoRes.FindPasswordDto findPasswordRes(User user) {
+
+        return UserDtoRes.FindPasswordDto.builder()
+                .userId(user.getId())
+                .build();
+    }
+
 }

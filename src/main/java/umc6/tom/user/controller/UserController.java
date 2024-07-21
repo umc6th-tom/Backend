@@ -59,7 +59,7 @@ public class UserController {
      * 로그인
      */
     @PostMapping("/login")
-    public ApiResponse<UserDtoRes.signInDto> login(@RequestBody UserDtoReq.SignInDto request) {
+    public ApiResponse<UserDtoRes.SignInDto> login(@RequestBody UserDtoReq.SignInDto request) {
 
         return ApiResponse.onSuccess(userService.signIn(request));
     }
@@ -83,8 +83,91 @@ public class UserController {
      */
     @PostMapping("/logout")
     public ApiResponse<SuccessStatus> logout(@RequestHeader("Authorization") String accessToken) {
+
         userService.logout(accessToken);
         return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
     }
 
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 아이디 찾기
+     */
+    @GetMapping("/find-id")
+    public ApiResponse<UserDtoRes.FindAccountDto> findAccount(@RequestBody UserDtoReq.FindAccountDto request) {
+
+        return ApiResponse.onSuccess(userService.findAccount(request));
+    }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 비밀번호 찾기
+     */
+    @GetMapping("/find-pwd")
+    public ApiResponse<UserDtoRes.FindPasswordDto> findPassword(@RequestBody UserDtoReq.FindPasswordDto request) {
+
+        return ApiResponse.onSuccess(userService.findPassword(request));
+    }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 비밀번호 찾기 후 재설정
+     */
+    @PatchMapping("/find-pwd-restore")
+    public ApiResponse<SuccessStatus> restorePassword(@RequestBody UserDtoReq.FindRestorePasswordDto request) {
+
+        userService.findRestorePassword(request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 아이디 재설정
+     */
+    @PatchMapping("/id-restore")
+    public ApiResponse<SuccessStatus> restoreAccount(@RequestBody UserDtoReq.RestoreAccountDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.restoreAccount(userId, request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 비밀번호 재설정
+     */
+    @PatchMapping("/pwd-restore")
+    public ApiResponse<SuccessStatus> restorePassword(@RequestBody UserDtoReq.RestorePasswordDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.restorePassword(userId, request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 닉네임 재설정
+     */
+    @PatchMapping("/nickname-restore")
+    public ApiResponse<SuccessStatus> restoreNickName(@RequestBody UserDtoReq.RestoreNickNameDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.restoreNickName(userId, request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 휴대폰 번호 재설정
+     */
+    @PatchMapping("/phone-restore")
+    public ApiResponse<SuccessStatus> restorePhone(@RequestBody UserDtoReq.RestorePhoneDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.restorePhone(userId, request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
 }
