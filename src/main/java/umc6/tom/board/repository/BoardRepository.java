@@ -10,4 +10,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByMajorsOrderByCreatedAtDesc(Majors majors, PageRequest pageRequest);
 
+    Page<Board> findAllByOrderByCreatedAtDesc(PageRequest pageRequest);
+
 }
