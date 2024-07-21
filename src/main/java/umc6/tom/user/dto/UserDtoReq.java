@@ -53,4 +53,52 @@ public class UserDtoReq {
         @NotBlank(message = "탈퇴를 위해 비밀번호는 필수 입력 항목입니다.")
         private String password;
     }
+
+    @Getter
+    public static class FindAccountDto {
+
+        @Size(message = "'-' 구분없이 입력", min = 11, max = 11)
+        private String phone;
+    }
+
+    @Getter
+    public static class FindPasswordDto {
+        private String account;
+        private String name;
+        private String phone;
+    }
+
+    @Getter
+    public static class FindRestorePasswordDto {
+        private Long id;
+        private String password;
+        private String passwordCheck;
+    }
+
+    @Getter
+    public static class RestoreAccountDto {
+        private String account;
+    }
+
+    @Getter
+    public static class RestorePasswordDto {
+        private String usedPassword;
+        private String password;
+        private String passwordCheck;
+    }
+
+    @Getter
+    public static class RestoreNickNameDto {
+        private String nickName;
+    }
+
+    @Getter
+    public static class RestorePhoneDto {
+        private String phone;
+    }
+
+    @Getter
+    public static class RestoreMajorDto {
+        private Long majorId;
+    }
 }

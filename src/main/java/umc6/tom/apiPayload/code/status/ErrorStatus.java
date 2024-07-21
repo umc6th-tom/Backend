@@ -21,12 +21,22 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "사용자가 없습니다."),
     USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "USER4002", "사용자는 활성 상태가 아닙니다."),
     USER_NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4003", "닉네임이 이미 존재합니다."),
-    USER_ACCOUNT_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4004", "이미 가입된 아이디입니다."),
-    USER_PASSWORD_NOT_EQUAL(HttpStatus.BAD_REQUEST, "USER4005", "비밀번호가 일치하지 않습니다."),
+    USER_ACCOUNT_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4004", "이미 등록된 아이디입니다."),
+    USER_PASSWORD_NOT_EQUAL(HttpStatus.BAD_REQUEST, "USER4005", "사용자의 비밀번호와 일치하지 않습니다."),
     USER_ALREADY_DELETED(HttpStatus.NOT_FOUND, "USER4006", "이미 삭제된 사용자입니다."),
     USER_ALREADY_WITHDRAW(HttpStatus.BAD_REQUEST, "USER4007", "이미 탈퇴 요청한 사용자입니다."),
+    USER_ACCOUNT_NOT_MATCHED(HttpStatus.BAD_REQUEST,"USER4008", "전화번호로 찾은 계정의 아이디와 일치하지 않습니다."),
+    USER_NAME_NOT_MATCHED(HttpStatus.BAD_REQUEST, "USER4009", "전화번호로 찾은 계정의 사용자 이름과 일치하지 않습니다."),
+    PASSWORD_NOT_MATCHED(HttpStatus.BAD_REQUEST, "USER4010", "비밀번호 비밀번호 확인이 맞지 않습니다."),
+    USER_ACCOUNT_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4011", "본인이 사용중인 아이디입니다."),
+    USER_NICKNAME_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4012", "본인이 사용중인 닉네임입니다."),
+    USER_PHONE_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4013", "본인이 사용중인 휴대폰번호입니다."),
+    USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
 
-    // 휴대폰 인증 관련 에러
+
+
+
+    // 인증 관련 에러
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "PHONE4001", "휴대폰 인증이 필요합니다."),
 
     // 전공 관련 에러

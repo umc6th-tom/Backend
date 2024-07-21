@@ -19,10 +19,25 @@ public class UserDtoRes {
     @Getter
     @Setter
     @Builder
-    public static class signInDto {
+    public static class SignInDto {
         private Long userId;
         private String accessToken;
         private String refreshToken;
         private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class FindAccountDto {
+        private String account;
+        private LocalDateTime createdAt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class FindPasswordDto {
+        private Long userId;
     }
 }
