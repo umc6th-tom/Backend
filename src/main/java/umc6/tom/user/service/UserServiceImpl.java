@@ -1,9 +1,11 @@
 package umc6.tom.user.service;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -114,7 +116,8 @@ public class UserServiceImpl implements UserService {
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
         // RefreshToken 을 cookie 에 저장 - 작성해야함
-
+        /*Cookie cookie = new Cookie("refresh_token", accessToken);
+        cookie.setPath("/");*/
         return UserConverter.signInRes(user, accessToken, refreshToken);
     }
 

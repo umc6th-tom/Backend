@@ -38,7 +38,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 20, nullable = false, unique = true)
     private String account;
 
-    @Column(length = 20, nullable = false)  // 수정된 부분
+    @Column(nullable = false)  // 수정된 부분
     private String password;
 
     @Column(length = 11, nullable = false)
