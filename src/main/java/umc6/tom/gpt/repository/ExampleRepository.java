@@ -6,6 +6,9 @@ import umc6.tom.gpt.dto.ExampleDto;
 import umc6.tom.gpt.model.Example;
 import umc6.tom.notice.model.Notice;
 
+import java.util.Optional;
+
 @Repository
 public interface ExampleRepository extends JpaRepository<Example, Long> {
+    void deleteById(Long id);
 }
