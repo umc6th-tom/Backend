@@ -76,4 +76,15 @@ public class UserController {
         userService.withDraw(userId, request);
         return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
     }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public ApiResponse<SuccessStatus> logout(@RequestHeader("Authorization") String accessToken) {
+        userService.logout(accessToken);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
+
 }

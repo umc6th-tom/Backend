@@ -25,6 +25,7 @@ import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -173,6 +174,14 @@ public class UserServiceImpl implements UserService {
             userRepository.deleteAll(users);
             log.info("Withdraw User deleted.");
         }
+    }
+
+    @Override
+    public void logout(String accessToken) {
+        Long userId = jwtTokenProvider.getUserIdInToken(accessToken);
+
+        // Cookie 에 있는 RefreshToken 의 데이터를 삭제
+
     }
 
     // 밀리초를 LocalDateTime 으로 변환하는 메서드
