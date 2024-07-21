@@ -7,10 +7,6 @@ import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
-import umc6.tom.user.model.enums.Agreement;
-import umc6.tom.user.model.enums.Role;
-import umc6.tom.user.model.enums.SocialType;
-import umc6.tom.user.model.enums.UserStatus;
 
 @Slf4j
 @Component

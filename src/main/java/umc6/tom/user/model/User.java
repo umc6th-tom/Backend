@@ -29,16 +29,16 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20) // nullable = false 추가
+    @Column(length = 20, nullable = false)  // 수정된 부분
     private String name;
 
     @Column(length = 20, nullable = false)
     private String nickName;
 
-    @Column(length = 20, nullable = false) // nullable = false 추가
+    @Column(length = 20, nullable = false)
     private String account;
 
-    @Column(nullable = false) // nullable = false 추가
+    @Column(length = 20, nullable = false)  // 수정된 부분
     private String password;
 
     @Column(length = 11, nullable = false)
@@ -55,7 +55,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'NON'")
     private SocialType socialType;
 
-    private String description; // 디폴트 길이 255
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(15) DEFAULT 'USER'", length = 15)
@@ -69,7 +69,7 @@ public class User extends BaseEntity implements UserDetails {
     private UserStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "majorId", nullable = false)
+    @JoinColumn(name = "majorsId", nullable = false)
     private Majors majors;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
