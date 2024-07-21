@@ -50,8 +50,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 게시판 관련 에러
     BoardLike_DUPLICATED(HttpStatus.UNAUTHORIZED, "BOARD4001", "이미 좋아요 되었습니다."),
-    BoardLike_NOT_FOUND(HttpStatus.UNAUTHORIZED, "BOARD4002", "이미 좋아요가 취소되었습니다. ");
+    BoardLike_NOT_FOUND(HttpStatus.UNAUTHORIZED, "BOARD4002", "이미 좋아요가 취소되었습니다. "),
 
+    // 예제 관련 에러
+    EXAMPLE_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "EXAMPLE4002", "예제 삭제에 실패했습니다."),
+    EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, "EXAMPLE4001" , "예제를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

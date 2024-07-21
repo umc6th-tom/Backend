@@ -1,13 +1,9 @@
 package umc6.tom.gpt.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
-import umc6.tom.gpt.dto.AnswerDto;
 import umc6.tom.gpt.dto.ExampleDto;
 import umc6.tom.gpt.service.FavoriteService;
 import umc6.tom.gpt.service.MajorService;
@@ -55,15 +51,14 @@ public class MajorController {
 //        return
 //    }
 
-//    //즐겨찾기 제거 후 조회
-//    @DeleteMapping("/{id}")
-//    public ApiResponse<ExampleDto> deleteFavorite(@PathVariable long id) {
-//        Long userId = jwtTokenProvider.getUserIdFromToken();
-//        favoriteService.deleteById(id);
-//        favoriteService.findAllFavorite(userId);
-//
-//        return ApiResponse.onSuccess();
-//    }
+    //즐겨찾기 제거 후 조회
+    //성공시 200 반환
+    @DeleteMapping("/{id}")
+    public ApiResponse<Integer> deleteFavorite(@PathVariable long id) {
+
+            return favoriteService.deleteById(id);
+
+    }
 
 
 }
