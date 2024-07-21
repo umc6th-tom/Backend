@@ -170,4 +170,17 @@ public class UserController {
         userService.restorePhone(userId, request);
         return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
     }
+
+    /**
+     * 24.07.21 작성자 : 류기현
+     * 전공 재설정
+     */
+    @PatchMapping("/major-restore")
+    public ApiResponse<SuccessStatus> restoreMajor(@RequestBody UserDtoReq.RestoreMajorDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.restoreMajor(userId, request);
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
 }
