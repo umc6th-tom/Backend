@@ -2,6 +2,7 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import umc6.tom.board.Comment.model.Pin;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -32,6 +34,7 @@ public class Board extends BaseEntity {
     private LocalDateTime popularAt;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
     private Status status;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)

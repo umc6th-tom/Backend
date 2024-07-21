@@ -7,7 +7,6 @@ import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
-import umc6.tom.user.model.enums.Role;
 
 @Slf4j
 @Component
@@ -24,7 +23,6 @@ public class UserConverter {
                 .password(request.getPassword())
                 .phone(request.getPhone())
                 .majors(major)
-                .role(Role.USER)
                 .build();
     }
 

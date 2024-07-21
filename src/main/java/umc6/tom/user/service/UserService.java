@@ -21,5 +21,7 @@ public interface UserService {
 
     void deleteUser();
 
+    void logout(String accessToken);
+
     LocalDateTime convertToLocalDateTime(long timestampMillis);
 }

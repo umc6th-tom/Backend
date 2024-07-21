@@ -1,45 +1,50 @@
 package umc6.tom.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import umc6.tom.security.config.JwtTokenProvider;
+import umc6.tom.apiPayload.ApiResponse;
+import umc6.tom.apiPayload.code.status.ErrorStatus;
 
 import java.io.IOException;
 
+@Slf4j
 @RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        // 헤더에서 JWT 를 받아옵니다.
+        String token = jwtTokenProvider.resolveAccessToken();
 
-        // 1. Request Header에서 JWT 토큰 추출
-        String token = resolveToken((HttpServletRequest) request);
-
-        // 2. validToken으로 토큰 유효성 검사
+        // 유효한 토큰인지 확인.
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        chain.doFilter(request, response);
+        filterChain.doFilter(request, response);
     }
 
-    // Request Header에서 토큰 정보 추출
-    private String resolveToken(HttpServletRequest request) {
-/*        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;*/
+    public static void setErrorResponse(HttpServletResponse response, ErrorStatus errorCode) throws IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(errorCode.getHttpStatus().value());
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        return request.getHeader("Authorization");
+        ApiResponse<String> failureResponse = ApiResponse.onFailure(errorCode.getCode(),errorCode.getMessage(),null);
+        String s = objectMapper.writeValueAsString(failureResponse);
+
+        response.getWriter().write(s);
     }
 }

@@ -2,6 +2,8 @@ package umc6.tom.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +18,8 @@ import java.util.Collections;
 @Entity
 @Getter
 @Setter
+@DynamicUpdate
+@DynamicInsert
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -25,16 +29,16 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 20) // nullable = false 추가
+    @Column(length = 20, nullable = false)  // 수정된 부분
     private String name;
 
     @Column(length = 20, nullable = false)
     private String nickName;
 
-    @Column(length = 20, nullable = false) // nullable = false 추가
+    @Column(length = 20, nullable = false)
     private String account;
 
-    @Column(nullable = false) // nullable = false 추가
+    @Column(length = 20, nullable = false)  // 수정된 부분
     private String password;
 
     @Column(length = 11, nullable = false)
@@ -51,13 +55,13 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'NON'")
     private SocialType socialType;
 
-    private String description; // 디폴트 길이 255
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(15) DEFAULT 'USER'", length = 15)
     private Role role;
 
-    @Column(length = 5)
+    @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
     private Integer report;
 
     @Enumerated(EnumType.STRING)
@@ -65,11 +69,8 @@ public class User extends BaseEntity implements UserDetails {
     private UserStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "majorId", nullable = false)
+    @JoinColumn(name = "majorsId", nullable = false)
     private Majors majors;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Resign resign;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AlarmSet alarmSet;
