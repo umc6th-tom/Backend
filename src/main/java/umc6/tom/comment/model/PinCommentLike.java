@@ -1,8 +1,7 @@
-package umc6.tom.board.Comment.model;
+package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
 
 @Entity
@@ -10,7 +9,7 @@ import umc6.tom.user.model.User;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinLike {
+public class PinCommentLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +20,6 @@ public class PinLike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pin_id")
-    private Pin pin;
+    @JoinColumn(name = "pinComment_id")
+    private PinComment pinComment;
 }

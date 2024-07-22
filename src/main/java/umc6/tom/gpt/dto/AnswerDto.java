@@ -11,12 +11,12 @@ import java.util.Date;
 @AllArgsConstructor
 public class AnswerDto {
 
-    private int id;
+    private Long id;
     private String question;
     private String questionTag;
     private String content;
     private Date timer;
-    private int userId;
+    private Long userId;
 
 
 }

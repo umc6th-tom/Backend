@@ -1,9 +1,8 @@
 package umc6.tom.board.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import umc6.tom.board.Comment.model.Pin;
-import umc6.tom.board.Comment.model.PinComment;
-import umc6.tom.common.model.Majors;
+import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinComment;
 
 import java.util.List;
 

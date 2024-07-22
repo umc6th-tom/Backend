@@ -11,10 +11,10 @@ import java.util.Date;
 @AllArgsConstructor
 public class ExampleFavoriteDto {
 
-    private int id;
+    private Long id;
     private Date createdAt;
     private String exampleId;
-    private int userId;
+    private Long userId;
 
 
 }

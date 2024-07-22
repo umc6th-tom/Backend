@@ -52,6 +52,13 @@ public enum ErrorStatus implements BaseErrorCode {
     BoardLike_DUPLICATED(HttpStatus.UNAUTHORIZED, "BOARD4001", "이미 좋아요 되었습니다."),
     BoardLike_NOT_FOUND(HttpStatus.UNAUTHORIZED, "BOARD4002", "이미 좋아요가 취소되었습니다. "),
 
+    // 댓글 관련 에러
+    PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),
+    PIN_NOT_FOUND(HttpStatus.NOT_FOUND, "PIN4002", "댓글을 찾을 수 없습니다."),
+    PIN_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4003", "댓글을 삭제하는데 실패하였습니다."),
+
+
+
     // 예제 관련 에러
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "FAVORITE4001", "즐겨찾기 예제를 찾는것에 실패하였습니다."),
     FAVORITE_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "FAVORITE4003", "즐겨찾기 등록에 실패했습니다."),
