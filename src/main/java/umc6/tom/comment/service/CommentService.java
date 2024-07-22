@@ -13,10 +13,9 @@ import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.PinConverter;
 import umc6.tom.comment.converter.PinPictureConverter;
 import umc6.tom.comment.dto.PinDto;
-import umc6.tom.comment.dto.PinPictureDto;
 import umc6.tom.comment.dto.PinReqDto;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.model.PinComment;
 import umc6.tom.comment.model.PinPicture;
 import umc6.tom.comment.repository.PinCommentRepository;
 import umc6.tom.comment.repository.PinPictureRepository;
@@ -53,5 +52,14 @@ public class CommentService {
             throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
         }
         return ApiResponse.onSuccess(200);
+    }
+
+    //댓글 수정하기위해 줌
+    @Transactional
+    public ApiResponse getDetailPin(Long commentId) {
+        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+        PinResDto pinResDto = PinConverter.toPinDto(pin);
+
+        return ApiResponse.onSuccess(pinResDto);
     }
 }

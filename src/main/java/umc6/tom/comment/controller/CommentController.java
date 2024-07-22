@@ -28,4 +28,13 @@ public class CommentController {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return pinService.pinRegister(pinReqDto,boardId,userId);
     }
+
+    //댓글 조회
+    @GetMapping("/detail/{commentId}")
+    public ApiResponse detail(@PathVariable("commentId") Long commentId) {
+        return pinService.getDetailPin(commentId);
+    }
+
+
+
 }
