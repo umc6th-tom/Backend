@@ -1,22 +1,19 @@
 package umc6.tom.comment.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
 @Builder
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
-public class PinDto {
+public class PinResDto {
     private Long id;
     private Long userId;
     private Long boardId;
     private String comment;
-    private Date createTime;
-    private Date updateTime;
-
-
+    private List<String> pic;
 }
