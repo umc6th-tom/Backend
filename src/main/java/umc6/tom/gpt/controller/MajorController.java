@@ -46,18 +46,26 @@ public class MajorController {
     }
 
     //즐겨찾기 등록
-//    @PostMapping("/register")
-//    public ApiResponse<ExampleDto> registerNewMajor(@RequestBody ExampleDto exampleDto) {
-//        return
-//    }
+    @PostMapping("/{exampleId}/register")
+    public ApiResponse registerNewFavorite(@PathVariable("exampleId") long exampleId) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return favoriteService.save(userId, exampleId);
+    }
 
-    //즐겨찾기 제거 후 조회
+    //즐겨찾기 제거
+    //제거할 때 문제테이블에서도 같이 제거해주기
     //성공시 200 반환
     @DeleteMapping("/{id}")
     public ApiResponse<Integer> deleteFavorite(@PathVariable long id) {
 
             return favoriteService.deleteById(id);
+    }
 
+    //즐겨찾기에서 예제 보기 즐겨찾기 ID로 검색함 예제데이터 넘겨주기
+    @GetMapping("/{favoriteId}/favorite")
+    public ApiResponse<ExampleDto> getFavoriteById(@PathVariable("favoriteId") long id) {
+
+        return favoriteService.getFindById(id);
     }
 
 

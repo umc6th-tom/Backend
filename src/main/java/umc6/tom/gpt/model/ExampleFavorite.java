@@ -28,4 +28,12 @@ public class ExampleFavorite {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    public static ExampleFavorite createExampleFavorite(Example example, User user) {
+        ExampleFavorite exampleFavorite = new ExampleFavorite();
+        exampleFavorite.example = example;
+        exampleFavorite.user = user;
+        exampleFavorite.createdAt = LocalDateTime.now();
+        return exampleFavorite;
+    }
 }

@@ -64,9 +64,33 @@ public class FavoriteService {
             exampleRepository.deleteById(exampleId);
 
         } catch (Exception e) {
-            throw new MajorHandler(ErrorStatus.EXAMPLE_NOT_DELETE);
+            throw new MajorHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
         }
         return ApiResponse.onSuccess(200);
     }
 
+    //즐겨찾기 등록
+    public ApiResponse<Integer> save(Long userId, long exampleId) {
+        try {
+            User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+            Example exampleOptionalEntity = exampleRepository.findById(exampleId)
+                    .orElseThrow(() -> new MajorHandler(ErrorStatus.EXAMPLE_NOT_FOUND));
+            exampleFavoriteRepository.save(ExampleFavorite.createExampleFavorite(exampleOptionalEntity, user));
+
+            return ApiResponse.onSuccess(200);
+        } catch (Exception e) {
+            throw new MajorHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
+        }
+
+    }
+
+    public ApiResponse<ExampleDto> getFindById(long id) {
+
+            ExampleFavorite exampleFavoriteEntity = exampleFavoriteRepository.findById(id).orElseThrow(() -> new MajorHandler(ErrorStatus.FAVORITE_NOT_FOUND));
+            Example exampleEntity = exampleRepository.findById(exampleFavoriteEntity.getExample().getId()).orElseThrow(() -> new MajorHandler(ErrorStatus.EXAMPLE_NOT_FOUND));
+            ExampleDto exampleDto = exampleConverter.toDto(exampleEntity);
+
+            return ApiResponse.onSuccess(exampleDto);
+
+    }
 }
