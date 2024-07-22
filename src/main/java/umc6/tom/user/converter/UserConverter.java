@@ -38,12 +38,11 @@ public class UserConverter {
     }
 
     // 로그인 응답
-    public static UserDtoRes.LoginDto signInRes(User user, String accessToken, String refreshToken) {
+    public static UserDtoRes.LoginDto signInRes(User user, String accessToken) {
 
         return UserDtoRes.LoginDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .createdAt(user.getCreatedAt())
                 .build();
     }
