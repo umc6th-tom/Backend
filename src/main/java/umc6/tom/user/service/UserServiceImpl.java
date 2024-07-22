@@ -1,11 +1,11 @@
 package umc6.tom.user.service;
 
-import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -14,17 +14,21 @@ import umc6.tom.apiPayload.exception.handler.PhoneHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
 import umc6.tom.security.JwtTokenProvider;
+import umc6.tom.user.converter.RefreshConverter;
 import umc6.tom.user.converter.ResignConverter;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
+import umc6.tom.user.model.RefreshToken;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.MajorsRepository;
+import umc6.tom.user.repository.RefreshTokenRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
+import umc6.tom.util.CookieUtil;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -32,6 +36,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -45,6 +50,7 @@ public class UserServiceImpl implements UserService {
     private final ResignRepository resignRepository;
     private final MajorsRepository majorsRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     // 회원 가입
@@ -61,7 +67,7 @@ public class UserServiceImpl implements UserService {
             throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCHED);
         }
         if (userRepository.findByPhone(request.getPhone()).isPresent()) {
-            log.info("이미 사용중인 휴대폰 번호 등록");
+            log.info("이미 사용중인 휴대폰 번호 등록 ");
             throw new UserHandler(ErrorStatus.USER_PHONE_IS_USED);
         }
 
@@ -78,10 +84,10 @@ public class UserServiceImpl implements UserService {
 
     // 로그인
     @Override
-    public UserDtoRes.SignInDto signIn(UserDtoReq.SignInDto request) {
+    public UserDtoRes.LoginDto login(HttpServletRequest request, HttpServletResponse response, UserDtoReq.LoginDto req) {
 
-        String account = request.getAccount();
-        String password = request.getPassword();
+        String account = req.getAccount();
+        String password = req.getPassword();
 
         List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW);
 
@@ -99,26 +105,55 @@ public class UserServiceImpl implements UserService {
             throw new PhoneHandler(ErrorStatus.USER_NOT_AUTHORIZED);
         }
 
-        if (userRepository.findByPhone(user.getPhone()).isPresent()) {
-            log.info("중복된 사용자입니다.");
-        }
-
-        log.info("탈퇴 유저 확인");
         // 탈퇴된 유저는 기간내 로그인 할 시 WITHDRAW to ACTIVE, 로그인
         if (user.getStatus() == UserStatus.WITHDRAW) {
             resignRepository.deleteByUser(user);
             user.setStatus(UserStatus.ACTIVE);
             log.info("탈퇴한 유저 {} 재가입", user.getId());
         }
-        log.info("탈퇴 유저 확인완료");
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        // RefreshToken 을 cookie 에 저장 - 작성해야함
-        /*Cookie cookie = new Cookie("refresh_token", accessToken);
-        cookie.setPath("/");*/
+        log.info("login refresh token : {}", refreshToken);
+
+        // 쿠키 저장
+        CookieUtil.deleteCookie(request, response, "refreshToken");
+        CookieUtil.addCookie(response, "refreshToken", refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_COOKIE);
+        // DB 의 refreshToken 삭제 후 저장 변경
+
+        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByUserId(user.getId());
+        if (refreshTokenOptional.isPresent()) {
+            refreshTokenOptional.get().setRefreshTokenValue(refreshToken);
+        } else {
+            refreshTokenRepository.save(RefreshConverter.toRefreshToken(user.getId(), refreshToken));
+        }
+
         return UserConverter.signInRes(user, accessToken, refreshToken);
+    }
+
+    // 쿠키의 RefreshToken 으로 AccessToken 재발행
+    @Override
+    public UserDtoRes.ReissueDto reissue(String refreshToken) {
+
+        // 토큰 유효성 검사
+        if(!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new IllegalArgumentException("Invalid refresh token");
+        }
+        Long userId = findTokenByRefreshToken(refreshToken).getUserId();
+        User user = userRepository.findById(userId)
+                        .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
+        return UserConverter.reissueRes(accessToken);
+    }
+
+    // String 의 RefreshToken 으로 RefreshToken 객체 반환
+    @Override
+    public RefreshToken findTokenByRefreshToken(String refreshToken) {
+
+        return refreshTokenRepository.findByRefreshTokenValue(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("해당하는 RefreshToken 이 없습니다. 다시 로그인해주세요."));  // 예외 수정해야함
     }
 
     // 닉네임 중복 확인 - 중복이 있다면 true
@@ -185,11 +220,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void logout(String accessToken) {
-        Long userId = jwtTokenProvider.getUserIdInToken(accessToken);
+    public void logout(HttpServletRequest request, HttpServletResponse response, String accessToken) {
 
         // Cookie 에 있는 RefreshToken 의 데이터를 삭제
-
+        CookieUtil.deleteCookie(request, response, "refreshToken");
     }
 
     // 밀리초를 LocalDateTime 으로 변환하는 메서드

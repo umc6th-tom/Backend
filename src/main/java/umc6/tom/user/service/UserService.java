@@ -1,7 +1,10 @@
 package umc6.tom.user.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
+import umc6.tom.user.model.RefreshToken;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -10,7 +13,11 @@ public interface UserService {
 
     User join(UserDtoReq.JoinDto request);
 
-    UserDtoRes.SignInDto signIn(UserDtoReq.SignInDto request);
+    UserDtoRes.LoginDto login(HttpServletRequest request, HttpServletResponse response, UserDtoReq.LoginDto req);
+
+    UserDtoRes.ReissueDto reissue(String refreshToken);
+
+    RefreshToken findTokenByRefreshToken(String refreshToken);
 
     boolean duplicatedNickName(String nickName);
 
@@ -20,7 +27,7 @@ public interface UserService {
 
     void deleteUser();
 
-    void logout(String accessToken);
+    void logout(HttpServletRequest request, HttpServletResponse response, String accessToken);
 
     LocalDateTime convertToLocalDateTime(long timestampMillis);
 

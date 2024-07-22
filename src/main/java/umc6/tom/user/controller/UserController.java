@@ -1,5 +1,7 @@
 package umc6.tom.user.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +13,7 @@ import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 import umc6.tom.user.service.UserService;
+import umc6.tom.util.CookieUtil;
 
 @Slf4j
 @RestController
@@ -59,16 +62,29 @@ public class UserController {
      * 로그인
      */
     @PostMapping("/login")
-    public ApiResponse<UserDtoRes.SignInDto> login(@RequestBody UserDtoReq.SignInDto request) {
+    public ApiResponse<UserDtoRes.LoginDto> login(@RequestBody UserDtoReq.LoginDto req,
+                                                  HttpServletRequest request, HttpServletResponse response) {
 
-        return ApiResponse.onSuccess(userService.signIn(request));
+        return ApiResponse.onSuccess(userService.login(request, response, req));
+    }
+
+    /**
+     * 24.07.23 작성자 : 류기현
+     * AccessToken 재발급
+     */
+    @PostMapping("/token-reissue")
+    public ApiResponse<UserDtoRes.ReissueDto> reissue(@CookieValue("refreshToken") String refreshToken) {
+
+        log.info("reissue token: {}", refreshToken);
+        UserDtoRes.ReissueDto accessToken = userService.reissue(refreshToken);
+        return ApiResponse.onSuccess(accessToken);
     }
 
     /**
      * 24.07.19 작성자 : 류기현
      * 회원 탈퇴 : userId(토큰) + 비밀번호
      */
-    @PatchMapping("/widthdraw")
+    @PatchMapping("/withdraw")
     public ApiResponse<SuccessStatus> withdraw(@RequestBody UserDtoReq.WithDrawDto request) {
 
         Long userId = jwtTokenProvider.getUserIdFromToken();
@@ -82,9 +98,10 @@ public class UserController {
      * 로그아웃
      */
     @PostMapping("/logout")
-    public ApiResponse<SuccessStatus> logout(@RequestHeader("Authorization") String accessToken) {
+    public ApiResponse<SuccessStatus> logout(@RequestHeader("Authorization") String accessToken,
+                                             HttpServletRequest request, HttpServletResponse response) {
 
-        userService.logout(accessToken);
+        userService.logout(request, response, accessToken);
         return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
     }
 

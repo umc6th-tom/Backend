@@ -37,7 +37,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // 인증 관련 에러
-    USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "PHONE4001", "휴대폰 인증이 필요합니다."),
+    USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH4001", "휴대폰 인증이 필요합니다."),
+
 
     // 전공 관련 에러
     MAJORS_NOR_FOUND(HttpStatus.NOT_FOUND, "MAJORS4001", "해당하는 전공이 없습니다."),

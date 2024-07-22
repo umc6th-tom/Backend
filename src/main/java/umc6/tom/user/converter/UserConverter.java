@@ -1,5 +1,6 @@
 package umc6.tom.user.converter;
 
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -37,13 +38,21 @@ public class UserConverter {
     }
 
     // 로그인 응답
-    public static UserDtoRes.SignInDto signInRes(User user, String accessToken, String refreshToken) {
+    public static UserDtoRes.LoginDto signInRes(User user, String accessToken, String refreshToken) {
 
-        return UserDtoRes.SignInDto.builder()
+        return UserDtoRes.LoginDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .createdAt(user.getCreatedAt())
+                .build();
+    }
+
+    // accessToken 재발급 응답
+    public static UserDtoRes.ReissueDto reissueRes(String accessToken) {
+
+        return UserDtoRes.ReissueDto.builder()
+                .accessToken(accessToken)
                 .build();
     }
 
