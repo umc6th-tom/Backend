@@ -42,6 +42,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 전공 관련 에러
     MAJORS_NOR_FOUND(HttpStatus.NOT_FOUND, "MAJORS4001", "해당하는 전공이 없습니다."),
+    USER_MAJOR_IS_YOURS(HttpStatus.BAD_REQUEST, "MAJORS4002", "아마 사용자의 전공입니다."),
 
     // 토큰 관련 에러
     JWT_AUTHORIZATION_FAILED(HttpStatus.UNAUTHORIZED, "JWT4001", "권한이 없습니다."),
