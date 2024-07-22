@@ -69,7 +69,7 @@ public class User extends BaseEntity implements UserDetails {
     private UserStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "majorsId", nullable = false)
+    @JoinColumn(name = "majors_id")
     private Majors majors;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

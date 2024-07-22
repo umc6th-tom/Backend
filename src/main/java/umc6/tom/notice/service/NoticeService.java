@@ -28,8 +28,8 @@ public class NoticeService {
     public List<NoticeDto> findAll(Pageable pageable) {
         Page<Notice> noticePage = noticeRepository.findAll(pageable);
         List<NoticeDto> noticeDTOList = noticePage.stream()
-                .map(NoticeDto::toNoticeListDTO)
-                .collect(Collectors.toList());
+                                        .map(NoticeDto::toNoticeListDTO)
+                                         .collect(Collectors.toList());
 
         return noticeDTOList;
     }
