@@ -1,6 +1,5 @@
 package umc6.tom.gpt.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,17 +69,4 @@ public class FavoriteService {
         return ApiResponse.onSuccess(200);
     }
 
-    //즐겨찾기 등록
-    public ApiResponse<Integer> save(Long userId, long exampleId) {
-        try {
-            User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-            Example exampleOptionalEntity = exampleRepository.findById(exampleId)
-                    .orElseThrow(() -> new MajorHandler(ErrorStatus.EXAMPLE_NOT_FOUND));
-
-            exampleFavoriteRepository.save(ExampleFavorite.createExampleFavorite(exampleOptionalEntity, user));
-        } catch (Exception e) {
-            throw new MajorHandler(ErrorStatus.FAVORITE_NOT_REGISTER);
-        }
-        return ApiResponse.onSuccess(200);
-    }
 }

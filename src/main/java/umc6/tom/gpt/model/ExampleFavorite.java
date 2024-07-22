@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -29,13 +28,4 @@ public class ExampleFavorite {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    // Static factory method
-    public static ExampleFavorite createExampleFavorite(Example example, User user) {
-        ExampleFavorite exampleFavorite = new ExampleFavorite();
-        exampleFavorite.example = example;
-        exampleFavorite.user = user;
-        exampleFavorite.createdAt = LocalDateTime.now();
-        return exampleFavorite;
-    }
 }
