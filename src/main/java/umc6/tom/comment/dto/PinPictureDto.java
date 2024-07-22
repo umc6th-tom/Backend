@@ -3,6 +3,7 @@ package umc6.tom.comment.dto;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,5 +13,5 @@ import java.util.Date;
 public class PinPictureDto {
     private Long id;
     private Long pinId;
-    private String pic;
+    private List<String> pic;
 }
