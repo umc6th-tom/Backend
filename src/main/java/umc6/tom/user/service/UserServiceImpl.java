@@ -129,7 +129,7 @@ public class UserServiceImpl implements UserService {
             refreshTokenRepository.save(RefreshConverter.toRefreshToken(user.getId(), refreshToken));
         }
 
-        return UserConverter.signInRes(user, accessToken, refreshToken);
+        return UserConverter.signInRes(user, accessToken);
     }
 
     // 쿠키의 RefreshToken 으로 AccessToken 재발행
@@ -179,13 +179,12 @@ public class UserServiceImpl implements UserService {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
         }
 
-        // 기존 UserStatus.WITHDRAW, resign 존재시
+        // 기존 UserStatus.WITHDRAW or resign 존재시
         if (user.getStatus() == UserStatus.WITHDRAW || resignRepository.findByUser(user).isPresent()) {
             throw new UserHandler(ErrorStatus.USER_ALREADY_WITHDRAW);
         }
 
-        // 회원 탈퇴시 탈퇴 정보 저장
-        // 재가입 대기 시간
+        // 회원 탈퇴시 탈퇴 정보 저장, 재가입 대기 시간 24시간(밀리초)
         final long USER_WAIT_WITHDRAWAL_TIME = 1000L * 60 * 60 * 24;
 
         ResignDtoReq.saveDto resign = ResignDtoReq.saveDto
@@ -294,7 +293,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        if (!passwordEncoder.matches(user.getPassword(), request.getUsedPassword())) {
+        if (!passwordEncoder.matches(request.getUsedPassword(), user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
         }
 
@@ -328,7 +327,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        if (!user.getPhone().equals(request.getPhone())) {
+        if (user.getPhone().equals(request.getPhone())) {
             throw new UserHandler(ErrorStatus.USER_PHONE_IS_YOURS);
         }
         if (userRepository.findByPhone(request.getPhone()).isPresent()) {
@@ -343,6 +342,10 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (user.getMajors().getId().equals(request.getMajorId())) {
+            throw new MajorHandler(ErrorStatus.USER_MAJOR_IS_YOURS);
+        }
 
         Majors majors = majorsRepository.findById(request.getMajorId())
                         .orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
