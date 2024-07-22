@@ -222,8 +222,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, String accessToken) {
 
-        // Cookie 에 있는 RefreshToken 의 데이터를 삭제
-        CookieUtil.deleteCookie(request, response, "refreshToken");
+        // Cookie 에 있는 RefreshToken 의 데이터를 value 0, 만료 0 으로 초기화
+        CookieUtil.addCookie(response, "refreshToken", null, 0);
     }
 
     // 밀리초를 LocalDateTime 으로 변환하는 메서드
