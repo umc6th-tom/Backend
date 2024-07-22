@@ -1,4 +1,4 @@
-package umc6.tom.board.Comment.model;
+package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,7 +21,7 @@ public class Pin extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 50)
-    private String content;
+    private String comment;
 
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
     private List<PinPicture> pinPictureList = new ArrayList<>();

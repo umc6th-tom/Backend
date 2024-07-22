@@ -1,15 +1,12 @@
 package umc6.tom.board.converter;
 
-import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import umc6.tom.board.Comment.model.Pin;
+import umc6.tom.comment.model.Pin;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
-import umc6.tom.board.repository.PinCommentRepositoryBoard;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;

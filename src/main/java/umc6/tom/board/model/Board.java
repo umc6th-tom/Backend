@@ -2,8 +2,7 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import umc6.tom.board.Comment.model.Pin;
+import umc6.tom.comment.model.Pin;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.enums.Status;
