@@ -16,4 +16,6 @@ public interface ExampleFavoriteRepository extends JpaRepository<ExampleFavorite
 //    List<Long> findExampIdsByUserOrderByCreatedAtAsc(@Param("user") Long userId);
 
     List<ExampleFavorite> findExampleFavoritesByUserOrderByCreatedAtAsc(User user);
+
+
 }

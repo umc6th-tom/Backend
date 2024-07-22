@@ -36,7 +36,7 @@ public class MajorController {
             return ApiResponse.onSuccess(majorService.exampleFindId(id));
     }
 
-    //즐겨찾기 조회
+    //즐겨찾기 리스트 조회
     @GetMapping("/myfavorite")
     public ApiResponse<List<ExampleDto>> getFindAllFavorite() {
         Long userId = jwtTokenProvider.getUserIdFromToken();
@@ -46,12 +46,13 @@ public class MajorController {
     }
 
     //즐겨찾기 등록
-//    @PostMapping("/register")
-//    public ApiResponse<ExampleDto> registerNewMajor(@RequestBody ExampleDto exampleDto) {
-//        return
-//    }
+    @PostMapping("/{exampleId}/register")
+    public ApiResponse registerNewFavorite(@RequestBody ExampleDto exampleDto, @PathVariable("exampleId") long exampleId) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return favoriteService.save(userId, exampleId);
+    }
 
-    //즐겨찾기 제거 후 조회
+    //즐겨찾기 제거
     //성공시 200 반환
     @DeleteMapping("/{id}")
     public ApiResponse<Integer> deleteFavorite(@PathVariable long id) {
