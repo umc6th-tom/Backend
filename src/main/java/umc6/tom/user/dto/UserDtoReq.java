@@ -13,7 +13,7 @@ public class UserDtoReq {
     @Getter
     @ToString
     @NoArgsConstructor
-    public static class SignInDto {
+    public static class LoginDto {
         private String account;
         private String password;
     }
@@ -37,12 +37,6 @@ public class UserDtoReq {
         private String phone;
     }
 
-    @Getter
-    @ToString
-    public static class JoinNickNameDto {
-
-        private String nickName;
-    }
 
     @Getter
     @ToString

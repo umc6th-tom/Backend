@@ -1,5 +1,6 @@
 package umc6.tom.user.dto;
 
+import jakarta.servlet.http.Cookie;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ public class UserDtoRes {
     @Setter
     @Builder
     public static class JoinDto {
+
         private Long id;
         private String nickName;
     }
@@ -19,7 +21,8 @@ public class UserDtoRes {
     @Getter
     @Setter
     @Builder
-    public static class SignInDto {
+    public static class LoginDto {
+
         private Long userId;
         private String accessToken;
         private String refreshToken;
@@ -29,7 +32,16 @@ public class UserDtoRes {
     @Getter
     @Setter
     @Builder
+    public static class ReissueDto {
+
+        private String accessToken;
+    }
+
+    @Getter
+    @Setter
+    @Builder
     public static class FindAccountDto {
+
         private String account;
         private LocalDateTime createdAt;
     }
@@ -38,6 +50,7 @@ public class UserDtoRes {
     @Setter
     @Builder
     public static class FindPasswordDto {
+
         private Long userId;
     }
 }
