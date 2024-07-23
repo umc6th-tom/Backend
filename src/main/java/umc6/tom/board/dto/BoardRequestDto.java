@@ -17,4 +17,11 @@ public class BoardRequestDto {
         Long major;
         //사진 구현 필요
     }
+
+    @Getter
+    public static class AddComplaintDto {
+
+        @NotBlank
+        String content;
+    }
 }

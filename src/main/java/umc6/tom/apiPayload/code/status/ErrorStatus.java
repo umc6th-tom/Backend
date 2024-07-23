@@ -51,8 +51,14 @@ public enum ErrorStatus implements BaseErrorCode {
     JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT4004", "만료된 토큰입니다."),
 
     // 게시판 관련 에러
-    BoardLike_DUPLICATED(HttpStatus.UNAUTHORIZED, "BOARD4001", "이미 좋아요 되었습니다."),
-    BoardLike_NOT_FOUND(HttpStatus.UNAUTHORIZED, "BOARD4002", "이미 좋아요가 취소되었습니다. "),
+    BOARDLIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "BOARD4001", "이미 좋아요 되었습니다."),
+    BOARDLIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD4002", "이미 좋아요가 취소되었습니다. "),
+    BOARD_ALREADY_DELETED(HttpStatus.NOT_FOUND, "BOARD4003", "이미 게시글이 삭제되었습니다."),
+    BOARD_NOT_SEARCH(HttpStatus.NOT_FOUND, "BOARD4004", "찾는 게시판이 없습니다."),
+    BOARD_SEARCHTYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "BOARD4005", "검색 조건이 잘못되었습니다."),
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD4006", "게시글을 찾지 못했습니다."),
+    BOARD_USER_NOT_MATCH(HttpStatus.UNAUTHORIZED, "BOARD4007", "본인의 게시글이 아닙니다."),
+    BOARD_CANNOT_DELETE(HttpStatus.BAD_REQUEST, "BOARD4008", "삭제할 수 없는 게시글입니다."),
 
     // 댓글 관련 에러
     PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),

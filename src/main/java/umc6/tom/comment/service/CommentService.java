@@ -39,7 +39,7 @@ public class CommentService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //임시 에러코드 사용함
         //게시판 댓글 저장
-        Board board =  boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BoardLike_NOT_FOUND));
+        Board board =  boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARDLIKE_NOT_FOUND));
         Pin pin = PinConverter.toPinEntity(user, board, pinReq);
         Pin pinSaved = pinRepository.save(pin);
         //댓글 사진 테이블에 저장하기
