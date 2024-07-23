@@ -56,4 +56,32 @@ public class BoardResponseDto {
         Long userId;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardDeleteDto{
+        Long boardId;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardComplaintDto{
+        Long boardId;
+        Long userId;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardMyAlarm{
+        String category;
+        String alarmContent;
+        String boardTitle;
+        LocalDateTime alarmAt;
+    }
+
 }

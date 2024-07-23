@@ -1,6 +1,7 @@
 package umc6.tom.board.converter;
 
 import org.springframework.data.domain.Page;
+import umc6.tom.board.model.BoardComplaint;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
@@ -72,6 +73,27 @@ public class BoardConverter {
         return BoardResponseDto.BoardLikeAddDto.builder()
                 .boardId(boardLike.getBoard().getId())
                 .userId(boardLike.getUser().getId())
+                .build();
+    }
+
+    public static BoardResponseDto.BoardDeleteDto toDeleteResultDto(Board board){
+        return BoardResponseDto.BoardDeleteDto.builder()
+                .boardId(board.getId())
+                .build();
+    }
+
+    public static BoardComplaint toBoardComplaint(BoardRequestDto.AddComplaintDto request, User user, Board board) {
+        return BoardComplaint.builder()
+                .board(board)
+                .user(user)
+                .content(request.getContent())
+                .build();
+    }
+
+    public static BoardResponseDto.BoardComplaintDto toBoardComplaintResultDto(BoardComplaint boardComplaint){
+        return BoardResponseDto.BoardComplaintDto.builder()
+                .boardId(boardComplaint.getId())
+                .userId(boardComplaint.getUser().getId())
                 .build();
     }
 
