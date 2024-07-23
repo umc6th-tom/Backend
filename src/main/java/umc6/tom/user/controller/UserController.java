@@ -13,7 +13,6 @@ import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 import umc6.tom.user.service.UserService;
-import umc6.tom.util.CookieUtil;
 
 @Slf4j
 @RestController
@@ -41,20 +40,20 @@ public class UserController {
      * 24.07.19 작성자 : 류기현
      * 닉네임 중복 확인
      */
-    @GetMapping("/nickname")
-    public ApiResponse<Boolean> checkNickName(@RequestParam String nickname) {
+    @GetMapping("/nickname-dup")
+    public ApiResponse<Boolean> checkNickName(@RequestBody UserDtoReq.CheckNickNameDto request) {
 
-        return ApiResponse.onSuccess(userService.duplicatedNickName(nickname));
+        return ApiResponse.onSuccess(userService.checkNickName(request));
     }
 
     /**
      * 24.07.19 작성자 : 류기현
      * 아이디 중복 확인
      */
-    @GetMapping("/account")
-    public ApiResponse<Boolean> checkAccount(@RequestParam String account) {
+    @GetMapping("/account-dup")
+    public ApiResponse<Boolean> checkAccount(@RequestBody UserDtoReq.CheckAccountDto request) {
 
-        return ApiResponse.onSuccess(userService.duplicatedAccount(account));
+        return ApiResponse.onSuccess(userService.checkAccount(request));
     }
 
     /**
@@ -199,5 +198,27 @@ public class UserController {
 
         userService.restoreMajor(userId, request);
         return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
+
+    /**
+     * 24.07. 작성자 : 류기현
+     * 프로필 사진 변경
+     */
+
+    /**
+     * 24.07. 작성자 : 류기현
+     * 프로필 사진 삭제(기본으로 변경)
+     */
+
+    /**
+     * 24.07.23 작성자 : 류기현
+     * 활동내역 공개 on/off
+     */
+    @PatchMapping("/agreement-change")
+    public ApiResponse<UserDtoRes.ChangeAgreementDto> changeAgreement() {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        return ApiResponse.onSuccess(userService.changeAgreement(userId));
     }
 }

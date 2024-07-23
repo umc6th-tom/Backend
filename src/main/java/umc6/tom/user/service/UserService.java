@@ -13,6 +13,10 @@ public interface UserService {
 
     User join(UserDtoReq.JoinDto request);
 
+    boolean checkNickName(UserDtoReq.CheckNickNameDto request);
+
+    boolean checkAccount(UserDtoReq.CheckAccountDto request);
+
     UserDtoRes.LoginDto login(HttpServletRequest request, HttpServletResponse response, UserDtoReq.LoginDto req);
 
     UserDtoRes.ReissueDto reissue(String refreshToken);
@@ -46,4 +50,6 @@ public interface UserService {
     void restorePhone(Long userId, UserDtoReq.RestorePhoneDto request);
 
     void restoreMajor(Long userId, UserDtoReq.RestoreMajorDto request);
+
+    UserDtoRes.ChangeAgreementDto changeAgreement(Long userId);
 }

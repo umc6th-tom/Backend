@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import umc6.tom.alarm.converter.AlarmSetConverter;
+import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.PhoneHandler;
@@ -23,6 +25,7 @@ import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.RefreshToken;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
+import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.RefreshTokenRepository;
@@ -51,6 +54,7 @@ public class UserServiceImpl implements UserService {
     private final MajorsRepository majorsRepository;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AlarmSetRepository alarmSetRepository;
 
 
     // 회원 가입
@@ -79,7 +83,23 @@ public class UserServiceImpl implements UserService {
         User user = UserConverter.toUser(request, major);
 
         userRepository.save(user);
+        alarmSetRepository.save(AlarmSetConverter.convertAlarmSetToAlarmSet(user));
+
         return user;
+    }
+
+    // 닉네임 중복 확인
+    @Override
+    public boolean checkNickName(UserDtoReq.CheckNickNameDto request) {
+
+        return duplicatedNickName(request.getNickName());
+    }
+
+    // 아이디 중복 확인
+    @Override
+    public boolean checkAccount(UserDtoReq.CheckAccountDto request) {
+
+        return duplicatedAccount(request.getAccount());
     }
 
     // 로그인
@@ -351,5 +371,21 @@ public class UserServiceImpl implements UserService {
                         .orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
 
         user.setMajors(majors);
+    }
+
+    // 활동내역 공개 여부 재설정
+    @Override
+    public UserDtoRes.ChangeAgreementDto changeAgreement(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        // 다른 값으로 저장되어 있다면 AGREE 로 설정
+        if (user.getAgreement() == Agreement.AGREE) {
+            user.setAgreement(Agreement.DISAGREE);
+        } else {
+            user.setAgreement(Agreement.AGREE);
+        }
+        return UserConverter.changeAgreementRes(user.getAgreement());
     }
 }
