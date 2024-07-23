@@ -37,6 +37,22 @@ public class UserDtoReq {
         private String phone;
     }
 
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class CheckNickNameDto {
+
+        private String nickName;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class CheckAccountDto {
+
+        private String account;
+    }
+
 
     @Getter
     @ToString

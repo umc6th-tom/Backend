@@ -71,7 +71,12 @@ public enum ErrorStatus implements BaseErrorCode {
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "FAVORITE4001", "즐겨찾기 예제를 찾는것에 실패하였습니다."),
     FAVORITE_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "FAVORITE4003", "즐겨찾기 등록에 실패했습니다."),
     EXAMPLE_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "EXAMPLE4002", "예제 삭제에 실패했습니다."),
-    EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, "EXAMPLE4004" , "예제를 찾을 수 없습니다.");
+    EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, "EXAMPLE4004" , "예제를 찾을 수 없습니다."),
+
+
+    // 알람 관련 에러
+    ALARM_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_SET4001", "알람셋이 없습니다! 관리자에게 문의하세요!")
+    ;
 
 
     private final HttpStatus httpStatus;

@@ -1,13 +1,17 @@
 package umc6.tom.user.converter;
 
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import umc6.tom.board.model.Board;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
+import umc6.tom.user.model.enums.Agreement;
+import umc6.tom.user.model.enums.UserStatus;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -24,6 +28,7 @@ public class UserConverter {
                 .password(request.getPassword())
                 .phone(request.getPhone())
                 .majors(major)
+                .status(UserStatus.ACTIVE)
                 .build();
     }
 
@@ -72,4 +77,24 @@ public class UserConverter {
                 .build();
     }
 
+    // 활동내역 공개 여부 변경 응답
+    public static UserDtoRes.ChangeAgreementDto changeAgreementRes(Agreement agreement) {
+
+        return UserDtoRes.ChangeAgreementDto.builder()
+                .agreement(agreement.name())
+                .build();
+    }
+
+    // 타인 프로필 조회 응답
+    public static UserDtoRes.ProfileDto toProfileRes(User user, List<Board> boards, List<Board> pins) {
+
+        return UserDtoRes.ProfileDto.builder()
+                .userId(user.getId())
+                .nickName(user.getNickName())
+                .pic(user.getPic())
+                .message(user.getDescription())
+                .written(boards)
+                .commented(pins)
+                .build();
+    }
 }
