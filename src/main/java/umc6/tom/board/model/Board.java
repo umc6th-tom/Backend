@@ -31,9 +31,6 @@ public class Board extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
-    @Column(nullable = false, length = 20)
-    private String birthday;
-
     private LocalDateTime popularAt;
 
     @Enumerated(EnumType.STRING)
