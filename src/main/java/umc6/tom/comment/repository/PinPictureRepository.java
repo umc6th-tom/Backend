@@ -6,4 +6,5 @@ import umc6.tom.comment.model.Pin;
 import umc6.tom.comment.model.PinPicture;
 @Repository
 public interface PinPictureRepository extends JpaRepository<PinPicture, Long> {
+    void deleteAllByPin(Pin pin);
 }
