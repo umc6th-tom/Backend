@@ -56,6 +56,7 @@ public enum ErrorStatus implements BaseErrorCode {
     PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),
     PIN_NOT_FOUND(HttpStatus.NOT_FOUND, "PIN4002", "댓글을 찾을 수 없습니다."),
     PIN_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4003", "댓글을 삭제하는데 실패하였습니다."),
+    PIN_NOT_UPDATE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4005", "댓글을 수정하는데 실패하였습니다."),
 
 
 

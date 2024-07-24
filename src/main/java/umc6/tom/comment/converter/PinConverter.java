@@ -19,7 +19,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PinConverter {
 
-    public static Pin toPinEntity(User user, Board board, PinReqDto pinReq) {
+    public static Pin toPinUpdateEntity(PinReqDto.PinAndPic pinReqDto) {
+        return Pin.builder()
+                .id(pinReqDto.getId())
+                .comment(pinReqDto.getComment())
+                .build();
+    }
+
+    public static Pin toPinEntity(User user, Board board, PinReqDto.PinCommentAndPic pinReq) {
         return Pin.builder()
                 .board(board)
                 .user(user)

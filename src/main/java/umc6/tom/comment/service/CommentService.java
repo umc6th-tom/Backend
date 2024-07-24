@@ -2,6 +2,8 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -22,6 +24,8 @@ import umc6.tom.comment.repository.PinPictureRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +36,11 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final PinCommentRepository pinCommentRepository;
     private final PinPictureRepository pinPictureRepository;
+    private final PinConverter pinConverter;
 
     //댓글 등록
     @Transactional
-    public ApiResponse pinRegister(PinReqDto pinReq, Long userId, Long boardId ) {
+    public ApiResponse pinRegister(PinReqDto.PinCommentAndPic pinReq, Long boardId, Long userId  ) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //임시 에러코드 사용함
         //게시판 댓글 저장
@@ -54,12 +59,36 @@ public class CommentService {
         return ApiResponse.onSuccess(200);
     }
 
-    //댓글 수정하기위해 줌
+    //댓글 수정하기위해 데이터 주는거!!
     @Transactional
     public ApiResponse getDetailPin(Long commentId) {
         Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
         PinResDto pinResDto = PinConverter.toPinDto(pin);
 
         return ApiResponse.onSuccess(pinResDto);
+    }
+
+    @Transactional
+    public ApiResponse pinModify(PinReqDto.PinAndPic pinDto) {
+        try {
+            Pin existingPin = pinRepository.findById(pinDto.getId())
+                    .orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+
+            if (pinDto.getComment() != null) {
+                existingPin.setComment(pinDto.getComment());
+            }
+            Pin pinSaved = pinRepository.save(existingPin);
+            pinPictureRepository.deleteAllByPin(pinSaved);
+
+            for (String picUrl : pinDto.getPic()) {
+                PinPicture pinPicutreEntity = PinPictureConverter.toPinPictureEntity(picUrl, pinSaved);
+                pinPictureRepository.save(pinPicutreEntity);
+            }
+
+            return ApiResponse.onSuccess(200);
+        }
+        catch(Exception e){
+            throw new PinHandler(ErrorStatus.PIN_NOT_UPDATE);
+        }
     }
 }

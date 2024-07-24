@@ -24,7 +24,7 @@ public class CommentController {
     //댓글 등록
     //댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
     @PostMapping("/{boardId}/register")
-    public ApiResponse register(@PathVariable("boardId") Long boardId,@RequestBody PinReqDto pinReqDto) {
+    public ApiResponse register(@PathVariable("boardId") Long boardId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return pinService.pinRegister(pinReqDto,boardId,userId);
     }
@@ -35,6 +35,12 @@ public class CommentController {
         return pinService.getDetailPin(commentId);
     }
 
+    //댓글 수정
+    @PatchMapping("/update")
+    public ApiResponse modify(@RequestBody PinReqDto.PinAndPic pinDto) {
+
+        return pinService.pinModify(pinDto);
+    }
 
 
 }

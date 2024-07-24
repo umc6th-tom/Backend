@@ -11,32 +11,33 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class Pin extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Long id;
 
     @Column(nullable = false, length = 50)
-    private String comment;
+    public String comment;
 
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
-    private List<PinPicture> pinPictureList = new ArrayList<>();
+    public List<PinPicture> pinPictureList = new ArrayList<>();
 
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
-    private List<PinLike> pinLikeList = new ArrayList<>();
+    public List<PinLike> pinLikeList = new ArrayList<>();
 
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
-    private List<PinComment> pinCommentList = new ArrayList<>();
+    public List<PinComment> pinCommentList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    public User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
-    private Board board;
+    public Board board;
 }
