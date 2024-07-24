@@ -88,7 +88,7 @@ public class BoardConverter {
         return BoardComplaint.builder()
                 .board(board)
                 .user(user)
-                .content(request.getContent())
+                .boardContent(request.getContent())
                 .build();
     }
 
