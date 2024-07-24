@@ -20,9 +20,6 @@ public class BoardComplaint extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 300)
-    private String content;
-
-    @Column(nullable = false, length = 300)
     private String complaintContent;
 
     @Column(nullable = false, length = 50)
