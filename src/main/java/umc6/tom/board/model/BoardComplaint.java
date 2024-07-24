@@ -22,6 +22,18 @@ public class BoardComplaint extends BaseEntity {
     @Column(nullable = false, length = 300)
     private String content;
 
+    @Column(nullable = false, length = 300)
+    private String complaintContent;
+
+    @Column(nullable = false, length = 50)
+    private String boardTitle;
+
+    @Column(nullable = false, length = 500)
+    private String boardContent;
+
+    @Column(nullable = false)
+    private Long boardUserId;
+
     @OneToMany(mappedBy = "boardComplaint", cascade = CascadeType.ALL)
     private List<BoardComplaintPicture> boardComplaintPictureList = new ArrayList<>();
 
