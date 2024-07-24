@@ -11,27 +11,26 @@ import org.springframework.stereotype.Service;
 import umc6.tom.alarm.converter.AlarmSetConverter;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.exception.handler.JwtHandler;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.PhoneHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
 import umc6.tom.security.JwtTokenProvider;
-import umc6.tom.user.converter.RefreshConverter;
 import umc6.tom.user.converter.ResignConverter;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
-import umc6.tom.user.model.RefreshToken;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.MajorsRepository;
-import umc6.tom.user.repository.RefreshTokenRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.CookieUtil;
+import umc6.tom.util.RedisUtil;
 import umc6.tom.util.SmsUtil;
 
 import java.security.SecureRandom;
@@ -52,9 +51,9 @@ public class UserServiceImpl implements UserService {
     private final ResignRepository resignRepository;
     private final MajorsRepository majorsRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final AlarmSetRepository alarmSetRepository;
     private final SmsUtil smsUtil;
+    private final RedisUtil redisUtil;
 
 
     // 회원 가입
@@ -111,15 +110,17 @@ public class UserServiceImpl implements UserService {
         // 인증번호 생성
         SecureRandom random = new SecureRandom();
         int randomNumber = random.nextInt(900000) + 100000;
-        String authNum = String.format("%06d", randomNumber);
+        String verificationCode = String.format("%06d", randomNumber);
 
         // 휴대폰 번호 "-" 제거
         request.setPhone(request.getPhone().replaceAll("-", ""));
 
-        log.info("{} 인증번호 : {}", request.getPhone(), authNum);
-        smsUtil.sendMessage(request.getPhone(), authNum);
+        log.info("{} 인증번호 : {}", request.getPhone(), verificationCode);
+        smsUtil.sendMessage(request.getPhone(), verificationCode);
 
-        return UserConverter.phoneAuth(request.getPhone(), authNum);
+        redisUtil.setDataAndExpire(verificationCode, request.getPhone(), 60 * 5L);
+
+        return UserConverter.phoneAuth(request.getPhone());
     }
 
     // 로그인
@@ -162,38 +163,33 @@ public class UserServiceImpl implements UserService {
         CookieUtil.addCookie(response, "refreshToken", refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_COOKIE);
         // DB 의 refreshToken 삭제 후 저장 변경
 
-        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByUserId(user.getId());
-        if (refreshTokenOptional.isPresent()) {
-            refreshTokenOptional.get().setRefreshTokenValue(refreshToken);
-        } else {
-            refreshTokenRepository.save(RefreshConverter.toRefreshToken(user.getId(), refreshToken));
-        }
+        redisUtil.setDataAndExpire("RT:" + user.getId(), refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
 
-        return UserConverter.signInRes(user, accessToken);
+        return UserConverter.signInRes(user, accessToken, refreshToken);
     }
 
-    // 쿠키의 RefreshToken 으로 AccessToken 재발행
+    // 쿠키의 RefreshToken 으로 AccessToken 재발행 / Redis 의 refreshToken 과 비교
     @Override
     public UserDtoRes.ReissueDto reissue(String refreshToken) {
 
         // 토큰 유효성 검사
         if(!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("Invalid refresh token");
+            throw new JwtHandler(ErrorStatus.JWT_INVALID);
         }
-        Long userId = findTokenByRefreshToken(refreshToken).getUserId();
+
+        Long userId = jwtTokenProvider.getUserIdInToken(refreshToken);
         User user = userRepository.findById(userId)
                         .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
-        return UserConverter.reissueRes(accessToken);
-    }
+        String refreshTokenInRedis = redisUtil.getValue("RT:" + userId);
 
-    // String 의 RefreshToken 으로 RefreshToken 객체 반환
-    @Override
-    public RefreshToken findTokenByRefreshToken(String refreshToken) {
+        if (!refreshTokenInRedis.equals(refreshToken)) {
+            throw new JwtHandler(ErrorStatus.JWT_REFRESHTOKEN_NOT_MATCHED);
+        }
 
-        return refreshTokenRepository.findByRefreshTokenValue(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 RefreshToken 이 없습니다. 다시 로그인해주세요."));  // 예외 수정해야함
+        String newAccessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
+        // 새로운 refreshToken 발급하는 로직 -> 보안 강화! (작성 예정)
+        return UserConverter.reissueRes(newAccessToken);
     }
 
     // 닉네임 중복 확인 - 중복이 있다면 true
@@ -262,9 +258,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, String accessToken) {
 
+        Long userId = jwtTokenProvider.getUserIdInToken(accessToken);
+
 //        Long expiration = jwtTokenProvider.expireToken(accessToken);
         // Cookie 에 있는 RefreshToken 의 데이터를 value 0, 만료 0 으로 초기화
         CookieUtil.addCookie(response, "refreshToken", null, 0);
+        redisUtil.deleteData("RT:" + userId);
     }
 
     // 밀리초를 LocalDateTime 으로 변환하는 메서드

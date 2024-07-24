@@ -35,6 +35,7 @@ public class JwtTokenProvider {
     public static final long TOKEN_VALID_TIME = 1000L * 60 * 60;    // Access 토큰 1시간(밀리초) - 임시
     public static final long REFRESH_TOKEN_VALID_TIME = 1000L * 60 * 60 * 24 * 7;   // 일주일(밀리초)
     public static final int REFRESH_TOKEN_VALID_TIME_IN_COOKIE = 60 * 60 * 24 * 7; // 일주일(초)
+    public static final int REFRESH_TOKEN_VALID_TIME_IN_REDIS = 60 * 60 * 24 * 7; // 일주일(초)
 
     private final CustomUserDetailsService userDetailService;
 

@@ -46,5 +46,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         String s = objectMapper.writeValueAsString(failureResponse);
 
         response.getWriter().write(s);
+        ApiResponse.onFailure(errorCode.getCode(),errorCode.getMessage(),null);
     }
 }
