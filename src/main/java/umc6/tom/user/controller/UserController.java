@@ -2,6 +2,7 @@ package umc6.tom.user.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class UserController {
      * 회원가입
      */
     @PostMapping("/join")
-    public ApiResponse<UserDtoRes.JoinDto> join(@RequestBody UserDtoReq.JoinDto request) {
+    public ApiResponse<UserDtoRes.JoinDto> join(@RequestBody @Valid UserDtoReq.JoinDto request) {
 
         User user = userService.join(request);
 
@@ -41,7 +42,7 @@ public class UserController {
      * 닉네임 중복 확인
      */
     @GetMapping("/nickname-dup")
-    public ApiResponse<Boolean> checkNickName(@RequestBody UserDtoReq.CheckNickNameDto request) {
+    public ApiResponse<Boolean> checkNickName(@RequestBody @Valid UserDtoReq.CheckNickNameDto request) {
 
         return ApiResponse.onSuccess(userService.checkNickName(request));
     }
@@ -51,9 +52,19 @@ public class UserController {
      * 아이디 중복 확인
      */
     @GetMapping("/account-dup")
-    public ApiResponse<Boolean> checkAccount(@RequestBody UserDtoReq.CheckAccountDto request) {
+    public ApiResponse<Boolean> checkAccount(@RequestBody @Valid UserDtoReq.CheckAccountDto request) {
 
         return ApiResponse.onSuccess(userService.checkAccount(request));
+    }
+
+    /**
+     * 24.07.24 작성자 : 류기현
+     * 휴대폰 인증
+     */
+    @PostMapping("/phone-auth")
+    public ApiResponse<UserDtoRes.PhoneAuthDto> phoneAuth(@RequestBody @Valid UserDtoReq.PhoneDto request) {
+
+        return ApiResponse.onSuccess(userService.phoneAuth(request));
     }
 
     /**
@@ -61,7 +72,7 @@ public class UserController {
      * 로그인
      */
     @PostMapping("/login")
-    public ApiResponse<UserDtoRes.LoginDto> login(@RequestBody UserDtoReq.LoginDto req,
+    public ApiResponse<UserDtoRes.LoginDto> login(@RequestBody @Valid UserDtoReq.LoginDto req,
                                                   HttpServletRequest request, HttpServletResponse response) {
 
         return ApiResponse.onSuccess(userService.login(request, response, req));
@@ -84,7 +95,7 @@ public class UserController {
      * 회원 탈퇴 : userId(토큰) + 비밀번호
      */
     @PatchMapping("/withdraw")
-    public ApiResponse<SuccessStatus> withdraw(@RequestBody UserDtoReq.WithDrawDto request) {
+    public ApiResponse<SuccessStatus> withdraw(@RequestBody @Valid UserDtoReq.WithDrawDto request) {
 
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
@@ -179,7 +190,7 @@ public class UserController {
      * 휴대폰 번호 재설정
      */
     @PatchMapping("/phone-restore")
-    public ApiResponse<SuccessStatus> restorePhone(@RequestBody UserDtoReq.RestorePhoneDto request) {
+    public ApiResponse<SuccessStatus> restorePhone(@RequestBody UserDtoReq.PhoneDto request) {
 
         Long userId = jwtTokenProvider.getUserIdFromToken();
 

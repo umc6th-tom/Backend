@@ -32,6 +32,15 @@ public class UserConverter {
                 .build();
     }
 
+    // 휴대폰 인증 응답
+    public static UserDtoRes.PhoneAuthDto phoneAuth(String phone, String authNum) {
+
+        return UserDtoRes.PhoneAuthDto.builder()
+                .phone(phone)
+                .authNum(authNum)
+                .build();
+    }
+
 
     // 회원가입 응답
     public static UserDtoRes.JoinDto joinRes(User user) {

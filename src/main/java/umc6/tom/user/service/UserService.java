@@ -17,6 +17,8 @@ public interface UserService {
 
     boolean checkAccount(UserDtoReq.CheckAccountDto request);
 
+    UserDtoRes.PhoneAuthDto phoneAuth(UserDtoReq.PhoneDto request);
+
     UserDtoRes.LoginDto login(HttpServletRequest request, HttpServletResponse response, UserDtoReq.LoginDto req);
 
     UserDtoRes.ReissueDto reissue(String refreshToken);
@@ -47,7 +49,7 @@ public interface UserService {
 
     void restoreNickName(Long userId, UserDtoReq.RestoreNickNameDto request);
 
-    void restorePhone(Long userId, UserDtoReq.RestorePhoneDto request);
+    void restorePhone(Long userId, UserDtoReq.PhoneDto request);
 
     void restoreMajor(Long userId, UserDtoReq.RestoreMajorDto request);
 

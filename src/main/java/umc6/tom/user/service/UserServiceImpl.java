@@ -32,14 +32,13 @@ import umc6.tom.user.repository.RefreshTokenRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.CookieUtil;
+import umc6.tom.util.SmsUtil;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @RequiredArgsConstructor
@@ -55,6 +54,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AlarmSetRepository alarmSetRepository;
+    private final SmsUtil smsUtil;
 
 
     // 회원 가입
@@ -71,8 +71,7 @@ public class UserServiceImpl implements UserService {
             throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCHED);
         }
         if (userRepository.findByPhone(request.getPhone()).isPresent()) {
-            log.info("이미 사용중인 휴대폰 번호 등록 ");
-            throw new UserHandler(ErrorStatus.USER_PHONE_IS_USED);
+            log.info("이미 사용중인 휴대폰 번호 등록 관리자 확인 필요!");
         }
 
         Majors major = majorsRepository.findById(request.getMajor())
@@ -80,6 +79,9 @@ public class UserServiceImpl implements UserService {
 
         // 비밀번호 암호화 후 저장
         request.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // 휴대폰 번호 "-" 제거
+        request.setPhone(request.getPhone().replaceAll("-", ""));
         User user = UserConverter.toUser(request, major);
 
         userRepository.save(user);
@@ -100,6 +102,24 @@ public class UserServiceImpl implements UserService {
     public boolean checkAccount(UserDtoReq.CheckAccountDto request) {
 
         return duplicatedAccount(request.getAccount());
+    }
+
+    // 휴대폰 인증
+    @Override
+    public UserDtoRes.PhoneAuthDto phoneAuth(UserDtoReq.PhoneDto request) {
+
+        // 인증번호 생성
+        SecureRandom random = new SecureRandom();
+        int randomNumber = random.nextInt(900000) + 100000;
+        String authNum = String.format("%06d", randomNumber);
+
+        // 휴대폰 번호 "-" 제거
+        request.setPhone(request.getPhone().replaceAll("-", ""));
+
+        log.info("{} 인증번호 : {}", request.getPhone(), authNum);
+        smsUtil.sendMessage(request.getPhone(), authNum);
+
+        return UserConverter.phoneAuth(request.getPhone(), authNum);
     }
 
     // 로그인
@@ -238,9 +258,11 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    // 로그아웃
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, String accessToken) {
 
+//        Long expiration = jwtTokenProvider.expireToken(accessToken);
         // Cookie 에 있는 RefreshToken 의 데이터를 value 0, 만료 0 으로 초기화
         CookieUtil.addCookie(response, "refreshToken", null, 0);
     }
@@ -342,10 +364,17 @@ public class UserServiceImpl implements UserService {
 
     // 휴대폰 번호 재설정
     @Override
-    public void restorePhone(Long userId, UserDtoReq.RestorePhoneDto request) {
+    public void restorePhone(Long userId, UserDtoReq.PhoneDto request) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        // 휴대폰 번호 "-" 제거
+        request.setPhone(request.getPhone().replaceAll("-", ""));
+
+        phoneAuth(UserDtoReq.PhoneDto.builder()
+                .phone(request.getPhone())
+                .build());
 
         if (user.getPhone().equals(request.getPhone())) {
             throw new UserHandler(ErrorStatus.USER_PHONE_IS_YOURS);
@@ -354,6 +383,8 @@ public class UserServiceImpl implements UserService {
             log.info("이미 사용중인 휴대폰 번호 등록");
             throw new UserHandler(ErrorStatus.USER_PHONE_IS_USED);
         }
+
+        user.setPhone(request.getPhone());
     }
 
     // 전공 재설정

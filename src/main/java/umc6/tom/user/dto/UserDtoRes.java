@@ -19,6 +19,15 @@ public class UserDtoRes {
         private String nickName;
     }
 
+    @Setter
+    @Getter
+    @Builder
+    public static class PhoneAuthDto {
+
+        private String phone;
+        private String authNum;
+    }
+
     @Getter
     @Setter
     @Builder
