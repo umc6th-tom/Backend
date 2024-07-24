@@ -2,9 +2,7 @@ package umc6.tom.common.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.common.BaseEntity;
-import umc6.tom.common.model.enums.Major;
-import umc6.tom.user.model.User;
+import umc6.tom.board.model.Board;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +12,17 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Majors extends BaseEntity {
+public class Majors {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private Major major;
+    @Column(nullable = false, unique = true, length = 30)
+    private String major;
+
+    @OneToMany(mappedBy = "majors", cascade = CascadeType.ALL)
+    private List<Board> boardList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")

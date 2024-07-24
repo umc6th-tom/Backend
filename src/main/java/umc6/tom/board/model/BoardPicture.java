@@ -5,10 +5,11 @@ import lombok.*;
 import umc6.tom.common.BaseEntity;
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class BoardPicture extends BaseEntity {
+public class BoardPicture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

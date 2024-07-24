@@ -3,12 +3,14 @@ package umc6.tom.gpt.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.user.model.User;
+
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Example extends BaseEntity {
+public class Example {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +20,9 @@ public class Example extends BaseEntity {
     private String problem;
 
     @Column(nullable = false, length = 1000)
-    private String answerProblem;
+    private String answer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "answer_id")
-    private Answer answer;
-
+    @Column(nullable = false, length = 40)
+    private String tag;
 
 }

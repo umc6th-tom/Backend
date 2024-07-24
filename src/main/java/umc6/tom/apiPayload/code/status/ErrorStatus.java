@@ -18,23 +18,67 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // 멤버 관려 에러
-    MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "MEMBER4001", "사용자가 없습니다."),
-    NICKNAME_NOT_EXIST(HttpStatus.BAD_REQUEST, "MEMBER4002", "닉네임은 필수 입니다."),
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER4001", "사용자가 없습니다."),
+    USER_NOT_ACTIVE(HttpStatus.BAD_REQUEST, "USER4002", "사용자는 활성 상태가 아닙니다."),
+    USER_NICKNAME_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4003", "닉네임이 이미 존재합니다."),
+    USER_ACCOUNT_DUPLICATED(HttpStatus.BAD_REQUEST, "USER4004", "이미 등록된 아이디입니다."),
+    USER_PASSWORD_NOT_EQUAL(HttpStatus.BAD_REQUEST, "USER4005", "사용자의 비밀번호와 일치하지 않습니다."),
+    USER_ALREADY_DELETED(HttpStatus.NOT_FOUND, "USER4006", "이미 삭제된 사용자입니다."),
+    USER_ALREADY_WITHDRAW(HttpStatus.BAD_REQUEST, "USER4007", "이미 탈퇴 요청한 사용자입니다."),
+    USER_ACCOUNT_NOT_MATCHED(HttpStatus.BAD_REQUEST,"USER4008", "전화번호로 찾은 계정의 아이디와 일치하지 않습니다."),
+    USER_NAME_NOT_MATCHED(HttpStatus.BAD_REQUEST, "USER4009", "전화번호로 찾은 계정의 사용자 이름과 일치하지 않습니다."),
+    PASSWORD_NOT_MATCHED(HttpStatus.BAD_REQUEST, "USER4010", "비밀번호 비밀번호 확인이 맞지 않습니다."),
+    USER_ACCOUNT_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4011", "본인이 사용중인 아이디입니다."),
+    USER_NICKNAME_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4012", "본인이 사용중인 닉네임입니다."),
+    USER_PHONE_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4013", "본인이 사용중인 휴대폰번호입니다."),
+    USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
 
-    // 예시,,,
-    ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "ARTICLE4001", "게시글이 없습니다."),
 
-    // Ror test
-    TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트"),
 
-    // FoodCategory Error
-    FOOD_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "FOOD_CATEGORY4001", "음식 카테고리가 없습니다."),
 
-    // Store Error
+    // 인증 관련 에러
+    USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH4001", "휴대폰 인증이 필요합니다."),
 
-    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_4001","가게가 없습니다."),
 
-    ITEM_NOTFOUND(HttpStatus.NOT_FOUND, "ITEM_4001", "아이템이 없습니다.");
+    // 전공 관련 에러
+    MAJORS_NOR_FOUND(HttpStatus.NOT_FOUND, "MAJORS4001", "해당하는 전공이 없습니다."),
+    USER_MAJOR_IS_YOURS(HttpStatus.BAD_REQUEST, "MAJORS4002", "아마 사용자의 전공입니다."),
+
+    // 토큰 관련 에러
+    JWT_AUTHORIZATION_FAILED(HttpStatus.UNAUTHORIZED, "JWT4001", "권한이 없습니다."),
+    JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT4002", "다시 로그인 해주세요."),
+    JWT_EMPTY(HttpStatus.UNAUTHORIZED, "JWT4003", "JWT 토큰을 넣어주세요."),
+    JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT4004", "만료된 토큰입니다."),
+
+    // 게시판 관련 에러
+    BOARDLIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "BOARD4001", "이미 좋아요 되었습니다."),
+    BOARDLIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD4002", "이미 좋아요가 취소되었습니다. "),
+    BOARD_ALREADY_DELETED(HttpStatus.NOT_FOUND, "BOARD4003", "이미 게시글이 삭제되었습니다."),
+    BOARD_NOT_SEARCH(HttpStatus.NOT_FOUND, "BOARD4004", "찾는 게시판이 없습니다."),
+    BOARD_SEARCHTYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "BOARD4005", "검색 조건이 잘못되었습니다."),
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD4006", "게시글을 찾지 못했습니다."),
+    BOARD_USER_NOT_MATCH(HttpStatus.UNAUTHORIZED, "BOARD4007", "본인의 게시글이 아닙니다."),
+    BOARD_CANNOT_DELETE(HttpStatus.BAD_REQUEST, "BOARD4008", "삭제할 수 없는 게시글입니다."),
+    BOARD_CANNOT_UPDATE(HttpStatus.BAD_REQUEST, "BOARD4008", "수정할 수 없는 게시글입니다."),
+
+    // 댓글 관련 에러
+    PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),
+    PIN_NOT_FOUND(HttpStatus.NOT_FOUND, "PIN4002", "댓글을 찾을 수 없습니다."),
+    PIN_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4003", "댓글을 삭제하는데 실패하였습니다."),
+    PIN_NOT_UPDATE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4005", "댓글을 수정하는데 실패하였습니다."),
+
+
+
+    // 예제 관련 에러
+    FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "FAVORITE4001", "즐겨찾기 예제를 찾는것에 실패하였습니다."),
+    FAVORITE_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "FAVORITE4003", "즐겨찾기 등록에 실패했습니다."),
+    EXAMPLE_NOT_DELETE(HttpStatus.INTERNAL_SERVER_ERROR, "EXAMPLE4002", "예제 삭제에 실패했습니다."),
+    EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, "EXAMPLE4004" , "예제를 찾을 수 없습니다."),
+
+
+    // 알람 관련 에러
+    ALARM_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_SET4001", "알람셋이 없습니다! 관리자에게 문의하세요!")
+    ;
 
 
     private final HttpStatus httpStatus;

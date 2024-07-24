@@ -3,8 +3,12 @@ package umc6.tom.gpt.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
+import umc6.tom.common.model.College;
+import umc6.tom.user.model.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -12,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Answer extends BaseEntity {
+public class Answer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +31,19 @@ public class Answer extends BaseEntity {
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @OneToOne(fetch = FetchType.LAZY) //답변이 주체(주인)이고 즐겨찾기가 하위개념
-    @JoinColumn(name = "favorite_id")
-    private Favorite favorite;
+    @Column(name = "timer")
+    private Date timer;
 
-    @OneToMany(mappedBy = "answer", cascade = CascadeType.ALL)
-    private List<Example> exampleList = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.timer == null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.WEEK_OF_YEAR, 3); // 3주 후로 설정
+            this.timer = calendar.getTime();
+        }
+    }
 }

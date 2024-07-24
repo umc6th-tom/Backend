@@ -31,4 +31,5 @@ public class Notice extends BaseEntity {
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL)
     private List<NoticePicture> noticePictureList = new ArrayList<>();
+
 }
