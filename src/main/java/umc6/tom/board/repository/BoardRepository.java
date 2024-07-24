@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import umc6.tom.board.model.Board;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.enums.Status;
-import umc6.tom.user.model.User;
 
 import java.util.List;
 
@@ -22,9 +21,24 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByUser_NickNameContainingOrderByCreatedAtDesc(String nickName, PageRequest pageRequest);
 
-    Page<Board> findAllByTitleContainingOrContentContainingOrderByCreatedAtDesc(String title, String content, PageRequest pageRequest);
+    Page<Board> findAllByTitleContainingOrContentContainingOrderByCreatedAtDesc
+            (String title, String content, PageRequest pageRequest);
 
-    Page<Board> findAllByUserIdOrderByCreatedAtDesc(Long userId, PageRequest pageRequest);
+    Page<Board> findAllByMajorsIdAndTitleContainingOrderByCreatedAtDesc
+            (Long majorId, String title, PageRequest pageRequest);
+
+    Page<Board> findAllByMajorsIdAndContentContainingOrderByCreatedAtDesc
+            (Long majorId, String title, PageRequest pageRequest);
+    Page<Board> findAllByMajorsIdAndTitleContainingOrContentContainingOrderByCreatedAtDesc
+            (Long majorId, String title, String content, PageRequest pageRequest);
+    Page<Board> findAllByMajorsIdAndUser_NickNameContainingOrderByCreatedAtDesc
+            (Long majorId, String nickName, PageRequest pageRequest);
+
+    Page<Board> findAllByPopularAtIsNotNullOrderByCreatedAtDesc(PageRequest pageRequest);
+
+    List<Board> findTop5ByMajorsOrderByCreatedAtDesc(Majors majors);
+    List<Board> findTop5ByPopularAtIsNotNullOrderByCreatedAtDesc();
+    List<Board> findTop5ByOrderByCreatedAtDesc();
 
 
 }

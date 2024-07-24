@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
@@ -23,7 +24,6 @@ import umc6.tom.security.JwtTokenProvider;
 public class BoardRestController {
     private final BoardService boardService;
     private final JwtTokenProvider jwtTokenProvider;
-
     /**
      * 24.07.19 작성자 : 박재락
      * 게시물 등록
@@ -117,24 +117,62 @@ public class BoardRestController {
         return ApiResponse.onSuccess(BoardConverter.toBoardListViewListDTO(boardPage));
     }
 
-//    @GetMapping("/search-major/{major-id}/{search_type}/{search_keyWord}")
-//    public void searchMajorBoard(@PathVariable (name = "major-id") String majorId,
-//                                 @PathVariable (name = "search_type") String searchType,
-//                                 @PathVariable (name = "search_keyWord") String searchKeyword,
-//                                 @RequestParam(name = "page") Integer page) {
-//
-//    }
-//
-//    @GetMapping("/search-hot/{search_type}/{search_keyWord}")
-//    public void searchHotBoard(@PathVariable (name = "search_type") String searchType,
-//                               @PathVariable (name = "search_keyWord") String searchKeyword,
-//                               @RequestParam(name = "page") Integer page) {
-//
-//    }
-//
-//    @GetMapping("/myboards")
-//    public void myBoards(@RequestParam(name = "page") Integer page) {
-//        Long userId = jwtTokenProvider.getUserIdFromToken();
-//
-//    }
+    /**
+     * 24.07.23 작성자 : 박재락
+     * 전공 게시판 검색 조회
+     */
+    @GetMapping("/search-major/{major-id}/{search_type}/{search_keyWord}")
+    public ApiResponse<BoardResponseDto.BoardListViewListDto> searchMajorBoard(@PathVariable (name = "major-id") Long majorId,
+                                 @PathVariable (name = "search_type") String searchType,
+                                 @PathVariable (name = "search_keyWord") String searchKeyword,
+                                 @RequestParam(name = "page") Integer page) {
+        Page<Board> boardPage = boardService.getSearchMajorBoardList(majorId, searchType, searchKeyword, page);
+        return ApiResponse.onSuccess(BoardConverter.toBoardListViewListDTO(boardPage));
+
+    }
+
+    /**
+     * 24.07.24 작성자 : 박재락
+     * 핫한 게시판 검색 조회
+     */
+    @GetMapping("/search-hot/{search_type}/{search_keyWord}")
+    public void searchHotBoard(@PathVariable (name = "search_type") String searchType,
+                               @PathVariable (name = "search_keyWord") String searchKeyword,
+                               @RequestParam(name = "page") Integer page) {
+        
+    }
+
+    /**
+     * 24.07.24 작성자 : 박재락
+     * 핫한 게시판 조회
+     */
+    @GetMapping("/hot")
+    public ApiResponse<BoardResponseDto.BoardListViewListDto> hotBoardList(@RequestParam(name = "page") Integer page) {
+        Page<Board> boardPage = boardService.getBoardHotList(page);
+
+        return ApiResponse.onSuccess(BoardConverter.toBoardListViewListDTO(boardPage));
+    }
+
+    /**
+     * 24.07.24 작성자 : 박재락
+     * 메인 게시판 홈 조회
+     */
+    @GetMapping("/main")
+    public ApiResponse<BoardResponseDto.BoardMainViewListDto> mainBoardList() {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        return ApiResponse.onSuccess(boardService.getBoardMainList(userId));
+    }
+
+    /**
+     * 24.07.24 작성자 : 박재락
+     * 게시물 수정
+     */
+    @PatchMapping("/{board_id}")
+    public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestBody @Valid BoardRequestDto.UpdateBoardDto request, @PathVariable(name = "board_id") Long boardId){
+        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        Board board = boardService.updateBoard(request, 2L, boardId);
+
+        return ApiResponse.onSuccess(BoardConverter.toUpdateBoardDto(board));
+    }
 }
