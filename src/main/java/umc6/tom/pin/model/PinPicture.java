@@ -1,25 +1,23 @@
-package umc6.tom.comment.model;
+package umc6.tom.pin.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.user.model.User;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinCommentLike {
+public class PinPicture {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(nullable = false, length = 100)
+    private String pic;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pinComment_id")
-    private PinComment pinComment;
+    @JoinColumn(name = "pin_id")
+    private Pin pin;
 }

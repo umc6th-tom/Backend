@@ -1,7 +1,7 @@
 package umc6.tom.board.converter;
 
 import org.springframework.data.domain.Page;
-import umc6.tom.comment.model.Pin;
+import umc6.tom.pin.model.Pin;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;

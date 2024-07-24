@@ -1,16 +1,14 @@
-package umc6.tom.comment.dto;
+package umc6.tom.pin.dto;
 
 import lombok.*;
-
-import java.util.Date;
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PinLikeDto {
+public class PinCommentLikeDto {
     private Long id;
     private Long userId;
-    private Long pinId;
+    private Long pinCommentId;
 }

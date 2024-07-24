@@ -1,4 +1,4 @@
-package umc6.tom.comment.dto;
+package umc6.tom.pin.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

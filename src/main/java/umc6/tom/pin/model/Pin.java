@@ -1,4 +1,4 @@
-package umc6.tom.comment.model;
+package umc6.tom.pin.model;
 
 import jakarta.persistence.*;
 import lombok.*;

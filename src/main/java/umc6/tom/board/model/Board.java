@@ -2,7 +2,7 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.comment.model.Pin;
+import umc6.tom.pin.model.Pin;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.enums.Status;
