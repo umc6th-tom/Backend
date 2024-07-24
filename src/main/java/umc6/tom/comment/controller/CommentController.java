@@ -42,5 +42,14 @@ public class CommentController {
         return pinService.pinModify(pinDto);
     }
 
+    //댓글 삭제
+    @DeleteMapping("/{commentId}")
+    public ApiResponse modify(@PathVariable("commentId") Long commentId) {
+
+        return pinService.pinDelete(commentId);
+    }
+
+
+
 
 }

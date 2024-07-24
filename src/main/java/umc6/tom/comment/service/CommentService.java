@@ -2,8 +2,6 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -14,7 +12,6 @@ import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.PinConverter;
 import umc6.tom.comment.converter.PinPictureConverter;
-import umc6.tom.comment.dto.PinDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
@@ -24,8 +21,6 @@ import umc6.tom.comment.repository.PinPictureRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -90,5 +85,14 @@ public class CommentService {
         catch(Exception e){
             throw new PinHandler(ErrorStatus.PIN_NOT_UPDATE);
         }
+    }
+
+    public ApiResponse pinDelete(Long commentId) {
+        try {
+            pinRepository.deleteById(commentId);
+        } catch (Exception e) {
+            throw new PinHandler(ErrorStatus.PIN_NOT_DELETE);
+        }
+        return ApiResponse.onSuccess(200);
     }
 }
