@@ -2,30 +2,29 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.PinConverter;
+import umc6.tom.comment.converter.PinLikeConverter;
 import umc6.tom.comment.converter.PinPictureConverter;
-import umc6.tom.comment.dto.PinDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinLike;
 import umc6.tom.comment.model.PinPicture;
 import umc6.tom.comment.repository.PinCommentRepository;
+import umc6.tom.comment.repository.PinLikeRepository;
 import umc6.tom.comment.repository.PinPictureRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +36,7 @@ public class CommentService {
     private final PinCommentRepository pinCommentRepository;
     private final PinPictureRepository pinPictureRepository;
     private final PinConverter pinConverter;
+    private final PinLikeRepository pinLikeRepository;
 
     //댓글 등록
     @Transactional
@@ -90,5 +90,34 @@ public class CommentService {
         catch(Exception e){
             throw new PinHandler(ErrorStatus.PIN_NOT_UPDATE);
         }
+    }
+
+    public ApiResponse pinDelete(Long commentId) {
+        try {
+            pinRepository.deleteById(commentId);
+        } catch (Exception e) {
+            throw new PinHandler(ErrorStatus.PIN_NOT_DELETE);
+        }
+        return ApiResponse.onSuccess(200);
+    }
+
+    //댓글 좋아요 추가/제거
+    public ApiResponse pinLikeSet(Long commentId, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+
+        PinLike likeEntity = pinLikeRepository.findByUser(user);
+
+        if(likeEntity == null){
+            pinLikeRepository.save(PinLikeConverter.toEntity(user,pin));
+            return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
+        }else{
+            pinLikeRepository.delete(likeEntity);
+            return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_UNLIKE);
+        }
+
+
+
+
     }
 }

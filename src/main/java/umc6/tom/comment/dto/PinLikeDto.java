@@ -2,8 +2,6 @@ package umc6.tom.comment.dto;
 
 import lombok.*;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @ToString

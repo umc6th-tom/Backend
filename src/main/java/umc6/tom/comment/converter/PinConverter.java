@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.board.model.Board;
-import umc6.tom.comment.dto.PinDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
@@ -12,7 +11,6 @@ import umc6.tom.comment.model.PinPicture;
 import umc6.tom.user.model.User;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component

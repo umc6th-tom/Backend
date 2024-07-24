@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.model.PinPicture;
+import umc6.tom.comment.model.PinLike;
+import umc6.tom.user.model.User;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class PinPictureConverter {
+public class PinLikeConverter {
 
-    public static PinPicture toPinPictureEntity(String picUrl,Pin pin) {
-        return PinPicture.builder()
-                .pic(picUrl)
+    public static PinLike toEntity(User user, Pin pin){
+        return PinLike.builder()
+                .user(user)
                 .pin(pin)
                 .build();
-
     }
 
 

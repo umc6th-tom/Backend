@@ -4,11 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
-import umc6.tom.comment.dto.PinDto;
-import umc6.tom.comment.dto.PinPictureDto;
 import umc6.tom.comment.dto.PinReqDto;
-import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.model.PinPicture;
 import umc6.tom.comment.service.CommentService;
 import umc6.tom.security.JwtTokenProvider;
 
@@ -41,6 +37,32 @@ public class CommentController {
 
         return pinService.pinModify(pinDto);
     }
+
+    //댓글 삭제
+    @DeleteMapping("/{commentId}")
+    public ApiResponse modify(@PathVariable("commentId") Long commentId) {
+
+        return pinService.pinDelete(commentId);
+    }
+
+    //댓글 좋아요
+    @PostMapping("/like/{commentId}")
+    public ApiResponse report(@PathVariable("commentId") Long commentId) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        return pinService.pinLikeSet(commentId,userId);
+    }
+
+    //댓글 신고
+//    @PostMapping("/report/{commentId}")
+//    public ApiResponse report(@PathVariable("commentId") Long commentId, @RequestBody ) {
+//        Long userId = jwtTokenProvider.getUserIdFromToken();
+//
+//        return pinService.pinDelete(commentId);
+//    }
+
+
+
 
 
 }
