@@ -16,6 +16,7 @@ import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardComplaint;
 import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.model.BoardPicture;
+import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.board.repository.*;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.common.model.Majors;
@@ -48,8 +49,6 @@ public class BoardServiceImpl implements BoardService{
 
         newBoard.setUser(user);
         newBoard.setMajors(majors);
-        newBoard.setStatus(Status.ACTIVE);
-
         return boardRepository.save(newBoard);
     }
 
@@ -129,9 +128,9 @@ public class BoardServiceImpl implements BoardService{
         if (!board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_USER_NOT_MATCH);
 
-        //댓글 작성 됐거나, 핫한 게시글시 삭제 못함.
+        //댓글 작성 됐거나, 핫한 게시글, 신고 상태에선 삭제 못함.
         //댓글 없고 대댓글만 있을 때 조건 추가야함*
-        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null )
+        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null)
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_DELETE);
 
         boardRepository.delete(board);
