@@ -2,6 +2,7 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
@@ -30,11 +31,14 @@ public class Board extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String content;
 
+    @Column(nullable = false, length = 20)
+    private String birthday;
+
     private LocalDateTime popularAt;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
-    private Status status;
+    private BoardStatus status;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<BoardPicture> boardPictureList = new ArrayList<>();
