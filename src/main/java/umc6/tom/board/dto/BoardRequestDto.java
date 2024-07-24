@@ -3,6 +3,8 @@ package umc6.tom.board.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
+import java.util.List;
+
 public class BoardRequestDto {
 
 
@@ -15,13 +17,20 @@ public class BoardRequestDto {
         String content;
         @NotBlank
         Long major;
-        //사진 구현 필요
+        List<String> pic;
     }
 
     @Getter
     public static class AddComplaintDto {
-
         @NotBlank
         String content;
+    }
+
+    @Getter
+    public static class UpdateBoardDto {
+        @NotBlank
+        String title;
+        String content;
+        List<String> pic;
     }
 }

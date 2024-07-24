@@ -5,6 +5,7 @@ import lombok.*;
 import umc6.tom.common.BaseEntity;
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

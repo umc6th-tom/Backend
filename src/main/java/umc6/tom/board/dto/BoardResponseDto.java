@@ -31,7 +31,7 @@ public class BoardResponseDto {
         Integer likeCount;
         String boardDate; // 21분전
         String userNickName;
-        //사진 구현 필요
+        List<String> picPreview;
     }
 
     @Builder
@@ -71,17 +71,48 @@ public class BoardResponseDto {
     public static class BoardComplaintDto{
         Long boardId;
         Long userId;
+        List<String> pic;
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class BoardMyAlarm{
+    public static class BoardMyAlarmDto{
         String category;
         String alarmContent;
         String boardTitle;
         LocalDateTime alarmAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardMainViewDto{
+        String title;
+        Integer likeCount;
+        Integer pinCount;
+        Boolean isHavingPic;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardMainViewListDto{
+        List<BoardMainViewDto> boardMajorList;
+        List<BoardMainViewDto> boardHotList;
+        List<BoardMainViewDto> boardAllList;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardUpdateDto{
+        Long boardId;
+        LocalDateTime updatedAt;
     }
 
 }

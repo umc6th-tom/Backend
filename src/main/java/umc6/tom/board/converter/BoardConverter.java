@@ -1,7 +1,9 @@
 package umc6.tom.board.converter;
 
 import org.springframework.data.domain.Page;
+import org.springframework.util.ObjectUtils;
 import umc6.tom.board.model.BoardComplaint;
+import umc6.tom.board.model.BoardPicture;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
@@ -94,6 +96,52 @@ public class BoardConverter {
         return BoardResponseDto.BoardComplaintDto.builder()
                 .boardId(boardComplaint.getId())
                 .userId(boardComplaint.getUser().getId())
+                .build();
+    }
+
+    public static BoardResponseDto.BoardMainViewDto toBoardMainListViewDto(Board board){
+        int pinCommentSize = 0; //대댓글 개수
+        for (Pin pin : board.getPinList())
+            pinCommentSize += pin.getPinCommentList().size();
+
+        return BoardResponseDto.BoardMainViewDto.builder()
+                .title(board.getTitle())
+                .likeCount(board.getBoardLikeList().size())
+                .pinCount(board.getPinList().size() + pinCommentSize)
+                .isHavingPic(!ObjectUtils.isEmpty(board.getBoardPictureList()))
+                .build();
+    }
+
+    public static BoardResponseDto.BoardMainViewListDto toBoardMainListViewListDto(List<Board> boardMajorList,
+                                                                                   List<Board> boardHotList,
+                                                                                   List<Board> boardAllList){
+
+        List<BoardResponseDto.BoardMainViewDto> boardMajorListViewDtoList = boardMajorList.stream()
+                .map(BoardConverter::toBoardMainListViewDto).collect(Collectors.toList());
+
+        List<BoardResponseDto.BoardMainViewDto> boardHotListViewDtoList = boardHotList.stream()
+                .map(BoardConverter::toBoardMainListViewDto).collect(Collectors.toList());
+
+        List<BoardResponseDto.BoardMainViewDto> boardAllListViewDtoList = boardAllList.stream()
+                .map(BoardConverter::toBoardMainListViewDto).collect(Collectors.toList());
+
+        return BoardResponseDto.BoardMainViewListDto.builder()
+                .boardMajorList(boardMajorListViewDtoList)
+                .boardHotList(boardHotListViewDtoList)
+                .boardAllList(boardAllListViewDtoList)
+                .build();
+    }
+    public static BoardPicture toBardPicture(Board board, String pic){
+        return BoardPicture.builder()
+                .board(board)
+                .pic(pic)
+                .build();
+    }
+
+    public static BoardResponseDto.BoardUpdateDto toUpdateBoardDto(Board board){
+        return BoardResponseDto.BoardUpdateDto.builder()
+                .boardId(board.getId())
+                .updatedAt(board.getUpdatedAt())
                 .build();
     }
 
