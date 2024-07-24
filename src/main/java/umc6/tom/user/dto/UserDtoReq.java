@@ -2,10 +2,7 @@ package umc6.tom.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 public class UserDtoReq {
 
@@ -53,6 +50,14 @@ public class UserDtoReq {
         private String account;
     }
 
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class PhoneDto {
+        private String phone;
+    }
 
     @Getter
     @ToString
@@ -100,11 +105,6 @@ public class UserDtoReq {
     @Getter
     public static class RestoreNickNameDto {
         private String nickName;
-    }
-
-    @Getter
-    public static class RestorePhoneDto {
-        private String phone;
     }
 
     @Getter

@@ -44,6 +44,9 @@ dependencies {
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+	// 문자 메세지
+	implementation 'net.nurigo:sdk:4.2.7'
 }
 
 

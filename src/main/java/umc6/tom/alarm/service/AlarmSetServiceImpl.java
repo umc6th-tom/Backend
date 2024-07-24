@@ -36,7 +36,11 @@ public class AlarmSetServiceImpl implements AlarmSetService {
     public AlarmOnOff pinAlarmChange(Long userId) {
 
         AlarmSet alarmSet = getAlarmSetFromUser(userId);
-        alarmSet.setPinSet(AlarmOnOff.OFF);
+        if (alarmSet.getPinSet() == AlarmOnOff.OFF) {
+            alarmSet.setPinSet(AlarmOnOff.ON);
+        } else {
+            alarmSet.setPinSet(AlarmOnOff.OFF);
+        }
         return alarmSet.getPinSet();
     }
 
@@ -44,7 +48,12 @@ public class AlarmSetServiceImpl implements AlarmSetService {
     public AlarmOnOff commentAlarmChange(Long userId) {
 
         AlarmSet alarmSet = getAlarmSetFromUser(userId);
-        alarmSet.setCommentSet(AlarmOnOff.ON);
+        if (alarmSet.getCommentSet() == AlarmOnOff.OFF) {
+            alarmSet.setCommentSet(AlarmOnOff.ON);
+        } else {
+            alarmSet.setCommentSet(AlarmOnOff.OFF);
+        }
+
         return alarmSet.getCommentSet();
     }
 
@@ -52,7 +61,11 @@ public class AlarmSetServiceImpl implements AlarmSetService {
     public AlarmOnOff eventAlarmChange(Long userId) {
 
         AlarmSet alarmSet = getAlarmSetFromUser(userId);
-        alarmSet.setEventSet(AlarmOnOff.ON);
+        if (alarmSet.getEventSet() == AlarmOnOff.OFF) {
+            alarmSet.setEventSet(AlarmOnOff.ON);
+        } else {
+            alarmSet.setEventSet(AlarmOnOff.OFF);
+        }
         return alarmSet.getEventSet();
     }
 
@@ -60,7 +73,11 @@ public class AlarmSetServiceImpl implements AlarmSetService {
     public AlarmOnOff hotAlarmChange(Long userId) {
 
         AlarmSet alarmSet = getAlarmSetFromUser(userId);
-        alarmSet.setHotSet(AlarmOnOff.ON);
+        if (alarmSet.getHotSet() == AlarmOnOff.OFF) {
+            alarmSet.setHotSet(AlarmOnOff.ON);
+        } else {
+            alarmSet.setHotSet(AlarmOnOff.OFF);
+        }
         return alarmSet.getHotSet();
     }
 
@@ -68,7 +85,11 @@ public class AlarmSetServiceImpl implements AlarmSetService {
     public AlarmOnOff likeAlarmChange(Long userId) {
 
         AlarmSet alarmSet = getAlarmSetFromUser(userId);
-        alarmSet.setLikeSet(AlarmOnOff.ON);
+        if (alarmSet.getLikeSet() == AlarmOnOff.OFF) {
+            alarmSet.setLikeSet(AlarmOnOff.ON);
+        } else {
+            alarmSet.setLikeSet(AlarmOnOff.OFF);
+        }
         return alarmSet.getLikeSet();
     }
 
@@ -76,7 +97,11 @@ public class AlarmSetServiceImpl implements AlarmSetService {
     public AlarmOnOff noticeAlarmChange(Long userId) {
 
         AlarmSet alarmSet = getAlarmSetFromUser(userId);
-        alarmSet.setNoticeSet(AlarmOnOff.ON);
+        if (alarmSet.getNoticeSet() == AlarmOnOff.OFF) {
+            alarmSet.setNoticeSet(AlarmOnOff.ON);
+        } else {
+            alarmSet.setNoticeSet(AlarmOnOff.OFF);
+        }
         return alarmSet.getNoticeSet();
     }
 
