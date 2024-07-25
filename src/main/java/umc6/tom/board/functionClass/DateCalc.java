@@ -1,11 +1,16 @@
 package umc6.tom.board.functionClass;
 
+import org.springframework.util.ObjectUtils;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class DateCalc {
 
     public String boardListDate(LocalDateTime pastDateTime) {
+        if(ObjectUtils.isEmpty(pastDateTime))
+            return "알 수 없음";
+
         LocalDateTime now = LocalDateTime.now();
         Duration duration = Duration.between(pastDateTime, now);
         

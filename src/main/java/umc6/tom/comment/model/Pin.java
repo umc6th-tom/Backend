@@ -1,5 +1,6 @@
 package umc6.tom.comment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.model.Board;
