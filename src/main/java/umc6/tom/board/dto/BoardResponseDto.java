@@ -4,7 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc6.tom.board.model.BoardPicture;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinComment;
+import umc6.tom.comment.model.PinLike;
+import umc6.tom.comment.model.PinPicture;
+import umc6.tom.user.model.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -129,7 +134,44 @@ public class BoardResponseDto {
         Integer likeCount;
         String boardDate; // 21분전
         List<String> boardPic;
-        List<Pin> pinList;
+        List<BoardViewPinListDto> pinList;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardViewPinListDto{
+        Long id;
+        String userNickname;
+        String comment;
+        String pinDate;
+        Integer pinLikeCount;
+        Integer pinCommentCount;
+        List<BoardViewPinCommentListDto> pinCommentList;
+        List<String> pinPictureList;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardViewPictureListDto{
+        Long id;
+        String pic;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardViewPinCommentListDto{
+        Long id;
+        String userNickname;
+        String comment;
+        String pinCommentDate;
+        Integer pinLikeCount;
+        List<String> pinPicList;
     }
 
 }

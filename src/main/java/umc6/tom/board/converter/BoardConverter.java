@@ -10,6 +10,9 @@ import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
+import umc6.tom.comment.model.PinComment;
+import umc6.tom.comment.model.PinCommentPicture;
+import umc6.tom.comment.model.PinPicture;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -148,12 +151,15 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board){
         int pinCommentSize = 0; //대댓글 개수
-        List<String> picURL = new ArrayList<>();
         for (Pin pin : board.getPinList())
             pinCommentSize += pin.getPinCommentList().size();
 
-        for (BoardPicture boardPicture : board.getBoardPictureList())
-            picURL.add(boardPicture.getPic());
+        List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = board.getPinList().stream()
+                .map(BoardConverter::toBoardViewPinListDto).collect(Collectors.toList());
+
+        List<String> newBoardPicList = new ArrayList<>();
+        for (BoardPicture picture : board.getBoardPictureList())
+            newBoardPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewDto.builder()
                 .userNickname(board.getUser().getNickName())
@@ -163,8 +169,49 @@ public class BoardConverter {
                 .pinCount(board.getPinList().size() + pinCommentSize)
                 .likeCount(board.getBoardLikeList().size())
                 .boardDate(new DateCalc().boardListDate(board.getCreatedAt()))
-                .boardPic(picURL)
-                .pinList(board.getPinList())
+                .boardPic(newBoardPicList)
+                .pinList(toBoardViewPinListDtoList)
                 .build();
     }
+
+    public static BoardResponseDto.BoardViewPinListDto toBoardViewPinListDto(Pin pin){
+        int pinCommentSize = 0; //대댓글 개수
+        for (PinComment pinComment : pin.getPinCommentList())
+            pinCommentSize += 1;
+
+        List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getPinCommentList().stream()
+                .map(BoardConverter::toBoardPinCommentListDto).collect(Collectors.toList());
+
+        List<String> newPinPicList = new ArrayList<>();
+        for (PinPicture picture : pin.getPinPictureList())
+            newPinPicList.add(picture.getPic());
+
+        return BoardResponseDto.BoardViewPinListDto.builder()
+                .id(pin.getId())
+                .userNickname(pin.getUser().getNickName())
+                .comment(pin.getComment())
+                .pinDate(new DateCalc().boardListDate(pin.getCreatedAt()))
+                .pinLikeCount(pin.getPinLikeList().size())
+                .pinCommentCount(pinCommentSize)
+                .pinCommentList(toBoardViewPinCommentListDtoList)
+                .pinPictureList(newPinPicList)
+                .build();
+    }
+
+    public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(PinComment pinComment){
+        List<String> newPinCommentPicList = new ArrayList<>();
+
+        for (PinCommentPicture picture : pinComment.getPinCommentPictureList())
+            newPinCommentPicList.add(picture.getPic());
+
+        return BoardResponseDto.BoardViewPinCommentListDto.builder()
+                .id(pinComment.getId())
+                .userNickname(pinComment.getUser().getNickName())
+                .comment(pinComment.getComment())
+                .pinCommentDate(new DateCalc().boardListDate(pinComment.getCreatedAt()))
+                .pinLikeCount(pinComment.getPinCommentLikeList().size())
+                .pinPicList(newPinCommentPicList)
+                .build();
+    }
+
 }
