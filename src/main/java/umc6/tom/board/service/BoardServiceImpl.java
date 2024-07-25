@@ -92,7 +92,7 @@ public class BoardServiceImpl implements BoardService{
         List<Board> boardMajorList = boardRepository.findTop5ByStatusAndMajorsOrderByCreatedAtDesc
                 (BoardStatus.ACTIVE,user.getMajors());
         List<Board> boardhotList = boardRepository.findTop5ByStatusAndPopularAtIsNotNullOrderByCreatedAtDesc(BoardStatus.ACTIVE);
-        List<Board> boardAllList = boardRepository.findTop5ByStatusAndOrderByCreatedAtDesc(BoardStatus.ACTIVE);
+        List<Board> boardAllList = boardRepository.findTop5ByStatusOrderByCreatedAtDesc(BoardStatus.ACTIVE);
         BoardResponseDto.BoardMainViewListDto boardMainList = BoardConverter.toBoardMainListViewListDto
                 (boardMajorList, boardhotList, boardAllList);
         return boardMainList;
