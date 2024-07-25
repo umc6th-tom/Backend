@@ -31,7 +31,7 @@ import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.CookieUtil;
 import umc6.tom.util.RedisUtil;
-//import umc6.tom.util.SmsUtil;
+import umc6.tom.util.SmsUtil;
 
 import java.security.SecureRandom;
 import java.time.Instant;
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     private final MajorsRepository majorsRepository;
     private final PasswordEncoder passwordEncoder;
     private final AlarmSetRepository alarmSetRepository;
-    //private final SmsUtil smsUtil;
+    private final SmsUtil smsUtil;
     private final RedisUtil redisUtil;
 
 
@@ -116,7 +116,7 @@ public class UserServiceImpl implements UserService {
         request.setPhone(request.getPhone().replaceAll("-", ""));
 
         log.info("{} 인증번호 : {}", request.getPhone(), verificationCode);
-        //smsUtil.sendMessage(request.getPhone(), verificationCode);
+        smsUtil.sendMessage(request.getPhone(), verificationCode);
 
         redisUtil.setDataAndExpire(verificationCode, request.getPhone(), 60 * 5L);
 
