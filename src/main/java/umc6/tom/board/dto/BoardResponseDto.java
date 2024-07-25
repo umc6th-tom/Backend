@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc6.tom.comment.model.Pin;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -113,6 +114,22 @@ public class BoardResponseDto {
     public static class BoardUpdateDto{
         Long boardId;
         LocalDateTime updatedAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardViewDto{
+        String userNickname;
+        String userProfilePic;
+        String title;
+        String content;
+        Integer pinCount;
+        Integer likeCount;
+        String boardDate; // 21분전
+        List<String> boardPic;
+        List<Pin> pinList;
     }
 
 }

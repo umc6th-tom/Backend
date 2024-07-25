@@ -13,6 +13,7 @@ import umc6.tom.board.model.BoardLike;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public class BoardConverter {
                 .likeCount(board.getBoardLikeList().size())
                 .pinCount(board.getPinList().size() + pinCommentSize)
                 .userNickName(board.getUser().getNickName())
-                .boardDate(new DateCalc().boardListDate(board.getUpdatedAt()))
+                .boardDate(new DateCalc().boardListDate(board.getCreatedAt()))
                 .build();
     }
 
@@ -145,4 +146,25 @@ public class BoardConverter {
                 .build();
     }
 
+    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board){
+        int pinCommentSize = 0; //대댓글 개수
+        List<String> picURL = new ArrayList<>();
+        for (Pin pin : board.getPinList())
+            pinCommentSize += pin.getPinCommentList().size();
+
+        for (BoardPicture boardPicture : board.getBoardPictureList())
+            picURL.add(boardPicture.getPic());
+
+        return BoardResponseDto.BoardViewDto.builder()
+                .userNickname(board.getUser().getNickName())
+                .userProfilePic(board.getUser().getPic())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .pinCount(board.getPinList().size() + pinCommentSize)
+                .likeCount(board.getBoardLikeList().size())
+                .boardDate(new DateCalc().boardListDate(board.getCreatedAt()))
+                .boardPic(picURL)
+                .pinList(board.getPinList())
+                .build();
+    }
 }

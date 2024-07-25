@@ -132,14 +132,16 @@ public class BoardRestController {
     }
 
     /**
-     * 24.07.24 작성자 : 박재락
+     * 24.07.25 작성자 : 박재락
      * 핫한 게시판 검색 조회
      */
     @GetMapping("/search-hot/{search_type}/{search_keyWord}")
-    public void searchHotBoard(@PathVariable (name = "search_type") String searchType,
-                               @PathVariable (name = "search_keyWord") String searchKeyword,
-                               @RequestParam(name = "page") Integer page) {
-        
+    public ApiResponse<BoardResponseDto.BoardListViewListDto> searchHotBoard(@PathVariable (name = "search_type") String searchType,
+                                                                             @PathVariable (name = "search_keyWord") String searchKeyword,
+                                                                             @RequestParam(name = "page") Integer page) {
+
+        Page<Board> boardPage = boardService.getSearchHotBoardList(searchType, searchKeyword, page);
+        return ApiResponse.onSuccess(BoardConverter.toBoardListViewListDTO(boardPage));
     }
 
     /**
@@ -169,10 +171,23 @@ public class BoardRestController {
      * 게시물 수정
      */
     @PatchMapping("/{board_id}")
-    public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestBody @Valid BoardRequestDto.UpdateBoardDto request, @PathVariable(name = "board_id") Long boardId){
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
-        Board board = boardService.updateBoard(request, 2L, boardId);
+    public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestBody @Valid BoardRequestDto.UpdateBoardDto request,
+                                                                    @PathVariable(name = "board_id") Long boardId){
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        Board board = boardService.updateBoard(request, userId, boardId);
 
         return ApiResponse.onSuccess(BoardConverter.toUpdateBoardDto(board));
     }
+
+    /**
+     * 24.07.25 작성자 : 박재락
+     * 게시글 조회
+     */
+    @GetMapping("/{board_id}")
+    public ApiResponse<BoardResponseDto.BoardViewDto> boardView(@RequestParam(name = "page") Integer page,
+                          @PathVariable(name = "board_id") Long boardId) {
+
+        return ApiResponse.onSuccess(boardService.getBoardView(boardId));
+    }
+
 }
