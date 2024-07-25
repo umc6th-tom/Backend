@@ -33,11 +33,10 @@ public class UserConverter {
     }
 
     // 휴대폰 인증 응답
-    public static UserDtoRes.PhoneAuthDto phoneAuth(String phone, String authNum) {
+    public static UserDtoRes.PhoneAuthDto phoneAuth(String phone) {
 
         return UserDtoRes.PhoneAuthDto.builder()
                 .phone(phone)
-                .authNum(authNum)
                 .build();
     }
 
@@ -52,11 +51,12 @@ public class UserConverter {
     }
 
     // 로그인 응답
-    public static UserDtoRes.LoginDto signInRes(User user, String accessToken) {
+    public static UserDtoRes.LoginDto signInRes(User user, String accessToken, String refreshToken) {
 
         return UserDtoRes.LoginDto.builder()
                 .userId(user.getId())
                 .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .createdAt(user.getCreatedAt())
                 .build();
     }
