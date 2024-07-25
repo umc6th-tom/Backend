@@ -15,10 +15,8 @@ import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardComplaint;
 import umc6.tom.board.model.BoardLike;
-import umc6.tom.board.model.BoardPicture;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.board.repository.*;
-import umc6.tom.comment.model.Pin;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.enums.Status;
 import umc6.tom.user.model.User;
@@ -58,33 +56,45 @@ public class BoardServiceImpl implements BoardService{
                 -> new BoardHandler(ErrorStatus.MAJORS_NOR_FOUND));
 
         Page<Board> boardPage = boardRepository.findAllByStatusAndMajorsOrderByCreatedAtDesc
-                (Status.ACTIVE, majors, PageRequest.of(page, 12));
+                (BoardStatus.ACTIVE, majors, PageRequest.of(page, 12));
         return boardPage;
     }
 
     @Override
     public Page<Board> getBoardAllList(Integer page) {
         Page<Board> boardPage= boardRepository.findAllByStatusOrderByCreatedAtDesc
-                (Status.ACTIVE, PageRequest.of(page, 12));
+                (BoardStatus.ACTIVE, PageRequest.of(page, 12));
 
         return boardPage;
     }
 
     @Override
     public Page<Board> getBoardHotList(Integer page) {
-        Page<Board> boardPage= boardRepository.findAllByPopularAtIsNotNullOrderByCreatedAtDesc
-                (PageRequest.of(page, 12));
+        Page<Board> boardPage= boardRepository.findAllByStatusAndPopularAtIsNotNullOrderByCreatedAtDesc
+                (BoardStatus.ACTIVE, PageRequest.of(page, 12));
 
         return boardPage;
     }
 
     @Override
+    public BoardResponseDto.BoardViewDto getBoardView(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+        //신고로 안보이게 된 게시글 조회 방지
+        if (!board.getStatus().equals(BoardStatus.ACTIVE))
+            throw new BoardHandler(ErrorStatus.BOARD_NOT_FOUND);
+
+        return BoardConverter.toBoardViewDto(board);
+    }
+
+    @Override
     public BoardResponseDto.BoardMainViewListDto getBoardMainList(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-        List<Board> boardMajorList = boardRepository.findTop5ByMajorsOrderByCreatedAtDesc(user.getMajors());
-        List<Board> boardhotList = boardRepository.findTop5ByPopularAtIsNotNullOrderByCreatedAtDesc();
-        List<Board> boardAllList = boardRepository.findTop5ByOrderByCreatedAtDesc();
-        BoardResponseDto.BoardMainViewListDto boardMainList = BoardConverter.toBoardMainListViewListDto(boardMajorList, boardhotList, boardAllList);
+        List<Board> boardMajorList = boardRepository.findTop5ByStatusAndMajorsOrderByCreatedAtDesc
+                (BoardStatus.ACTIVE,user.getMajors());
+        List<Board> boardhotList = boardRepository.findTop5ByStatusAndPopularAtIsNotNullOrderByCreatedAtDesc(BoardStatus.ACTIVE);
+        List<Board> boardAllList = boardRepository.findTop5ByStatusAndOrderByCreatedAtDesc(BoardStatus.ACTIVE);
+        BoardResponseDto.BoardMainViewListDto boardMainList = BoardConverter.toBoardMainListViewListDto
+                (boardMajorList, boardhotList, boardAllList);
         return boardMainList;
     }
 
@@ -132,8 +142,15 @@ public class BoardServiceImpl implements BoardService{
         //댓글 없고 대댓글만 있을 때 조건 추가야함*
         if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null)
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_DELETE);
+        //신고 기록없을 때만 실제 데이터 삭제
+        //신고 상태에서 삭제하면 화면에만 안보이고 실제 데이터 보존
+        if (board.getStatus().equals(BoardStatus.ACTIVE) || board.getReport()==0)
+            boardRepository.delete(board);
+        else if(board.getReport()>=1) {
+            board.setStatus(BoardStatus.COMPLAINTDELETE);
+            boardRepository.save(board);
+        }
 
-        boardRepository.delete(board);
         return board;
     }
 
@@ -162,7 +179,16 @@ public class BoardServiceImpl implements BoardService{
     public BoardComplaint complaintBoard(BoardRequestDto.AddComplaintDto request, Long userId, Long boardId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        board.setReport(board.getReport()+1);
+        if (board.getReport()==10)
+            board.setStatus(BoardStatus.OVERCOMPLAINT);
+
+        boardRepository.save(board);
         BoardComplaint boardComplaint = BoardConverter.toBoardComplaint(request, user, board);
+        boardComplaint.setBoardTitle(board.getTitle());
+        boardComplaint.setBoardContent(board.getContent());
+        boardComplaint.setBoardUserId(board.getUser().getId());
         return boardComplaintRepository.save(boardComplaint);
     }
 
@@ -171,21 +197,20 @@ public class BoardServiceImpl implements BoardService{
         Page<Board> boardPage;
 
         if (searchType.equals("title"))
-            boardPage = boardRepository.findAllByTitleContainingOrderByCreatedAtDesc
-                    (searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository.findAllByStatusAndTitleContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("content"))
-            boardPage = boardRepository.findAllByContentContainingOrderByCreatedAtDesc
-                    (searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository.findAllByStatusAndContentContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("title-content"))
-            boardPage = boardRepository.findAllByTitleContainingOrContentContainingOrderByCreatedAtDesc
-                    (searchKeyword, searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository.findAllByStatusAndTitleContainingOrContentContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("nickname"))
-            boardPage = boardRepository.findAllByUser_NickNameContainingOrderByCreatedAtDesc
-                    (searchKeyword, PageRequest.of(page, 12));
-
+            boardPage = boardRepository.findAllByStatusAndUser_NickNameContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
         else
             throw new BoardHandler(ErrorStatus.BOARD_SEARCHTYPE_NOT_FOUND);
         
@@ -201,21 +226,49 @@ public class BoardServiceImpl implements BoardService{
         Page<Board> boardPage;
 
         if (searchType.equals("title"))
-            boardPage = boardRepository.findAllByMajorsIdAndTitleContainingOrderByCreatedAtDesc
-                    (majorId, searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository.findAllByStatusAndMajorsIdAndTitleContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, majorId, searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("content"))
-            boardPage = boardRepository.findAllByMajorsIdAndContentContainingOrderByCreatedAtDesc
-                    (majorId, searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository.findAllByStatusAndMajorsIdAndContentContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, majorId, searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("title-content"))
-            boardPage = boardRepository.findAllByMajorsIdAndTitleContainingOrContentContainingOrderByCreatedAtDesc
-                    (majorId, searchKeyword,searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository.findAllByStatusAndMajorsIdAndTitleContainingOrContentContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, majorId, searchKeyword,searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("nickname"))
-            boardPage = boardRepository. findAllByMajorsIdAndUser_NickNameContainingOrderByCreatedAtDesc
-                    (majorId, searchKeyword, PageRequest.of(page, 12));
+            boardPage = boardRepository. findAllByStatusAndMajorsIdAndUser_NickNameContainingOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, majorId, searchKeyword, PageRequest.of(page, 12));
+        else
+            throw new BoardHandler(ErrorStatus.BOARD_SEARCHTYPE_NOT_FOUND);
 
+        //검색한 결과가 없을 때
+        if (ObjectUtils.isEmpty(boardPage))
+            throw new BoardHandler(ErrorStatus.BOARD_NOT_SEARCH);
+
+        return boardPage;
+    }
+
+    @Override
+    public Page<Board> getSearchHotBoardList(String searchType, String searchKeyword, Integer page) {
+        Page<Board> boardPage;
+
+        if (searchType.equals("title"))
+            boardPage = boardRepository.findAllByStatusAndTitleContainingAndPopularAtIsNotNullOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
+
+        else if (searchType.equals("content"))
+            boardPage = boardRepository.findAllByStatusAndContentContainingAndPopularAtIsNotNullOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
+
+        else if (searchType.equals("title-content"))
+            boardPage = boardRepository.findAllByStatusAndTitleContainingOrContentContainingAndPopularAtIsNotNullOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, searchKeyword, PageRequest.of(page, 12));
+
+        else if (searchType.equals("nickname"))
+            boardPage = boardRepository.findAllByStatusAndUser_NickNameContainingAndPopularAtIsNotNullOrderByCreatedAtDesc
+                    (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
         else
             throw new BoardHandler(ErrorStatus.BOARD_SEARCHTYPE_NOT_FOUND);
 

@@ -24,6 +24,8 @@ public interface BoardService {
 
     Page<Board> getSearchAllBoardList(String searchType, String searchKeyword, Integer page);
     Page<Board> getSearchMajorBoardList(Long majorId, String searchType, String searchKeyword, Integer page);
+    Page<Board> getSearchHotBoardList(String searchType, String searchKeyword, Integer page);
 
+    BoardResponseDto.BoardViewDto getBoardView(Long boardId);
 
 }
