@@ -97,7 +97,7 @@ public class BoardRestController {
      * 게시물 신고
      */
     @PostMapping("/report/{board_id}")
-    public ApiResponse<BoardResponseDto.BoardComplaintDto> deleteBoard(@RequestBody @Valid BoardRequestDto.AddComplaintDto request,
+    public ApiResponse<BoardResponseDto.BoardComplaintDto> reportBoard(@RequestBody @Valid BoardRequestDto.AddComplaintDto request,
                                                                        @PathVariable (name = "board_id") Long boardId) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         BoardComplaint boardComplaint= boardService.complaintBoard(request, userId, boardId);
