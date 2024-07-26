@@ -1,0 +1,44 @@
+spring:
+  datasource:
+    url: ${AWS_DB_URL}
+    username: ${AWS_DB_USERNAME}
+    password: ${AWS_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        hbm2ddl:
+          auto: update
+        default_batch_fetch_size: 1000
+  redis:
+    host: ${REDIS_HOSTNAME}
+    port: ${REDIS_PORT}
+
+#  servlet:
+#    multipart:
+#      enabled: true
+#      max-file-size: 200MB
+#      max-request-size: 300MB
+
+jwt:
+  secret: ${JWT_SECRET_KEY}
+
+coolSms:
+  api:
+    sender: ${SMS_SENDER}
+    key: ${SMS_KEY}
+    secretKey: ${SMS_SECRET_KEY}
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
