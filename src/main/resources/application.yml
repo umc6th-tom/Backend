@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: ${AWS_DB_URL} # jdbc:mysql://localhost:3306/Yesol
+    username: ${AWS_DB_USERNAME} # root
+    password: ${AWS_DB_PASSWORD} # fbrlgus!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: never
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        hbm2ddl:
+          auto: update
+        default_batch_fetch_size: 1000
+  redis:
+    host: ${REDIS_HOSTNAME} # localhost
+    port: ${REDIS_PORT} # 6379
+
+#  servlet:
+#    multipart:
+#      enabled: true
+#      max-file-size: 200MB
+#      max-request-size: 300MB
+
+jwt:
+  secret: ${JWT_SECRET_KEY} # 9hlumHCidTRrSgjVSHXOej5OQv1Ds3oBjfOiAnZpQucAqFCs9yRKOzIRd8f2E38n
+
+coolSms:
+  api:
+    sender: ${SMS_SENDER} # 01022945135
+    key: ${SMS_KEY} # NCSUFU1NPKUPWU7A
+    secretKey: ${SMS_SECRET_KEY} # CQJZL5A3LETDYCAJEDM8DPU0MEYIMLNS
