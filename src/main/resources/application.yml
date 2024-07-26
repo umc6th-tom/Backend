@@ -35,3 +35,10 @@ coolSms:
     sender: ${SMS_SENDER}
     key: ${SMS_KEY}
     secretKey: ${SMS_SECRET_KEY}
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
