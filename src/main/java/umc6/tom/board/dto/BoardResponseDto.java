@@ -77,7 +77,6 @@ public class BoardResponseDto {
     public static class BoardComplaintDto{
         Long boardId;
         Long userId;
-        List<String> pic;
     }
 
     @Builder
