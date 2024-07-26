@@ -43,6 +43,11 @@ public class BoardConverter {
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
             pinCommentSize += pin.getPinCommentList().size();
+        String boardPreViewPic = null;
+        
+        //list는 없는 index 참조시 나는 오류를 제거
+        if(!ObjectUtils.isEmpty(board.getBoardPictureList()))
+            boardPreViewPic = board.getBoardPictureList().get(0).getPic();
 
         return BoardResponseDto.BoardListViewDto.builder()
                 .title(board.getTitle())
@@ -50,6 +55,7 @@ public class BoardConverter {
                 .likeCount(board.getBoardLikeList().size())
                 .pinCount(board.getPinList().size() + pinCommentSize)
                 .userNickName(board.getUser().getNickName())
+                .picPreview(boardPreViewPic)
                 .boardDate(new DateCalc().boardListDate(board.getCreatedAt()))
                 .build();
     }

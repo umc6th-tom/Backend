@@ -37,7 +37,7 @@ public class BoardResponseDto {
         Integer likeCount;
         String boardDate; // 21분전
         String userNickName;
-        List<String> picPreview;
+        String picPreview;
     }
 
     @Builder
