@@ -2,6 +2,7 @@ package umc6.tom.user.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
@@ -51,4 +52,8 @@ public interface UserService {
     void restoreMajor(Long userId, UserDtoReq.RestoreMajorDto request);
 
     UserDtoRes.ChangeAgreementDto changeAgreement(Long userId);
+
+    UserDtoRes.RestorePic restorePic(Long userId, MultipartFile request);
+
+    void restorePicDef(Long userId);
 }

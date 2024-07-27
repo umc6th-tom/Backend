@@ -48,7 +48,7 @@ public class User extends BaseEntity implements UserDetails {
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'AGREE'")
     private Agreement agreement;
 
-    @Column(length = 50)
+    @Column
     private String pic;
 
     @Enumerated(EnumType.STRING)

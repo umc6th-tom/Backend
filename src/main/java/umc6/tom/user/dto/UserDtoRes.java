@@ -86,4 +86,13 @@ public class UserDtoRes {
         private List<Board> commented;
         private String message;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class RestorePic {
+
+        private Long userId;
+        private String pic;
+    }
 }

@@ -17,15 +17,38 @@ spring:
         hbm2ddl:
           auto: update
         default_batch_fetch_size: 1000
-  redis:
-    host: ${REDIS_HOSTNAME}
-    port: ${REDIS_PORT}
+
+  data:
+    redis:
+      host: ${REDIS_HOSTNAME}
+      port: ${REDIS_PORT}
 
 #  servlet:
 #    multipart:
 #      enabled: true
 #      max-file-size: 200MB
 #      max-request-size: 300MB
+
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET}
+      profile: ${S3_PROFILE}
+      board: ${S3_BOARD}
+      boardComplain: ${S3_BOARD_COMPLAIN}
+      pin: ${S3_PIN}
+      comment: ${S3_COMMENT}
+      pinComplain: ${S3_PIN_COMPLAIN}
+      commentComplain: ${S3_COMMENT_COMPLAIN}
+      notice: ${S3_NOTICE}
+    region:
+      static: ${AWS_REGION}
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AMAZON_S3_ACCESS_KEY}
+      secret-key: ${AMAZON_S3_SECRET_KEY}
+
 
 jwt:
   secret: ${JWT_SECRET_KEY}

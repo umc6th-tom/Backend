@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.security.JwtTokenProvider;
@@ -215,11 +216,25 @@ public class UserController {
      * 24.07. 작성자 : 류기현
      * 프로필 사진 변경
      */
+    @PatchMapping(value = "/pic-restore", consumes = "multipart/form-data")
+    public ApiResponse<UserDtoRes.RestorePic> restorePic(@RequestPart MultipartFile request) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        return ApiResponse.onSuccess(userService.restorePic(userId, request));
+    }
 
     /**
      * 24.07. 작성자 : 류기현
      * 프로필 사진 삭제(기본으로 변경)
      */
+    @PatchMapping("pic-default")
+    public ApiResponse<SuccessStatus> restorePicDefault() {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        userService.restorePicDef(userId);
+
+        return ApiResponse.onSuccessWithoutResult(SuccessStatus._OK);
+    }
 
     /**
      * 24.07.23 작성자 : 류기현

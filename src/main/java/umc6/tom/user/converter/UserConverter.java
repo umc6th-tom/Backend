@@ -19,7 +19,7 @@ import java.util.List;
 public class UserConverter {
 
     // 회원 객체 생성
-    public static User toUser(UserDtoReq.JoinDto request, Majors major) {
+    public static User toUser(UserDtoReq.JoinDto request, Majors major, String defaultProfilePAth) {
 
         return User.builder()
                 .name(request.getName())
@@ -27,6 +27,8 @@ public class UserConverter {
                 .account(request.getAccount())
                 .password(request.getPassword())
                 .phone(request.getPhone())
+                .agreement(Agreement.AGREE)
+                .pic(defaultProfilePAth)
                 .majors(major)
                 .status(UserStatus.ACTIVE)
                 .build();
