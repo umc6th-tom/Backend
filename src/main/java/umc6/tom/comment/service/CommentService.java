@@ -22,6 +22,8 @@ import umc6.tom.comment.repository.*;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -112,13 +114,19 @@ public class CommentService {
 
         CommentLike likeEntity = commentLikeRepository.findByUser(user);
 
-        if(likeEntity == null){
-            commentLikeRepository.save(CommentLikeConverter.toEntity(user,comment));
-            return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
+        if(Objects.equals(user.getId(), comment.getUser().getId())){
+            return ApiResponse.onFailure("COMMENT_LIKE_4010","자기 댓글에 좋아요를 누를 수 없습니다.", null);
         }else{
-            commentLikeRepository.delete(likeEntity);
-            return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_UNLIKE);
+            if(likeEntity == null){
+                commentLikeRepository.save(CommentLikeConverter.toEntity(user,comment));
+                return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
+            }else{
+                commentLikeRepository.delete(likeEntity);
+                return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_UNLIKE);
+            }
         }
+
+
     }
 
     //대댓글 신고하기
@@ -128,12 +136,17 @@ public class CommentService {
 
         CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
 
-        CommentComplaint commentComplaintSaved = commentComplaintRepository.save(commentComplaintEntity);
+        if(Objects.equals(user.getId(), comment.getUser().getId())){
+            return ApiResponse.onFailure("COMMENT_REPORT_4011","자기 댓글을 신고할 수 없습니다.", null);
+        }else {
+            CommentComplaint commentComplaintSaved = commentComplaintRepository.save(commentComplaintEntity);
 
-        for(String pic : reportDto.getPic()){
-            commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
+            for (String pic : reportDto.getPic()) {
+                commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
+            }
+
+            return ApiResponse.onSuccess(200);
         }
 
-        return ApiResponse.onSuccess(200);
     }
 }

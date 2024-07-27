@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import umc6.tom.apiPayload.code.BaseCode;
+import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
 
 @Getter
