@@ -33,14 +33,6 @@ cloud:
   aws:
     s3:
       bucket: ${S3_BUCKET}
-      profile: ${S3_PROFILE}
-      board: ${S3_BOARD}
-      boardComplain: ${S3_BOARD_COMPLAIN}
-      pin: ${S3_PIN}
-      comment: ${S3_COMMENT}
-      pinComplain: ${S3_PIN_COMPLAIN}
-      commentComplain: ${S3_COMMENT_COMPLAIN}
-      notice: ${S3_NOTICE}
     region:
       static: ${AWS_REGION}
     stack:

@@ -27,29 +27,21 @@ public class AmazonConfig {
     @Value("${cloud.aws.region.static}")
     private String region;
 
-    @Value("${cloud.aws.s3.profile}")
-    private String profilePath;
+    private final String profilePath = "profile";
 
-    @Value("${cloud.aws.s3.board}")
-    private String boardPath;
+    private final String boardPath = "board";
 
-    @Value("${cloud.aws.s3.boardComplain}")
-    private String boardComplainPath;
+    private final String boardComplainPath = "boardComplain";
 
-    @Value("${cloud.aws.s3.pin}")
-    private String pinPath;
+    private final String pinPath = "pin";
 
-    @Value("${cloud.aws.s3.comment}")
-    private String commentPath;
+    private final String commentPath = "comment";
 
-    @Value("${cloud.aws.s3.pinComplain}")
-    private String pinComplainPath;
+    private final String pinComplainPath = "pinComplain";
 
-    @Value("${cloud.aws.s3.commentComplain}")
-    private String commentComplainPath;
+    private final String commentComplainPath = "commentComplain";
 
-    @Value("${cloud.aws.s3.notice}")
-    private String noticePath;
+    private final String noticePath = "notice";
 
 
     @PostConstruct
