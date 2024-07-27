@@ -80,5 +80,6 @@ public class AmazonS3Util {
 
     public String generateKeyName(String path, Uuid uuid) {
         return path + '/' + uuid.getUuid();
+
     }
 }
