@@ -3,6 +3,7 @@ package umc6.tom.user.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 public class UserDtoReq {
 
@@ -110,5 +111,10 @@ public class UserDtoReq {
     @Getter
     public static class RestoreMajorDto {
         private Long majorId;
+    }
+
+    @Getter
+    public static class RestorePicDto {
+        private MultipartFile userPic;
     }
 }

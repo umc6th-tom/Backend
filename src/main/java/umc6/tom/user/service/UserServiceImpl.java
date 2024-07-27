@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.alarm.converter.AlarmSetConverter;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -16,6 +17,9 @@ import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.PhoneHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
+import umc6.tom.common.model.Uuid;
+import umc6.tom.common.repository.UuidRepository;
+import umc6.tom.config.AmazonConfig;
 import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.converter.ResignConverter;
 import umc6.tom.user.converter.UserConverter;
@@ -29,10 +33,12 @@ import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.ResignRepository;
 import umc6.tom.user.repository.UserRepository;
+import umc6.tom.util.AmazonS3Util;
 import umc6.tom.util.CookieUtil;
 import umc6.tom.util.RedisUtil;
 import umc6.tom.util.SmsUtil;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -54,6 +60,11 @@ public class UserServiceImpl implements UserService {
     private final AlarmSetRepository alarmSetRepository;
     private final SmsUtil smsUtil;
     private final RedisUtil redisUtil;
+    private final AmazonS3Util amazonS3Util;
+    private final UuidRepository uuidRepository;
+    private final AmazonConfig amazonConfig;
+
+    private static final String DEFAULT_PROFILE_PATH = "https://yesol.s3.ap-northeast-2.amazonaws.com/profile/defaultProfile.png";
 
 
     // 회원 가입
@@ -81,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
         // 휴대폰 번호 "-" 제거
         request.setPhone(request.getPhone().replaceAll("-", ""));
-        User user = UserConverter.toUser(request, major);
+        User user = UserConverter.toUser(request, major, DEFAULT_PROFILE_PATH);
 
         userRepository.save(user);
         alarmSetRepository.save(AlarmSetConverter.convertAlarmSetToAlarmSet(user));
@@ -417,5 +428,53 @@ public class UserServiceImpl implements UserService {
             user.setAgreement(Agreement.AGREE);
         }
         return UserConverter.changeAgreementRes(user.getAgreement());
+    }
+
+    // 프로필 사진 변경
+    @Override
+    public UserDtoRes.RestorePic restorePic(Long userId, MultipartFile request) {
+
+        String fileName;
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        // 사진 변경
+        if (request != null) {
+            log.info("requst != null");
+            try {
+                String uuid = UUID.randomUUID().toString();
+                Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+
+                fileName = amazonS3Util.upload(request, amazonConfig.getProfilePath(), savedUuid);
+                log.info("사진 업로드 성공 : {}", fileName);
+            } catch (IOException e) {
+                throw new UserHandler(ErrorStatus.USER_FILE_CHANGE_ERROR);
+            }
+            // 기존 파일 삭제 후 세팅 - 디폴트라면 삭제 x
+            if (!user.getPic().equals(DEFAULT_PROFILE_PATH)) {
+                amazonS3Util.deleteFile(user.getPic());
+            }
+
+            user.setPic(fileName);
+        }
+        log.info("request == null");
+
+        return UserDtoRes.RestorePic.builder()  // 굳이 컨버터를 거쳐야하나..?
+                .userId(userId)
+                .pic(user.getPic()).build();
+    }
+
+    // 프로필 사진 기본값으로 변경
+    @Override
+    public void restorePicDef(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if (user.getPic().equals(DEFAULT_PROFILE_PATH)) {
+            throw new UserHandler(ErrorStatus.PROFILE_IS_DEFAULT);
+        }
+        amazonS3Util.deleteFile(user.getPic());
+        user.setPic(DEFAULT_PROFILE_PATH);
     }
 }

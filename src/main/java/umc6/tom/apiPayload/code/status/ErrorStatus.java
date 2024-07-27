@@ -34,8 +34,6 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
 
 
-
-
     // 인증 관련 에러
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH4001", "휴대폰 인증이 필요합니다."),
 
@@ -79,7 +77,15 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // 알람 관련 에러
-    ALARM_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_SET4001", "알람셋이 없습니다! 관리자에게 문의하세요!")
+    ALARM_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_SET4001", "알람셋이 없습니다! 관리자에게 문의하세요!"),
+
+
+    // 사진 관련 헤어
+    PROFILE_IS_DEFAULT(HttpStatus.BAD_REQUEST, "PIC4001", "사진이 이미 기본값입니다."),
+
+
+    // 내부 서버 에러
+    USER_FILE_CHANGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR5004", "파일 전환에 실패하였습니다.")
     ;
 
 
