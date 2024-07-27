@@ -6,46 +6,44 @@ import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
-import umc6.tom.comment.service.CommentService;
 import umc6.tom.comment.service.PinService;
 import umc6.tom.security.JwtTokenProvider;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/comment")
-public class CommentController {
+@RequestMapping("/pin")
+public class PinController {
 
-    private final CommentService commentService;
+    private final PinService pinService;
     private final JwtTokenProvider jwtTokenProvider;
 
     //댓글 등록
     //댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
-    @PostMapping("/{pinId}/register")
-    public ApiResponse register(@PathVariable("pinId") Long pinId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
+    @PostMapping("/{boardId}/register")
+    public ApiResponse register(@PathVariable("boardId") Long boardId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        return commentService.commentRegister(pinReqDto,pinId,userId);
+        return pinService.pinRegister(pinReqDto,boardId,userId);
     }
 
     //댓글 조회
     @GetMapping("/detail/{commentId}")
     public ApiResponse detail(@PathVariable("commentId") Long commentId) {
-
-        return commentService.getDetailPin(commentId);
+        return pinService.getDetailPin(commentId);
     }
 
     //댓글 수정
     @PatchMapping("/update")
     public ApiResponse modify(@RequestBody PinReqDto.PinAndPic pinDto) {
 
-        return commentService.pinModify(pinDto);
+        return pinService.pinModify(pinDto);
     }
 
     //댓글 삭제
     @DeleteMapping("/{commentId}")
     public ApiResponse modify(@PathVariable("commentId") Long commentId) {
 
-        return commentService.pinDelete(commentId);
+        return pinService.pinDelete(commentId);
     }
 
     //댓글 좋아요/제거
@@ -53,7 +51,7 @@ public class CommentController {
     public ApiResponse like(@PathVariable("commentId") Long commentId) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return commentService.pinLikeSet(commentId,userId);
+        return pinService.pinLikeSet(commentId,userId);
     }
 
     //댓글 신고
@@ -61,7 +59,7 @@ public class CommentController {
     public ApiResponse report(@PathVariable("commentId") Long commentId, @RequestBody PinReportReqDto.PinReportDto reportDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return commentService.pinReport(commentId,reportDto,userId);
+        return pinService.pinReport(commentId,reportDto,userId);
     }
 
 

@@ -11,7 +11,10 @@ import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
-import umc6.tom.comment.converter.*;
+import umc6.tom.comment.converter.PinComplaintConverter;
+import umc6.tom.comment.converter.PinConverter;
+import umc6.tom.comment.converter.PinLikeConverter;
+import umc6.tom.comment.converter.PinPictureConverter;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
@@ -22,7 +25,7 @@ import umc6.tom.user.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor
-public class CommentService {
+public class PinService {
 
     private final UserRepository userRepository;
     private final PinRepository pinRepository;
@@ -34,23 +37,21 @@ public class CommentService {
     private final PinComplaintConverter pinComplaintConverter;
     private final PinComplaintRepository pinComplaintRepository;
     private final PinComplaintPictureRepository pinComplaintPictureRepository;
-    private final CommentRepository commentRepository;
-    private final CommentPictureRepository commentPictureRepository;
 
     //댓글 등록
     @Transactional
-    public ApiResponse commentRegister(PinReqDto.PinCommentAndPic pinReq, Long pinId, Long userId) {
+    public ApiResponse pinRegister(PinReqDto.PinCommentAndPic pinReq, Long boardId, Long userId  ) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //임시 에러코드 사용함
         //게시판 댓글 저장
-        Pin pin =  pinRepository.findById(pinId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
-        Comment comment = CommentConverter.toCommentEntity(user, pin, pinReq);
-        Comment commentSaved = commentRepository.save(comment);
+        Board board =  boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARDLIKE_NOT_FOUND));
+        Pin pin = PinConverter.toPinEntity(user, board, pinReq);
+        Pin pinSaved = pinRepository.save(pin);
         //댓글 사진 테이블에 저장하기
         try{
             for(String picUrl : pinReq.getPic()){
-                CommentPicture commentPicture = CommentPictureConverter.toCommentPictureEntity(picUrl, commentSaved);
-                commentPictureRepository.save(commentPicture);
+                PinPicture pinPicture = PinPictureConverter.toPinPictureEntity(picUrl, pinSaved);
+                pinPictureRepository.save(pinPicture);
             }
         }catch(Exception e){
             throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
