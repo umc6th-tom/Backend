@@ -166,4 +166,15 @@ public class BoardResponseDto {
         List<String> pinPicList;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FindProfileDto{
+        Long id;
+        String title;
+        Integer likeCount;
+        Integer pinCount;
+    }
+
 }

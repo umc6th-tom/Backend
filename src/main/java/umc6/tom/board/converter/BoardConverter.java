@@ -220,4 +220,13 @@ public class BoardConverter {
                 .build();
     }
 
+    public static BoardResponseDto.FindProfileDto toFindProfileDto(Board board){
+        return BoardResponseDto.FindProfileDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .pinCount(board.getPinList().size())
+                .likeCount(board.getBoardLikeList().size())
+                .build();
+    }
+
 }

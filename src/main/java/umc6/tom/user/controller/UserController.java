@@ -247,4 +247,10 @@ public class UserController {
 
         return ApiResponse.onSuccess(userService.changeAgreement(userId));
     }
+
+    @GetMapping("/{userId}/find")
+    public ApiResponse<UserDtoRes.FindProfileDto> findProfile(@PathVariable("userId") Long userId) {
+
+        return ApiResponse.onSuccess(userService.findProfile(userId));
+    }
 }
