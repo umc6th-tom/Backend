@@ -19,7 +19,7 @@ import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.comment.model.PinLike;
 import umc6.tom.comment.model.PinPicture;
-import umc6.tom.comment.repository.PinCommentRepository;
+import umc6.tom.comment.repository.CommentRepository;
 import umc6.tom.comment.repository.PinLikeRepository;
 import umc6.tom.comment.repository.PinPictureRepository;
 import umc6.tom.comment.repository.PinRepository;
@@ -33,7 +33,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PinRepository pinRepository;
     private final BoardRepository boardRepository;
-    private final PinCommentRepository pinCommentRepository;
+    private final CommentRepository pinCommentRepository;
     private final PinPictureRepository pinPictureRepository;
     private final PinConverter pinConverter;
     private final PinLikeRepository pinLikeRepository;

@@ -20,8 +20,8 @@ public class CommentComplaint extends BaseEntity {
     public Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pinComment_id")
-    public PinComment pinComment;
+    @JoinColumn(name = "comment_id")
+    public Comment comment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -35,7 +35,7 @@ public class CommentComplaint extends BaseEntity {
     public User commentUser;
 
     @Column(nullable = false, length = 200)
-    public String comment;
+    public String commentComment;
 
     @OneToMany(mappedBy = "commentComplaint", cascade = CascadeType.ALL)
     public List<CommentComplaintPicture> commentComplaintPictureList = new ArrayList<>();

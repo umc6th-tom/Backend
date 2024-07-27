@@ -1,6 +1,5 @@
 package umc6.tom.comment.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.model.Board;
@@ -32,7 +31,7 @@ public class Pin extends BaseEntity {
     public List<PinLike> pinLikeList = new ArrayList<>();
 
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
-    public List<PinComment> pinCommentList = new ArrayList<>();
+    public List<Comment> commentList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinComment extends BaseEntity {
+public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +22,11 @@ public class PinComment extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String comment;
 
-    @OneToMany(mappedBy = "pinComment", cascade = CascadeType.ALL)
-    private List<PinCommentLike> pinCommentLikeList = new ArrayList<>();
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    private List<CommentLike> commentLikeList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "pinComment", cascade = CascadeType.ALL)
-    private List<PinCommentPicture> pinCommentPictureList = new ArrayList<>();
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
+    private List<CommentPicture> commentPictureList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
