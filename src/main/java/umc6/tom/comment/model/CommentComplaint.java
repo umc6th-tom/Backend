@@ -30,9 +30,8 @@ public class CommentComplaint extends BaseEntity {
     @Column(nullable = false, length = 200)
     public String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    public User commentUser;
+    @Column(nullable = false)
+    private Long commentUserId;
 
     @Column(nullable = false, length = 200)
     public String commentComment;

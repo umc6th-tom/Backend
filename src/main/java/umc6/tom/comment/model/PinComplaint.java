@@ -30,9 +30,8 @@ public class PinComplaint extends BaseEntity {
     @Column(nullable = false, length = 200)
     public String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    public User pinUser;
+    @Column(nullable = false)
+    private Long pinUserId;
 
     @Column(nullable = false, length = 200)
     public String pinComment;

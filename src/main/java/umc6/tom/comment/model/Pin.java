@@ -33,6 +33,9 @@ public class Pin extends BaseEntity {
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
     public List<Comment> commentList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
+    public List<PinComplaint> pinComplaintList = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User user;
