@@ -11,18 +11,15 @@ import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.converter.PinComplaintConverter;
 import umc6.tom.comment.converter.PinConverter;
 import umc6.tom.comment.converter.PinLikeConverter;
 import umc6.tom.comment.converter.PinPictureConverter;
+import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
-import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.model.PinLike;
-import umc6.tom.comment.model.PinPicture;
-import umc6.tom.comment.repository.CommentRepository;
-import umc6.tom.comment.repository.PinLikeRepository;
-import umc6.tom.comment.repository.PinPictureRepository;
-import umc6.tom.comment.repository.PinRepository;
+import umc6.tom.comment.model.*;
+import umc6.tom.comment.repository.*;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
@@ -37,6 +34,9 @@ public class CommentService {
     private final PinPictureRepository pinPictureRepository;
     private final PinConverter pinConverter;
     private final PinLikeRepository pinLikeRepository;
+    private final PinComplaintConverter pinComplaintConverter;
+    private final PinComplaintRepository pinComplaintRepository;
+    private final PinComplaintPictureRepository pinComplaintPictureRepository;
 
     //댓글 등록
     @Transactional
@@ -115,9 +115,21 @@ public class CommentService {
             pinLikeRepository.delete(likeEntity);
             return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_UNLIKE);
         }
+    }
 
+    //댓글 신고하기
+    public ApiResponse pinReport(Long commentId, PinReportReqDto.PinReportDto reportDto, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
 
+        PinComplaint pinComplaintEntity = PinComplaintConverter.toPinComplaintEntity(reportDto,user,pin);
 
+        PinComplaint pinComplaintSaved = pinComplaintRepository.save(pinComplaintEntity);
 
+        for(String pic : reportDto.getPic()){
+            pinComplaintPictureRepository.save(PinComplaintPicture.builder().pinComplaint(pinComplaintSaved).pic(pic).build());
+        }
+
+        return ApiResponse.onSuccess(200);
     }
 }
