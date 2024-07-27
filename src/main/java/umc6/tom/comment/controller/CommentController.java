@@ -31,14 +31,14 @@ public class CommentController {
     @GetMapping("/detail/{commentId}")
     public ApiResponse detail(@PathVariable("commentId") Long commentId) {
 
-        return commentService.getDetailPin(commentId);
+        return commentService.getDetailComment(commentId);
     }
 
     //댓글 수정
     @PatchMapping("/update")
     public ApiResponse modify(@RequestBody PinReqDto.PinAndPic pinDto) {
 
-        return commentService.pinModify(pinDto);
+        return commentService.commentModify(pinDto);
     }
 
     //댓글 삭제

@@ -27,9 +27,9 @@ public class PinController {
     }
 
     //댓글 조회
-    @GetMapping("/detail/{commentId}")
-    public ApiResponse detail(@PathVariable("commentId") Long commentId) {
-        return pinService.getDetailPin(commentId);
+    @GetMapping("/detail/{pinId}")
+    public ApiResponse detail(@PathVariable("pinId") Long pinId) {
+        return pinService.getDetailPin(pinId);
     }
 
     //댓글 수정
@@ -40,26 +40,26 @@ public class PinController {
     }
 
     //댓글 삭제
-    @DeleteMapping("/{commentId}")
-    public ApiResponse modify(@PathVariable("commentId") Long commentId) {
+    @DeleteMapping("/{pinId}")
+    public ApiResponse modify(@PathVariable("pinId") Long pinId) {
 
-        return pinService.pinDelete(commentId);
+        return pinService.pinDelete(pinId);
     }
 
     //댓글 좋아요/제거
-    @PostMapping("/like/{commentId}")
-    public ApiResponse like(@PathVariable("commentId") Long commentId) {
+    @PostMapping("/like/{pinId}")
+    public ApiResponse like(@PathVariable("pinId") Long pinId) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return pinService.pinLikeSet(commentId,userId);
+        return pinService.pinLikeSet(pinId,userId);
     }
 
     //댓글 신고
-    @PostMapping("/report/{commentId}")
-    public ApiResponse report(@PathVariable("commentId") Long commentId, @RequestBody PinReportReqDto.PinReportDto reportDto) {
+    @PostMapping("/report/{pinId}")
+    public ApiResponse report(@PathVariable("pinId") Long pinId, @RequestBody PinReportReqDto.PinReportDto reportDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return pinService.pinReport(commentId,reportDto,userId);
+        return pinService.pinReport(pinId,reportDto,userId);
     }
 
 

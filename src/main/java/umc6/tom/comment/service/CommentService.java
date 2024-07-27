@@ -7,11 +7,13 @@ import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
+import umc6.tom.apiPayload.exception.handler.CommentHandler;
 import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.*;
+import umc6.tom.comment.dto.CommentResDto;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
@@ -60,34 +62,34 @@ public class CommentService {
 
     //댓글 수정하기위해 데이터 주는거!!
     @Transactional
-    public ApiResponse getDetailPin(Long commentId) {
-        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
-        PinResDto pinResDto = PinConverter.toPinDto(pin);
+    public ApiResponse getDetailComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
+        CommentResDto CommentResDto = CommentConverter.toCommentDto(comment);
 
-        return ApiResponse.onSuccess(pinResDto);
+        return ApiResponse.onSuccess(CommentResDto);
     }
 
     @Transactional
-    public ApiResponse pinModify(PinReqDto.PinAndPic pinDto) {
+    public ApiResponse commentModify(PinReqDto.PinAndPic commentDto) {
         try {
-            Pin existingPin = pinRepository.findById(pinDto.getId())
-                    .orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+            Comment existingComment = commentRepository.findById(commentDto.getId())
+                    .orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
-            if (pinDto.getComment() != null) {
-                existingPin.setComment(pinDto.getComment());
+            if (commentDto.getComment() != null) {
+                existingComment.setComment(commentDto.getComment());
             }
-            Pin pinSaved = pinRepository.save(existingPin);
-            pinPictureRepository.deleteAllByPin(pinSaved);
+            Comment commentSaved = commentRepository.save(existingComment);
+            commentPictureRepository.deleteAllByComment(commentSaved);
 
-            for (String picUrl : pinDto.getPic()) {
-                PinPicture pinPicutreEntity = PinPictureConverter.toPinPictureEntity(picUrl, pinSaved);
-                pinPictureRepository.save(pinPicutreEntity);
+            for (String picUrl : commentDto.getPic()) {
+                CommentPicture commentPictureEntity = CommentPictureConverter.toCommentPictureEntity(picUrl, commentSaved);
+                commentPictureRepository.save(commentPictureEntity);
             }
 
             return ApiResponse.onSuccess(200);
         }
         catch(Exception e){
-            throw new PinHandler(ErrorStatus.PIN_NOT_UPDATE);
+            throw new CommentHandler(ErrorStatus.COMMENT_NOT_UPDATE);
         }
     }
 
