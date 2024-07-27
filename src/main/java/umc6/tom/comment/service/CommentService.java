@@ -38,6 +38,9 @@ public class CommentService {
     private final PinComplaintPictureRepository pinComplaintPictureRepository;
     private final CommentRepository commentRepository;
     private final CommentPictureRepository commentPictureRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    private final CommentComplaintRepository commentComplaintRepository;
+    private final CommentComplaintPictureRepository commentComplaintPictureRepository;
 
     //댓글 등록
     @Transactional
@@ -93,42 +96,42 @@ public class CommentService {
         }
     }
 
-    public ApiResponse pinDelete(Long commentId) {
+    public ApiResponse commentDelete(Long commentId) {
         try {
-            pinRepository.deleteById(commentId);
+            commentRepository.deleteById(commentId);
         } catch (Exception e) {
-            throw new PinHandler(ErrorStatus.PIN_NOT_DELETE);
+            throw new CommentHandler(ErrorStatus.COMMENT_NOT_DELETE);
         }
         return ApiResponse.onSuccess(200);
     }
 
     //댓글 좋아요 추가/제거
-    public ApiResponse pinLikeSet(Long commentId, Long userId) {
+    public ApiResponse commentLikeSet(Long commentId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
-        PinLike likeEntity = pinLikeRepository.findByUser(user);
+        CommentLike likeEntity = commentLikeRepository.findByUser(user);
 
         if(likeEntity == null){
-            pinLikeRepository.save(PinLikeConverter.toEntity(user,pin));
+            commentLikeRepository.save(CommentLikeConverter.toEntity(user,comment));
             return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
         }else{
-            pinLikeRepository.delete(likeEntity);
+            commentLikeRepository.delete(likeEntity);
             return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_UNLIKE);
         }
     }
 
-    //댓글 신고하기
+    //대댓글 신고하기
     public ApiResponse pinReport(Long commentId, PinReportReqDto.PinReportDto reportDto, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
-        PinComplaint pinComplaintEntity = PinComplaintConverter.toPinComplaintEntity(reportDto,user,pin);
+        CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
 
-        PinComplaint pinComplaintSaved = pinComplaintRepository.save(pinComplaintEntity);
+        CommentComplaint commentComplaintSaved = commentComplaintRepository.save(commentComplaintEntity);
 
         for(String pic : reportDto.getPic()){
-            pinComplaintPictureRepository.save(PinComplaintPicture.builder().pinComplaint(pinComplaintSaved).pic(pic).build());
+            commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
         }
 
         return ApiResponse.onSuccess(200);

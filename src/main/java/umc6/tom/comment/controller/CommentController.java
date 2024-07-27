@@ -19,44 +19,44 @@ public class CommentController {
     private final CommentService commentService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    //댓글 등록
-    //댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
+    //대댓글 등록
+    //대댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
     @PostMapping("/{pinId}/register")
     public ApiResponse register(@PathVariable("pinId") Long pinId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return commentService.commentRegister(pinReqDto,pinId,userId);
     }
 
-    //댓글 조회
+    //대댓글 조회
     @GetMapping("/detail/{commentId}")
     public ApiResponse detail(@PathVariable("commentId") Long commentId) {
 
         return commentService.getDetailComment(commentId);
     }
 
-    //댓글 수정
+    //대댓글 수정
     @PatchMapping("/update")
     public ApiResponse modify(@RequestBody PinReqDto.PinAndPic pinDto) {
 
         return commentService.commentModify(pinDto);
     }
 
-    //댓글 삭제
+    //대댓글 삭제
     @DeleteMapping("/{commentId}")
     public ApiResponse modify(@PathVariable("commentId") Long commentId) {
 
-        return commentService.pinDelete(commentId);
+        return commentService.commentDelete(commentId);
     }
 
-    //댓글 좋아요/제거
+    //대댓글 좋아요/제거
     @PostMapping("/like/{commentId}")
     public ApiResponse like(@PathVariable("commentId") Long commentId) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return commentService.pinLikeSet(commentId,userId);
+        return commentService.commentLikeSet(commentId,userId);
     }
 
-    //댓글 신고
+    //대댓글 신고
     @PostMapping("/report/{commentId}")
     public ApiResponse report(@PathVariable("commentId") Long commentId, @RequestBody PinReportReqDto.PinReportDto reportDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
