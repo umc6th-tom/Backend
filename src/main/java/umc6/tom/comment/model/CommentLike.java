@@ -9,7 +9,7 @@ import umc6.tom.user.model.User;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinCommentLike {
+public class CommentLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +20,6 @@ public class PinCommentLike {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pinComment_id")
-    private PinComment pinComment;
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 }

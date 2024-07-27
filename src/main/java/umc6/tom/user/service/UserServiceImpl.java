@@ -11,11 +11,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.alarm.converter.AlarmSetConverter;
 import umc6.tom.alarm.repository.AlarmSetRepository;
+import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
-import umc6.tom.apiPayload.exception.handler.JwtHandler;
-import umc6.tom.apiPayload.exception.handler.MajorHandler;
-import umc6.tom.apiPayload.exception.handler.PhoneHandler;
-import umc6.tom.apiPayload.exception.handler.UserHandler;
+import umc6.tom.apiPayload.exception.handler.*;
+import umc6.tom.board.converter.BoardConverter;
+import umc6.tom.board.dto.BoardResponseDto;
+import umc6.tom.board.model.Board;
+import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
 import umc6.tom.common.repository.UuidRepository;
@@ -65,6 +69,8 @@ public class UserServiceImpl implements UserService {
     private final AmazonConfig amazonConfig;
 
     private static final String DEFAULT_PROFILE_PATH = "https://yesol.s3.ap-northeast-2.amazonaws.com/profile/defaultProfile.png";
+    private final BoardRepository boardRepository;
+    private final PinRepository pinRepository;
 
 
     // 회원 가입
@@ -476,5 +482,35 @@ public class UserServiceImpl implements UserService {
         }
         amazonS3Util.deleteFile(user.getPic());
         user.setPic(DEFAULT_PROFILE_PATH);
+    }
+
+    @Override
+    public UserDtoRes.FindProfileDto findProfile(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if(user.getAgreement() == Agreement.DISAGREE) {
+            return UserConverter.findProfileRes(user,null,null);
+        }
+
+        List<Board> boardListEntity = boardRepository.findTop3ByUserIdOrderByCreatedAtDesc(user.getId());
+
+        List<BoardResponseDto.FindProfileDto> findProfileBoardDto = boardListEntity.stream()
+                                                                    .map(BoardConverter::toFindProfileDto)
+                                                                    .toList();
+        //한게시글에 여러개의 댓글까지 생각하기
+        List<Pin> pinListEntity = pinRepository.findTop30ByUserIdOrderByCreatedAtDesc(user.getId());
+
+        //게시글 id, 제목, 좋아요 수, 댓글 수
+        List<BoardResponseDto.FindProfileDto> findProfilePinDto = pinListEntity.stream()
+                                    .map(pin -> pin.getBoard().getId())
+                                    .distinct()
+                                    .limit(3)
+                                    .map(boardId -> boardRepository.findById(boardId)
+                                            .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND)))
+                                    .map(BoardConverter::toFindProfileDto)
+                                    .toList();
+
+        return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
     }
 }

@@ -56,4 +56,6 @@ public interface UserService {
     UserDtoRes.RestorePic restorePic(Long userId, MultipartFile request);
 
     void restorePicDef(Long userId);
+
+    UserDtoRes.FindProfileDto findProfile(Long userId);
 }

@@ -8,8 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class PinCommentPicture {
-
+public class CommentComplaintPicture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +17,6 @@ public class PinCommentPicture {
     private String pic;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pinComment_id")
-    private PinComment pinComment;
+    @JoinColumn(name = "commentComplaint_id")
+    private CommentComplaint commentComplaint;
 }

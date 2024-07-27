@@ -1,0 +1,8 @@
+package umc6.tom.apiPayload.exception.handler;
+
+import umc6.tom.apiPayload.code.BaseErrorCode;
+import umc6.tom.apiPayload.exception.GeneralException;
+
+public class CommentHandler extends GeneralException {
+    public CommentHandler(BaseErrorCode errorCode) {super(errorCode);}
+}

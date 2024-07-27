@@ -30,4 +30,6 @@ public class PinReqDto {
         private List<String> pic;
     }
 
+
+
 }

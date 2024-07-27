@@ -9,7 +9,7 @@ import java.util.Date;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PinCommentDto {
+public class CommentDto {
     private Long id;
     private Long userId;
     private Long pinId;

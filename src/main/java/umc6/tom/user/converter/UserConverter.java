@@ -3,6 +3,7 @@ package umc6.tom.user.converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
@@ -106,6 +107,29 @@ public class UserConverter {
                 .message(user.getDescription())
                 .written(boards)
                 .commented(pins)
+                .build();
+    }
+
+
+    // 타인 프로필 조회 정상 응답
+    public static UserDtoRes.FindProfileDto findProfileRes(User user, List<BoardResponseDto.FindProfileDto> boards, List<BoardResponseDto.FindProfileDto> pins) {
+        // 타인 프로필 조회 응답 비공계 계정일경우
+        if(boards == null && pins == null){
+            return UserDtoRes.FindProfileDto.builder()
+                    .userId(user.getId())
+                    .nickName(user.getNickName())
+                    .pic(user.getPic())
+                    .description(user.getDescription())
+                    .build();
+        }
+
+        return UserDtoRes.FindProfileDto.builder()
+                .userId(user.getId())
+                .nickName(user.getNickName())
+                .pic(user.getPic())
+                .description(user.getDescription())
+                .board(boards)
+                .pinBoard(pins)
                 .build();
     }
 }

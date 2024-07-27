@@ -10,8 +10,8 @@ import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
-import umc6.tom.comment.model.PinComment;
-import umc6.tom.comment.model.PinCommentPicture;
+import umc6.tom.comment.model.Comment;
+import umc6.tom.comment.model.CommentPicture;
 import umc6.tom.comment.model.PinPicture;
 import umc6.tom.user.model.User;
 
@@ -42,7 +42,7 @@ public class BoardConverter {
     public static BoardResponseDto.BoardListViewDto toBoardListViewDto(Board board){
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
-            pinCommentSize += pin.getPinCommentList().size();
+            pinCommentSize += pin.getCommentList().size();
         String boardPreViewPic = null;
         
         //list는 없는 index 참조시 나는 오류를 제거
@@ -112,7 +112,7 @@ public class BoardConverter {
     public static BoardResponseDto.BoardMainViewDto toBoardMainListViewDto(Board board){
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
-            pinCommentSize += pin.getPinCommentList().size();
+            pinCommentSize += pin.getCommentList().size();
 
         return BoardResponseDto.BoardMainViewDto.builder()
                 .title(board.getTitle())
@@ -158,7 +158,7 @@ public class BoardConverter {
     public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board){
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
-            pinCommentSize += pin.getPinCommentList().size();
+            pinCommentSize += pin.getCommentList().size();
 
         List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = board.getPinList().stream()
                 .map(BoardConverter::toBoardViewPinListDto).collect(Collectors.toList());
@@ -182,10 +182,10 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardViewPinListDto toBoardViewPinListDto(Pin pin){
         int pinCommentSize = 0; //대댓글 개수
-        for (PinComment pinComment : pin.getPinCommentList())
+        for (Comment comment : pin.getCommentList())
             pinCommentSize += 1;
 
-        List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getPinCommentList().stream()
+        List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getCommentList().stream()
                 .map(BoardConverter::toBoardPinCommentListDto).collect(Collectors.toList());
 
         List<String> newPinPicList = new ArrayList<>();
@@ -204,19 +204,28 @@ public class BoardConverter {
                 .build();
     }
 
-    public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(PinComment pinComment){
+    public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(Comment comment){
         List<String> newPinCommentPicList = new ArrayList<>();
 
-        for (PinCommentPicture picture : pinComment.getPinCommentPictureList())
+        for (CommentPicture picture : comment.getCommentPictureList())
             newPinCommentPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewPinCommentListDto.builder()
-                .id(pinComment.getId())
-                .userNickname(pinComment.getUser().getNickName())
-                .comment(pinComment.getComment())
-                .pinCommentDate(new DateCalc().boardListDate(pinComment.getCreatedAt()))
-                .pinLikeCount(pinComment.getPinCommentLikeList().size())
+                .id(comment.getId())
+                .userNickname(comment.getUser().getNickName())
+                .comment(comment.getComment())
+                .pinCommentDate(new DateCalc().boardListDate(comment.getCreatedAt()))
+                .pinLikeCount(comment.getCommentLikeList().size())
                 .pinPicList(newPinCommentPicList)
+                .build();
+    }
+
+    public static BoardResponseDto.FindProfileDto toFindProfileDto(Board board){
+        return BoardResponseDto.FindProfileDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .pinCount(board.getPinList().size())
+                .likeCount(board.getBoardLikeList().size())
                 .build();
     }
 

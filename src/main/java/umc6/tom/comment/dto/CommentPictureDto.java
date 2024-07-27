@@ -7,8 +7,8 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PinCommentPictureDto {
+public class CommentPictureDto {
     private Long id;
-    private Long pinCommentId;
+    private Long commentId;
     private String pic;
 }
