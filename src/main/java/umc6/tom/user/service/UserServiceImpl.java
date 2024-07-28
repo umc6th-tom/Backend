@@ -6,6 +6,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +21,7 @@ import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.dto.LikeBoardDto;
@@ -521,7 +525,8 @@ public class UserServiceImpl implements UserService {
         return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
     }
 
-    public List<UserDtoRes.HistoryDto> findHistoryAll(Long userId){
+    @Override
+    public Page<UserDtoRes.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -545,9 +550,67 @@ public class UserServiceImpl implements UserService {
                                         .toList();
 
         // 세 개의 리스트를 합치고 시간 순으로 정렬
-        return Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
-                                .distinct()
-                                .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // 시간 순으로 정렬
-                                .toList();
+        List<UserDtoRes.HistoryDto> mergedList = Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
+                                        .distinct()
+                                        .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // 시간 순으로 정렬
+                                        .toList();
+
+        // 전체 결과를 페이징하여 반환
+        int start = Math.min((int) pageable.getOffset(), mergedList.size());
+        int end = Math.min((start + pageable.getPageSize()), mergedList.size());
+
+        return new PageImpl<>(mergedList.subList(start, end), pageable, mergedList.size());
     }
+
+    @Override
+    public Page<UserDtoRes.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 쓴 글
+        Page<Board> boardPage = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
+
+        List<UserDtoRes.HistoryDto> historyDtoList = boardPage.stream()
+                .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
+                .toList();
+
+        return new PageImpl<>(historyDtoList, adjustedPageable, boardPage.getTotalElements());
+    }
+
+    @Override
+    public Page<UserDtoRes.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        // 자기가 댓글 단 글
+        Page<Pin> pinPage = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(), adjustedPageable);
+
+        List<UserDtoRes.HistoryDto> pinBoardsDto = pinPage.stream()
+                .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(pinBoardsDto, adjustedPageable, pinPage.getTotalElements());
+    }
+
+    @Override
+    public Page<UserDtoRes.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 좋아요 누른 글
+        Page<BoardLike> likePage = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId(),adjustedPageable);
+
+        List<UserDtoRes.HistoryDto> LikeBoardsDto = likePage.stream()
+                                    .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
+                                            .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                                    .distinct()
+                                    .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
+                                    .toList();
+
+        return new PageImpl<>(LikeBoardsDto, adjustedPageable, likePage.getTotalElements());
+    }
+
 }
