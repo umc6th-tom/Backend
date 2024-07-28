@@ -49,7 +49,7 @@ public class BoardServiceImpl implements BoardService{
     @Override
     public Board registerBoard(BoardRequestDto.RegisterDto request, Long userId, MultipartFile[] files) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-        Majors majors = majorRepositoryBoard.findById(request.getMajor()).orElseThrow(()
+        Majors majors = majorRepositoryBoard.findById(request.getMajorId()).orElseThrow(()
                 -> new BoardHandler(ErrorStatus.MAJORS_NOR_FOUND));
         Board newBoard = BoardConverter.toBoard(request, user, majors);
 
