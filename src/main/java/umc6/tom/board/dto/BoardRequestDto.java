@@ -17,7 +17,6 @@ public class BoardRequestDto {
         String content;
         @NotBlank
         Long major;
-        List<String> pic;
     }
 
     @Getter
