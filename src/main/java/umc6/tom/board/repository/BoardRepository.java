@@ -52,4 +52,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     List<Board> findTop3ByUserIdOrderByCreatedAtDesc(Long userId);
 
+    List<Board> findAllByUserIdOrderByCreatedAtDesc(Long userId);
 }

@@ -5,10 +5,13 @@ import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
 import umc6.tom.user.model.User;
 
+import java.util.List;
+
 public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
 
     boolean existsBoardLikeByUserAndBoard(User user, Board board);
 
     void deleteBoardLikeByUserAndBoard(User user, Board board);
 
+    List<BoardLike> findAllByUserIdOrderByIdDesc(Long userId);
 }

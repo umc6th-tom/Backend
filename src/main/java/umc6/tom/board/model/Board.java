@@ -17,24 +17,24 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    public Long id;
 
     @Column(nullable = false, length = 50)
-    private String title;
+    public String title;
 
     @Column(nullable = false, length = 500)
-    private String content;
+    public String content;
 
     @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
-    private Integer report;
+    public Integer report;
 
-    private LocalDateTime popularAt;
+    public LocalDateTime popularAt;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
