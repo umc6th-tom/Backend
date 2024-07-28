@@ -1,6 +1,7 @@
 package umc6.tom.board.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.util.List;
@@ -15,8 +16,8 @@ public class BoardRequestDto {
         String title;
         @NotBlank
         String content;
-        @NotBlank
-        Long major;
+        @NotNull
+        Long majorId;
     }
 
     @Getter

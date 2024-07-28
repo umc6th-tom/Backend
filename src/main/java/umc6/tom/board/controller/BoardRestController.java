@@ -31,7 +31,7 @@ public class BoardRestController {
      * 게시물 등록
      */
     //사진 등록구현 필요
-    @PostMapping(value = "/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<BoardResponseDto.RegisterResultDto> join(@RequestPart @Valid BoardRequestDto.RegisterDto request,
                                                                 @RequestPart MultipartFile[] files) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
