@@ -278,4 +278,13 @@ public class UserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findMyBoards(userId,adjustedPageable));
     }
+
+    //내가 쓴 댓글 글 조회
+    @GetMapping("/mycomments")
+    public ApiResponse<Page<UserDtoRes.HistoryDto>> findMyComments(@RequestParam(defaultValue = "1") int page,
+                                                                 @PageableDefault(size = 3) Pageable pageable) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findMyComments(userId,adjustedPageable));
+    }
 }

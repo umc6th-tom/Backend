@@ -65,4 +65,6 @@ public interface UserService {
     Page<UserDtoRes.HistoryDto> findHistoryAll(Long userId, Pageable adjustedPageable);
 
     Page<UserDtoRes.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable);
+
+    Page<UserDtoRes.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable);
 }

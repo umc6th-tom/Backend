@@ -575,5 +575,24 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(historyDtoList, adjustedPageable, boardPage.getTotalElements());
     }
 
+    public Page<UserDtoRes.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        // 자기가 댓글 단 글
+        Page<Pin> pinPage = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(), adjustedPageable);
+
+        List<UserDtoRes.HistoryDto> pinBoardsDto = pinPage.stream()
+                .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(pinBoardsDto, adjustedPageable, pinPage.getTotalElements());
+    }
+
+
+
 
 }
