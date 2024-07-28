@@ -126,9 +126,9 @@ public class UserDtoRes {
     public static class HistoryDto {
         private Long boardId;
         private String header;
+        private String createdAt;
         private String title;
         private String content;
-        private LocalDateTime createdAt;
     }
 
 }

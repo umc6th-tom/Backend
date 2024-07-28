@@ -1,9 +1,11 @@
 package umc6.tom.user.converter;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.board.dto.BoardResponseDto;
+import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
@@ -12,6 +14,7 @@ import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.UserStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -134,13 +137,13 @@ public class UserConverter {
     }
 
     //나의 내역 보기
-    public static UserDtoRes.HistoryDto toHistoryRes(Board board, String header) {
+    public static UserDtoRes.HistoryDto toHistoryRes(Board board, String header, LocalDateTime createdAt) {
 
         return UserDtoRes.HistoryDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .createdAt(board.getCreatedAt())
+                .createdAt(new DateCalc().formatDate(createdAt))
                 .header(header)
                 .build();
     }

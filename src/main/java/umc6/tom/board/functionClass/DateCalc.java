@@ -4,6 +4,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class DateCalc {
 
@@ -46,5 +47,11 @@ public class DateCalc {
         }
 
         return "방금 전";
+    }
+
+    public String formatDate(LocalDateTime pastDateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return pastDateTime.format(formatter);
+
     }
 }

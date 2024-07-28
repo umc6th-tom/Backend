@@ -2,7 +2,10 @@ package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import umc6.tom.user.model.User;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,4 +25,7 @@ public class CommentLike {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
+
+    @CreatedDate
+    private LocalDateTime createdAt;
 }

@@ -15,10 +15,13 @@ import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
+import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.dto.LikeBoardDto;
+import umc6.tom.comment.dto.PinBoardDto;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
@@ -524,22 +527,21 @@ public class UserServiceImpl implements UserService {
 
         //자기가 쓴 글
         List<UserDtoRes.HistoryDto> boardsDto = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
-                                        .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글"))
+                                        .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
                                         .toList();
         //자기가 댓글 단 글
         List<UserDtoRes.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
-                                        .map(pin -> pin.getBoard().getId())
+                                        .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
+                                                .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
-                                        .map(boardId -> boardRepository.findById(boardId)
-                                                .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND)))
-                                        .map(board -> UserConverter.toHistoryRes(board, "댓글 단 글"))
+                                        .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
                                         .toList();
         //자기가 좋아요 누른 글
         List<UserDtoRes.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
-                                        .map(like -> like.getBoard().getId())
+                                        .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
+                                                .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
-                                        .map(boardId -> boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND)))
-                                        .map(board -> UserConverter.toHistoryRes(board, "좋아요 단 글"))
+                                        .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
                                         .toList();
 
         // 세 개의 리스트를 합치고 시간 순으로 정렬
