@@ -173,7 +173,7 @@ public class BoardRestController {
      * 24.07.24 작성자 : 박재락
      * 게시물 수정
      */
-    @PatchMapping(value = "/{board_id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(value = "/{board_id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestPart @Valid BoardRequestDto.UpdateBoardDto request,
                                                                     @RequestPart MultipartFile[] files,
                                                                     @PathVariable(name = "board_id") Long boardId){
