@@ -21,6 +21,7 @@ import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.dto.LikeBoardDto;
@@ -524,6 +525,7 @@ public class UserServiceImpl implements UserService {
         return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
     }
 
+    @Override
     public Page<UserDtoRes.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
@@ -556,11 +558,11 @@ public class UserServiceImpl implements UserService {
         // 전체 결과를 페이징하여 반환
         int start = Math.min((int) pageable.getOffset(), mergedList.size());
         int end = Math.min((start + pageable.getPageSize()), mergedList.size());
-        Page<UserDtoRes.HistoryDto> page = new PageImpl<>(mergedList.subList(start, end), pageable, mergedList.size());
 
-        return page;
+        return new PageImpl<>(mergedList.subList(start, end), pageable, mergedList.size());
     }
 
+    @Override
     public Page<UserDtoRes.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
@@ -575,6 +577,7 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(historyDtoList, adjustedPageable, boardPage.getTotalElements());
     }
 
+    @Override
     public Page<UserDtoRes.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
@@ -592,7 +595,22 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(pinBoardsDto, adjustedPageable, pinPage.getTotalElements());
     }
 
+    @Override
+    public Page<UserDtoRes.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        //자기가 좋아요 누른 글
+        Page<BoardLike> likePage = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId(),adjustedPageable);
 
+        List<UserDtoRes.HistoryDto> LikeBoardsDto = likePage.stream()
+                                    .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
+                                            .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                                    .distinct()
+                                    .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
+                                    .toList();
+
+        return new PageImpl<>(LikeBoardsDto, adjustedPageable, likePage.getTotalElements());
+    }
 
 }

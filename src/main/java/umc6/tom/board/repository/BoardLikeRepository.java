@@ -1,5 +1,7 @@
 package umc6.tom.board.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
@@ -14,4 +16,6 @@ public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
     void deleteBoardLikeByUserAndBoard(User user, Board board);
 
     List<BoardLike> findAllByUserIdOrderByIdDesc(Long userId);
+
+    Page<BoardLike> findAllByUserIdOrderByIdDesc(Long userId, Pageable pageable);
 }
