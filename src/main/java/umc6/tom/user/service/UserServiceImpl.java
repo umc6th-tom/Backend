@@ -17,6 +17,7 @@ import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.comment.repository.PinRepository;
@@ -48,6 +49,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RequiredArgsConstructor
@@ -71,6 +74,7 @@ public class UserServiceImpl implements UserService {
     private static final String DEFAULT_PROFILE_PATH = "https://yesol.s3.ap-northeast-2.amazonaws.com/profile/defaultProfile.png";
     private final BoardRepository boardRepository;
     private final PinRepository pinRepository;
+    private final BoardLikeRepository boardLikeRepository;
 
 
     // 회원 가입
@@ -512,5 +516,36 @@ public class UserServiceImpl implements UserService {
                                     .toList();
 
         return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
+    }
+
+    public List<UserDtoRes.HistoryDto> findHistoryAll(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 쓴 글
+        List<UserDtoRes.HistoryDto> boardsDto = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+                                        .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글"))
+                                        .toList();
+        //자기가 댓글 단 글
+        List<UserDtoRes.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+                                        .map(pin -> pin.getBoard().getId())
+                                        .distinct()
+                                        .map(boardId -> boardRepository.findById(boardId)
+                                                .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND)))
+                                        .map(board -> UserConverter.toHistoryRes(board, "댓글 단 글"))
+                                        .toList();
+        //자기가 좋아요 누른 글
+        List<UserDtoRes.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
+                                        .map(like -> like.getBoard().getId())
+                                        .distinct()
+                                        .map(boardId -> boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND)))
+                                        .map(board -> UserConverter.toHistoryRes(board, "좋아요 단 글"))
+                                        .toList();
+
+        // 세 개의 리스트를 합치고 시간 순으로 정렬
+        return Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
+                                .distinct()
+                                .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // 시간 순으로 정렬
+                                .toList();
     }
 }

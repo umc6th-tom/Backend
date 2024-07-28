@@ -8,6 +8,7 @@ import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface UserService {
 
@@ -58,4 +59,6 @@ public interface UserService {
     void restorePicDef(Long userId);
 
     UserDtoRes.FindProfileDto findProfile(Long userId);
+
+    List<UserDtoRes.HistoryDto> findHistoryAll(Long userId);
 }

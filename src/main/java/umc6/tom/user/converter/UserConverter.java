@@ -132,4 +132,16 @@ public class UserConverter {
                 .pinBoard(pins)
                 .build();
     }
+
+    //나의 내역 보기
+    public static UserDtoRes.HistoryDto toHistoryRes(Board board, String header) {
+
+        return UserDtoRes.HistoryDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .createdAt(board.getCreatedAt())
+                .header(header)
+                .build();
+    }
 }

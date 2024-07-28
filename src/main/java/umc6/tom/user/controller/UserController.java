@@ -16,6 +16,8 @@ import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 import umc6.tom.user.service.UserService;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -248,9 +250,17 @@ public class UserController {
         return ApiResponse.onSuccess(userService.changeAgreement(userId));
     }
 
+    //타인 프로필 조회
     @GetMapping("/{userId}/find")
     public ApiResponse<UserDtoRes.FindProfileDto> findProfile(@PathVariable("userId") Long userId) {
 
         return ApiResponse.onSuccess(userService.findProfile(userId));
+    }
+
+    //활동내역 전체 조회 (내가 쓴글,댓글 단글, 좋아요)
+    @GetMapping("/history")
+    public ApiResponse<List<UserDtoRes.HistoryDto>> findHistoryAll() {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(userService.findHistoryAll(userId));
     }
 }
