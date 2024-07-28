@@ -4,9 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Parameter;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardRequestDto;
@@ -29,10 +31,11 @@ public class BoardRestController {
      * 게시물 등록
      */
     //사진 등록구현 필요
-    @PostMapping("/register")
-    public ApiResponse<BoardResponseDto.RegisterResultDto> join(@RequestBody @Valid BoardRequestDto.RegisterDto request) {
+    @PostMapping(value = "/register", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ApiResponse<BoardResponseDto.RegisterResultDto> join(@RequestPart @Valid BoardRequestDto.RegisterDto request,
+                                                                @RequestPart MultipartFile[] files) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        Board board = boardService.registerBoard(request, userId);
+        Board board = boardService.registerBoard(request, userId, files);
         return ApiResponse.onSuccess(BoardConverter.toRegisterResultDto(board));
     }
 
@@ -170,11 +173,12 @@ public class BoardRestController {
      * 24.07.24 작성자 : 박재락
      * 게시물 수정
      */
-    @PatchMapping("/{board_id}")
-    public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestBody @Valid BoardRequestDto.UpdateBoardDto request,
+    @PatchMapping(value = "/{board_id}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestPart @Valid BoardRequestDto.UpdateBoardDto request,
+                                                                    @RequestPart MultipartFile[] files,
                                                                     @PathVariable(name = "board_id") Long boardId){
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        Board board = boardService.updateBoard(request, userId, boardId);
+        Board board = boardService.updateBoard(request, userId, boardId, files);
 
         return ApiResponse.onSuccess(BoardConverter.toUpdateBoardDto(board));
     }

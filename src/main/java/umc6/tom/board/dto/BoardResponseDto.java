@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import umc6.tom.board.model.BoardComplaint;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -118,6 +119,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardViewDto{
+        Long userId; //수정, 삭제를 위한 유저 토큰id와, 게시글 유저아이디 비교용
         String userNickname;
         String userProfilePic;
         String title;
@@ -135,6 +137,7 @@ public class BoardResponseDto {
     @AllArgsConstructor
     public static class BoardViewPinListDto{
         Long id;
+        Long userId; //수정, 삭제를 위한 유저 토큰id와, 게시글 유저아이디 비교용
         String userNickname;
         String comment;
         String pinDate;
@@ -159,11 +162,21 @@ public class BoardResponseDto {
     @AllArgsConstructor
     public static class BoardViewPinCommentListDto{
         Long id;
+        Long userId;
         String userNickname;
         String comment;
         String pinCommentDate;
         Integer pinLikeCount;
         List<String> pinPicList;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardComplaintPictureDto {
+        BoardComplaint boardComplaint;
+        String pic;
     }
 
     @Builder

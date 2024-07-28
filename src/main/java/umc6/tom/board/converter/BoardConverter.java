@@ -2,17 +2,15 @@ package umc6.tom.board.converter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.util.ObjectUtils;
-import umc6.tom.board.model.BoardComplaint;
-import umc6.tom.board.model.BoardPicture;
+import umc6.tom.board.model.*;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
-import umc6.tom.board.model.Board;
-import umc6.tom.board.model.BoardLike;
 import umc6.tom.comment.model.Comment;
 import umc6.tom.comment.model.CommentPicture;
 import umc6.tom.comment.model.PinPicture;
+import umc6.tom.common.model.Majors;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -24,11 +22,13 @@ import java.util.stream.Collectors;
 public class BoardConverter {
 
 
-    public static Board toBoard(BoardRequestDto.RegisterDto request){
+    public static Board toBoard(BoardRequestDto.RegisterDto request, User user, Majors majors){
 
         return Board.builder()
                 .title(request.getTitle())
                 .content(request.getContent())
+                .user(user)
+                .majors(majors)
                 .build();
     }
 
@@ -44,7 +44,7 @@ public class BoardConverter {
         for (Pin pin : board.getPinList())
             pinCommentSize += pin.getCommentList().size();
         String boardPreViewPic = null;
-        
+
         //list는 없는 index 참조시 나는 오류를 제거
         if(!ObjectUtils.isEmpty(board.getBoardPictureList()))
             boardPreViewPic = board.getBoardPictureList().get(0).getPic();
@@ -98,7 +98,10 @@ public class BoardConverter {
         return BoardComplaint.builder()
                 .board(board)
                 .user(user)
-                .boardContent(request.getContent())
+                .boardTitle(board.getTitle())
+                .boardContent(board.getContent())
+                .boardUserId(board.getUser().getId())
+                .complaintContent(request.getContent())
                 .build();
     }
 
@@ -141,11 +144,19 @@ public class BoardConverter {
                 .boardAllList(boardAllListViewDtoList)
                 .build();
     }
-    public static BoardPicture toBardPicture(Board board, String pic){
+    public static BoardPicture toBoardPicture(Board board, String pic){
         return BoardPicture.builder()
                 .board(board)
                 .pic(pic)
                 .build();
+    }
+
+    public static List<String> toStringList(List<BoardPicture> boardPictureList){
+        List<String> picList = new ArrayList<>();
+        for(BoardPicture boardPicture : boardPictureList){
+            picList.add(boardPicture.getPic());
+        }
+        return picList;
     }
 
     public static BoardResponseDto.BoardUpdateDto toUpdateBoardDto(Board board){
@@ -168,6 +179,7 @@ public class BoardConverter {
             newBoardPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewDto.builder()
+                .userId(board.getUser().getId())
                 .userNickname(board.getUser().getNickName())
                 .userProfilePic(board.getUser().getPic())
                 .title(board.getTitle())
@@ -182,7 +194,7 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardViewPinListDto toBoardViewPinListDto(Pin pin){
         int pinCommentSize = 0; //대댓글 개수
-        for (Comment comment : pin.getCommentList())
+        for (Comment pinComment : pin.getCommentList())
             pinCommentSize += 1;
 
         List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getCommentList().stream()
@@ -194,6 +206,7 @@ public class BoardConverter {
 
         return BoardResponseDto.BoardViewPinListDto.builder()
                 .id(pin.getId())
+                .userId(pin.getUser().getId())
                 .userNickname(pin.getUser().getNickName())
                 .comment(pin.getComment())
                 .pinDate(new DateCalc().boardListDate(pin.getCreatedAt()))
@@ -201,6 +214,14 @@ public class BoardConverter {
                 .pinCommentCount(pinCommentSize)
                 .pinCommentList(toBoardViewPinCommentListDtoList)
                 .pinPictureList(newPinPicList)
+                .build();
+    }
+
+    public static BoardComplaintPicture toBoardComplaintPictureDto(BoardComplaint boardComplaint, String boardPic){
+
+        return BoardComplaintPicture.builder()
+                .boardComplaint(boardComplaint)
+                .pic(boardPic)
                 .build();
     }
 
@@ -212,6 +233,7 @@ public class BoardConverter {
 
         return BoardResponseDto.BoardViewPinCommentListDto.builder()
                 .id(comment.getId())
+                .userId(comment.getUser().getId())
                 .userNickname(comment.getUser().getNickName())
                 .comment(comment.getComment())
                 .pinCommentDate(new DateCalc().boardListDate(comment.getCreatedAt()))

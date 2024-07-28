@@ -6,24 +6,30 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
-import umc6.tom.board.model.Board;
-import umc6.tom.board.model.BoardComplaint;
-import umc6.tom.board.model.BoardLike;
+import umc6.tom.board.model.*;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.board.repository.*;
 import umc6.tom.common.model.Majors;
-import umc6.tom.common.model.enums.Status;
+import umc6.tom.common.model.Uuid;
+import umc6.tom.common.repository.UuidRepository;
+import umc6.tom.config.AmazonConfig;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
+import umc6.tom.util.AmazonS3Util;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,19 +40,36 @@ public class BoardServiceImpl implements BoardService{
     private final MajorRepositoryBoard majorRepositoryBoard;
     private final BoardLikeRepository boardLikeRepository;
     private final BoardComplaintRepository boardComplaintRepository;
-    private final PinRepositoryBoard pinRepositoryBoard;
-    private final PinCommentRepositoryBoard pinCommentRepositoryBoard;
     private final BoardPictureRepository boardPictureRepository;
+    private final BoardComplaintPictureRepository boardComplaintPictureRepository;
+    private final UuidRepository uuidRepository;
+    private final AmazonS3Util amazonS3Util;
+    private final AmazonConfig amazonConfig;
 
     @Override
-    public Board registerBoard(BoardRequestDto.RegisterDto request, Long userId) {
-        Board newBoard = BoardConverter.toBoard(request);
+    public Board registerBoard(BoardRequestDto.RegisterDto request, Long userId, MultipartFile[] files) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Majors majors = majorRepositoryBoard.findById(request.getMajor()).orElseThrow(()
                 -> new BoardHandler(ErrorStatus.MAJORS_NOR_FOUND));
+        Board newBoard = BoardConverter.toBoard(request, user, majors);
 
-        newBoard.setUser(user);
-        newBoard.setMajors(majors);
+        String fileName = null;
+
+
+        if(!ObjectUtils.isEmpty(files)) {
+            for (MultipartFile file : files) {
+                try {
+                    String uuid = UUID.randomUUID().toString();
+                    Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+
+                    fileName = amazonS3Util.upload(file, amazonConfig.getProfilePath(), savedUuid);
+                } catch (IOException e) {
+                    throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
+                }
+                BoardPicture newboardPicture= BoardConverter.toBoardPicture(newBoard, fileName);
+                boardPictureRepository.save(newboardPicture);
+            }
+        }
         return boardRepository.save(newBoard);
     }
 
@@ -155,7 +178,8 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public Board updateBoard(BoardRequestDto.UpdateBoardDto request, Long userId, Long boardId) {
+    @Transactional
+    public Board updateBoard(BoardRequestDto.UpdateBoardDto request, Long userId, Long boardId, MultipartFile[] files) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
         //타인 게시글 수정 못하게
@@ -169,10 +193,32 @@ public class BoardServiceImpl implements BoardService{
 
         board.setContent(request.getContent());
         board.setTitle(request.getTitle());
-        boardRepository.save(board);
-        for (String pic : request.getPic())
-            boardPictureRepository.save(BoardConverter.toBardPicture(board, pic));
-        return board;
+
+        String fileName = null;
+        if(!ObjectUtils.isEmpty(files)) {
+            for (MultipartFile file : files) {
+                try {
+                    String uuid = UUID.randomUUID().toString();
+                    Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+
+                    fileName = amazonS3Util.upload(file, amazonConfig.getProfilePath(), savedUuid);
+                } catch (IOException e) {
+                    throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
+                }
+                BoardPicture newboardPicture= BoardConverter.toBoardPicture(board, fileName);
+                boardPictureRepository.save(newboardPicture);
+            }
+            if(!ObjectUtils.isEmpty(board.getBoardPictureList())){
+                //수정으로 삭제된 사진만 남음(중복안된 값)
+                List<String> deletedUrl = BoardConverter.toStringList(board.getBoardPictureList()).stream().
+                        filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
+                        .collect(Collectors.toList());
+                //삭제시 사진파일은 게시물 신고 사진 때문에 데이터는 남겨두고 url만 지움
+                for (String deletedPic : deletedUrl)
+                    boardPictureRepository.deleteByPic(deletedPic);
+            }
+        }
+        return boardRepository.save(board);
     }
 
     @Override
@@ -185,11 +231,15 @@ public class BoardServiceImpl implements BoardService{
             board.setStatus(BoardStatus.OVERCOMPLAINT);
 
         boardRepository.save(board);
+
         BoardComplaint boardComplaint = BoardConverter.toBoardComplaint(request, user, board);
-        boardComplaint.setBoardTitle(board.getTitle());
-        boardComplaint.setBoardContent(board.getContent());
-        boardComplaint.setBoardUserId(board.getUser().getId());
-        return boardComplaintRepository.save(boardComplaint);
+        boardComplaintRepository.save(boardComplaint);
+        BoardComplaintPicture boardComplaintPicture;
+        for (BoardPicture pic : board.getBoardPictureList()){
+            boardComplaintPicture= BoardConverter.toBoardComplaintPictureDto(boardComplaint, pic.getPic());
+            boardComplaintPictureRepository.save(boardComplaintPicture);
+        }
+        return boardComplaint;
     }
 
     @Override
@@ -213,7 +263,7 @@ public class BoardServiceImpl implements BoardService{
                     (BoardStatus.ACTIVE, searchKeyword, PageRequest.of(page, 12));
         else
             throw new BoardHandler(ErrorStatus.BOARD_SEARCHTYPE_NOT_FOUND);
-        
+
         //검색한 결과가 없을 때
         if (ObjectUtils.isEmpty(boardPage))
             throw new BoardHandler(ErrorStatus.BOARD_NOT_SEARCH);
