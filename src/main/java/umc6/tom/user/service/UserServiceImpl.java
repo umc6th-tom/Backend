@@ -6,6 +6,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -521,7 +524,7 @@ public class UserServiceImpl implements UserService {
         return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
     }
 
-    public List<UserDtoRes.HistoryDto> findHistoryAll(Long userId){
+    public Page<UserDtoRes.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
@@ -545,9 +548,32 @@ public class UserServiceImpl implements UserService {
                                         .toList();
 
         // 세 개의 리스트를 합치고 시간 순으로 정렬
-        return Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
-                                .distinct()
-                                .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // 시간 순으로 정렬
-                                .toList();
+        List<UserDtoRes.HistoryDto> mergedList = Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
+                                        .distinct()
+                                        .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // 시간 순으로 정렬
+                                        .toList();
+
+        // 전체 결과를 페이징하여 반환
+        int start = Math.min((int) pageable.getOffset(), mergedList.size());
+        int end = Math.min((start + pageable.getPageSize()), mergedList.size());
+        Page<UserDtoRes.HistoryDto> page = new PageImpl<>(mergedList.subList(start, end), pageable, mergedList.size());
+
+        return page;
     }
+
+    public Page<UserDtoRes.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 쓴 글
+        Page<Board> boardPage = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
+
+        List<UserDtoRes.HistoryDto> historyDtoList = boardPage.stream()
+                .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
+                .toList();
+
+        return new PageImpl<>(historyDtoList, adjustedPageable, boardPage.getTotalElements());
+    }
+
+
 }

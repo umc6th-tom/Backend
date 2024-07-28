@@ -2,6 +2,7 @@ package umc6.tom.board.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.enums.BoardStatus;
@@ -53,4 +54,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     List<Board> findTop3ByUserIdOrderByCreatedAtDesc(Long userId);
 
     List<Board> findAllByUserIdOrderByCreatedAtDesc(Long userId);
+
+    Page<Board> findAllByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 }

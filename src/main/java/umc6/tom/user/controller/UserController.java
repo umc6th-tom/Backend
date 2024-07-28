@@ -5,6 +5,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.ApiResponse;
@@ -259,8 +263,19 @@ public class UserController {
 
     //활동내역 전체 조회 (내가 쓴글,댓글 단글, 좋아요)
     @GetMapping("/history")
-    public ApiResponse<List<UserDtoRes.HistoryDto>> findHistoryAll() {
+    public ApiResponse<Page<UserDtoRes.HistoryDto>> findHistoryAll(@RequestParam(defaultValue = "1") int page,
+                                                                    @PageableDefault(size = 15) Pageable pageable) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        return ApiResponse.onSuccess(userService.findHistoryAll(userId));
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findHistoryAll(userId,adjustedPageable));
+    }
+
+    //내가 쓴글 조회
+    @GetMapping("/myboards")
+    public ApiResponse<Page<UserDtoRes.HistoryDto>> findMyBoards(@RequestParam(defaultValue = "1") int page,
+                                                                   @PageableDefault(size = 3) Pageable pageable) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findMyBoards(userId,adjustedPageable));
     }
 }
