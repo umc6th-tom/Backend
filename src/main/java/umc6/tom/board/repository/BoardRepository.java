@@ -57,4 +57,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Page<Board> findAllByUserIdOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
+    Board findAllById(Long id);
+
 }

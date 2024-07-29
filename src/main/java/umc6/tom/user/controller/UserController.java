@@ -270,7 +270,13 @@ public class UserController {
         return ApiResponse.onSuccess(userService.findProfileBoards(userId,adjustedPageable));
     }
 
-
+    //타인이 댓글단 글 조회
+    @GetMapping("/{userId}/comments")
+    public ApiResponse<Page<BoardResponseDto.FindUserBoardsDto>> findProfileComments(@PathVariable("userId") Long userId,@RequestParam(defaultValue = "1") int page,
+                                                                                   @PageableDefault(size = 12) Pageable pageable) {
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findProfileComments(userId,adjustedPageable));
+    }
 
     //활동내역 전체 조회 (내가 쓴글,댓글 단글, 좋아요)
     @GetMapping("/history")

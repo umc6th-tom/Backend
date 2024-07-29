@@ -537,6 +537,22 @@ public class UserServiceImpl implements UserService {
                                         .toList();
 
         return new PageImpl<>(boardList, adjustedPageable, boardList.size());
+    }
+
+    public Page<BoardResponseDto.FindUserBoardsDto> findProfileComments(Long userId, Pageable adjustedPageable){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        Page<Pin> pagePinEntity = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
+
+        //map으로 Board를 조회하고 조회한 값들을 pagePin과 같이 dto에 넣는다.
+        List<BoardResponseDto.FindUserBoardsDto> boardsDto = pagePinEntity.stream()
+                                    .distinct()
+                                    .map(pin -> new PinBoardDto(pin,boardRepository.findAllById(pin.getBoard().getId())))
+                                    .map(pinBoardDto -> BoardConverter.toFindCommentsDto(pinBoardDto.getPin(),pinBoardDto.getBoard()))
+                                    .toList();
+
+        return new PageImpl<>(boardsDto, adjustedPageable, boardsDto.size());
 
     }
 

@@ -72,4 +72,6 @@ public interface UserService {
     Page<BoardResponseDto.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable);
 
     Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable);
+
+    Page<BoardResponseDto.FindUserBoardsDto> findProfileComments(Long userId, Pageable adjustedPageable);
 }
