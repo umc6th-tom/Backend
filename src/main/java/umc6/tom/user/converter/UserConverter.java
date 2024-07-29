@@ -137,9 +137,9 @@ public class UserConverter {
     }
 
     //나의 내역 보기
-    public static UserDtoRes.HistoryDto toHistoryRes(Board board, String header, LocalDateTime createdAt) {
+    public static BoardResponseDto.HistoryDto toHistoryRes(Board board, String header, LocalDateTime createdAt) {
 
-        return UserDtoRes.HistoryDto.builder()
+        return BoardResponseDto.HistoryDto.builder()
                 .boardId(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())

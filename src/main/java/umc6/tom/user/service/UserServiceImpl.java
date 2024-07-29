@@ -526,23 +526,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDtoRes.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
+    public Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        Page<Board> boardPageEntity = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
+
+        List<BoardResponseDto.FindUserBoardsDto> boardList = boardPageEntity.stream()
+                                        .map(BoardConverter::toFindBoardsDto)
+                                        .toList();
+
+        return new PageImpl<>(boardList, adjustedPageable, boardList.size());
+
+    }
+
+    @Override
+    public Page<BoardResponseDto.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         //자기가 쓴 글
-        List<UserDtoRes.HistoryDto> boardsDto = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                                         .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
                                         .toList();
         //자기가 댓글 단 글
-        List<UserDtoRes.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+        List<BoardResponseDto.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                                         .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
                                                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
                                         .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
                                         .toList();
         //자기가 좋아요 누른 글
-        List<UserDtoRes.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
+        List<BoardResponseDto.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
                                         .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
                                                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
@@ -550,7 +565,7 @@ public class UserServiceImpl implements UserService {
                                         .toList();
 
         // 세 개의 리스트를 합치고 시간 순으로 정렬
-        List<UserDtoRes.HistoryDto> mergedList = Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
+        List<BoardResponseDto.HistoryDto> mergedList = Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
                                         .distinct()
                                         .sorted((b1, b2) -> b2.getCreatedAt().compareTo(b1.getCreatedAt())) // 시간 순으로 정렬
                                         .toList();
@@ -563,14 +578,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDtoRes.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
+    public Page<BoardResponseDto.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         //자기가 쓴 글
         Page<Board> boardPage = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
 
-        List<UserDtoRes.HistoryDto> historyDtoList = boardPage.stream()
+        List<BoardResponseDto.HistoryDto> historyDtoList = boardPage.stream()
                 .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
                 .toList();
 
@@ -578,14 +593,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDtoRes.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
+    public Page<BoardResponseDto.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         // 자기가 댓글 단 글
         Page<Pin> pinPage = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(), adjustedPageable);
 
-        List<UserDtoRes.HistoryDto> pinBoardsDto = pinPage.stream()
+        List<BoardResponseDto.HistoryDto> pinBoardsDto = pinPage.stream()
                 .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
                         .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                 .distinct()
@@ -596,14 +611,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDtoRes.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable) {
+    public Page<BoardResponseDto.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         //자기가 좋아요 누른 글
         Page<BoardLike> likePage = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId(),adjustedPageable);
 
-        List<UserDtoRes.HistoryDto> LikeBoardsDto = likePage.stream()
+        List<BoardResponseDto.HistoryDto> LikeBoardsDto = likePage.stream()
                                     .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
                                             .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                     .distinct()
@@ -612,5 +627,7 @@ public class UserServiceImpl implements UserService {
 
         return new PageImpl<>(LikeBoardsDto, adjustedPageable, likePage.getTotalElements());
     }
+
+
 
 }

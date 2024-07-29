@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
+import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.UserDtoReq;
@@ -261,19 +262,28 @@ public class UserController {
         return ApiResponse.onSuccess(userService.findProfile(userId));
     }
 
+    //타인 게시 글 조회
+    @GetMapping("/{userId}/boards")
+    public ApiResponse<Page<BoardResponseDto.FindUserBoardsDto>> findProfileBoards(@PathVariable("userId") Long userId,@RequestParam(defaultValue = "1") int page,
+                                                                             @PageableDefault(size = 12) Pageable pageable) {
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findProfileBoards(userId,adjustedPageable));
+    }
+
+
+
     //활동내역 전체 조회 (내가 쓴글,댓글 단글, 좋아요)
     @GetMapping("/history")
-    public ApiResponse<Page<UserDtoRes.HistoryDto>> findHistoryAll(@RequestParam(defaultValue = "1") int page,
-                                                                    @PageableDefault(size = 15) Pageable pageable) {
+    public ApiResponse<Page<BoardResponseDto.HistoryDto>> findHistoryAll(@RequestParam(defaultValue = "1") int page,
+                                                                         @PageableDefault(size = 15) Pageable pageable) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findHistoryAll(userId,adjustedPageable));
     }
-
     //내가 쓴글 조회
     @GetMapping("/myboards")
-    public ApiResponse<Page<UserDtoRes.HistoryDto>> findMyBoards(@RequestParam(defaultValue = "1") int page,
-                                                                   @PageableDefault(size = 12) Pageable pageable) {
+    public ApiResponse<Page<BoardResponseDto.HistoryDto>> findMyBoards(@RequestParam(defaultValue = "1") int page,
+                                                                 @PageableDefault(size = 12) Pageable pageable) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findMyBoards(userId,adjustedPageable));
@@ -281,7 +291,7 @@ public class UserController {
 
     //내가 쓴 댓글 글 조회
     @GetMapping("/mycomments")
-    public ApiResponse<Page<UserDtoRes.HistoryDto>> findMyComments(@RequestParam(defaultValue = "1") int page,
+    public ApiResponse<Page<BoardResponseDto.HistoryDto>> findMyComments(@RequestParam(defaultValue = "1") int page,
                                                                  @PageableDefault(size = 12) Pageable pageable) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
@@ -290,7 +300,7 @@ public class UserController {
 
     //내가 좋아요 단 글 조회
     @GetMapping("/mylikes")
-    public ApiResponse<Page<UserDtoRes.HistoryDto>> findMyLikes(@RequestParam(defaultValue = "1") int page,
+    public ApiResponse<Page<BoardResponseDto.HistoryDto>> findMyLikes(@RequestParam(defaultValue = "1") int page,
                                                                    @PageableDefault(size = 12) Pageable pageable) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
