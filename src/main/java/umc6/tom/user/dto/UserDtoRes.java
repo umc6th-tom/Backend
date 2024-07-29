@@ -120,15 +120,4 @@ public class UserDtoRes {
         private String pic;
     }
 
-    @Getter
-    @Setter
-    @Builder
-    public static class HistoryDto {
-        private Long boardId;
-        private String header;
-        private String createdAt;
-        private String title;
-        private String content;
-    }
-
 }

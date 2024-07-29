@@ -1,9 +1,6 @@
 package umc6.tom.board.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import umc6.tom.board.model.BoardComplaint;
 
 import java.time.LocalDateTime;
@@ -188,6 +185,27 @@ public class BoardResponseDto {
         String title;
         Integer likeCount;
         Integer pinCount;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class HistoryDto {
+        private Long boardId;
+        private String header;
+        private String createdAt;
+        private String title;
+        private String content;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class FindUserBoardsDto {
+        private Long boardId;
+        private String title;
+        private String content;
+        private String createdAt;
     }
 
 }

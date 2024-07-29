@@ -251,4 +251,21 @@ public class BoardConverter {
                 .build();
     }
 
+    public static BoardResponseDto.FindUserBoardsDto toFindBoardsDto(Board board){
+        return BoardResponseDto.FindUserBoardsDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .createdAt(new DateCalc().formatDate(board.getCreatedAt()))
+                .build();
+    }
+
+    public static BoardResponseDto.FindUserBoardsDto toFindCommentsDto(Pin pin, Board board){
+        return BoardResponseDto.FindUserBoardsDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .createdAt(new DateCalc().formatDate(pin.getCreatedAt()))
+                .build();
+    }
 }
