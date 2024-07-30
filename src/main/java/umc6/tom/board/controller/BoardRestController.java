@@ -151,9 +151,10 @@ public class BoardRestController {
      * 24.07.24 작성자 : 박재락
      * 핫한 게시판 조회
      */
-    @GetMapping("/hot")
-    public ApiResponse<BoardResponseDto.BoardListViewListDto> hotBoardList(@RequestParam(name = "page") Integer page) {
-        Page<Board> boardPage = boardService.getBoardHotList(page);
+    @GetMapping("/hot/{major_id}")
+    public ApiResponse<BoardResponseDto.BoardListViewListDto> hotBoardList(@PathVariable (name = "major_id") Long majorId,
+                                                                           @RequestParam(name = "page") Integer page) {
+        Page<Board> boardPage = boardService.getBoardHotList(page, majorId);
 
         return ApiResponse.onSuccess(BoardConverter.toBoardListViewListDTO(boardPage));
     }
