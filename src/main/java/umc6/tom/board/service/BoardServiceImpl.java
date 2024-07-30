@@ -157,6 +157,7 @@ public class BoardServiceImpl implements BoardService{
     @Transactional
     public Board deleteBoard(Long userId, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+        List<String> boardPicList=BoardConverter.toStringList(board.getBoardPictureList());
         //타인 게시글 삭제 못하게
         if (!board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_USER_NOT_MATCH);
@@ -167,8 +168,11 @@ public class BoardServiceImpl implements BoardService{
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_DELETE);
         //신고 기록없을 때만 실제 데이터 삭제
         //신고 상태에서 삭제하면 화면에만 안보이고 실제 데이터 보존
-        if (board.getStatus().equals(BoardStatus.ACTIVE) || board.getReport()==0)
+        if (board.getStatus().equals(BoardStatus.ACTIVE) || board.getReport()==0) {
+            for (String deletedPic : boardPicList)
+                amazonS3Util.deleteFile(deletedPic);
             boardRepository.delete(board);
+        }
         else if(board.getReport()>=1) {
             board.setStatus(BoardStatus.COMPLAINTDELETE);
             boardRepository.save(board);
@@ -213,9 +217,14 @@ public class BoardServiceImpl implements BoardService{
                 List<String> deletedUrl = BoardConverter.toStringList(board.getBoardPictureList()).stream().
                         filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
                         .collect(Collectors.toList());
-                //삭제시 사진파일은 게시물 신고 사진 때문에 데이터는 남겨두고 url만 지움
-                for (String deletedPic : deletedUrl)
+                //삭제시 신고 된 경우 DB에 연결된 url만 삭제.
+                for (String deletedPic : deletedUrl) {
+                    //신고된적 없을시 실제 버킷 사진 데이터 삭제
+                    if (board.getStatus().equals(BoardStatus.ACTIVE))
+                        amazonS3Util.deleteFile(deletedPic);
                     boardPictureRepository.deleteByPic(deletedPic);
+                }
+
             }
         }
         return boardRepository.save(board);
