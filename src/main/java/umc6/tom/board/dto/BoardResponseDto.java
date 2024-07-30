@@ -25,6 +25,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardListViewDto{
+        Long id;
         String title;
         String content;
         Integer pinCount;
@@ -89,6 +90,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardMainViewDto{
+        Long id;
         String title;
         Integer likeCount;
         Integer pinCount;
@@ -119,6 +121,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardViewDto{
+        Long id;
         Long userId; //수정, 삭제를 위한 유저 토큰id와, 게시글 유저아이디 비교용
         String userNickname;
         String userProfilePic;
