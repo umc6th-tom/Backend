@@ -44,7 +44,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     Page<Board> findAllByStatusAndUser_NickNameContainingAndPopularAtIsNotNullOrderByCreatedAtDesc
             (BoardStatus status, String nickName, PageRequest pageRequest);
 
-    Page<Board> findAllByStatusAndPopularAtIsNotNullOrderByCreatedAtDesc(BoardStatus status, PageRequest pageRequest);
+    Page<Board> findAllByStatusAndMajorsIdAndPopularAtIsNotNullOrderByCreatedAtDesc(BoardStatus status, Long majorId,PageRequest pageRequest);
 
     List<Board> findTop5ByStatusAndMajorsOrderByCreatedAtDesc(BoardStatus status,Majors majors);
     List<Board> findTop5ByStatusAndPopularAtNotNullOrderByCreatedAtDesc(BoardStatus status);

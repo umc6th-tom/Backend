@@ -92,9 +92,9 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public Page<Board> getBoardHotList(Integer page) {
-        Page<Board> boardPage= boardRepository.findAllByStatusAndPopularAtIsNotNullOrderByCreatedAtDesc
-                (BoardStatus.ACTIVE, PageRequest.of(page, 12));
+    public Page<Board> getBoardHotList(Integer page, Long majorId) {
+        Page<Board> boardPage= boardRepository.findAllByStatusAndMajorsIdAndPopularAtIsNotNullOrderByCreatedAtDesc
+                (BoardStatus.ACTIVE, majorId, PageRequest.of(page, 12));
 
         return boardPage;
     }

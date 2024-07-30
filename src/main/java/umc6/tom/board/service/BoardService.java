@@ -13,7 +13,7 @@ public interface BoardService {
     Board registerBoard(BoardRequestDto.RegisterDto request, Long userId, MultipartFile[] files);
     Page<Board> getBoardMajorList(Long boardId, Integer page);
     Page<Board> getBoardAllList(Integer page);
-    Page<Board> getBoardHotList(Integer page);
+    Page<Board> getBoardHotList(Integer page, Long majorId);
     BoardResponseDto.BoardMainViewListDto getBoardMainList(Long userId);
 
     BoardLike addBoardLike(Long userId, Long boardId);
