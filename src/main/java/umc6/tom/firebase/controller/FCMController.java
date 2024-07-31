@@ -36,9 +36,8 @@ public class FCMController {
      */
     //서버에 토큰 등록 userId, 토큰
     @PostMapping("/saveFcmToken/{user_id}")
-    public ResponseEntity saveToken(@RequestBody String fcmToken,
-                                    @RequestParam(name = "user_id") Long userId) throws IOException {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+    public ResponseEntity saveToken(@RequestBody String fcmToken) throws IOException {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.saveFcmToken(userId, fcmToken);
         return ResponseEntity.ok().build();
     }
@@ -48,8 +47,8 @@ public class FCMController {
      * 유저의 토큰 불러오기 (api가 필요한가?)
      */
     @GetMapping("/getFcmToken/{user_id}")
-    public ResponseEntity getToken(@RequestParam(name = "user_id") Long userId) throws IOException {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+    public ResponseEntity getToken() throws IOException {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.getAllFcmToken(userId);
         return ResponseEntity.ok().build();
     }
@@ -58,9 +57,8 @@ public class FCMController {
      * 한개의 토큰 삭제 (한 디바이스의 로그 아웃) (api가 필요한가?)
      */
     @DeleteMapping("/deleteFcmToken/{user_id}")
-    public ResponseEntity deleteToken(@RequestBody String fcmToken,
-                                      @RequestParam(name = "user_id") Long userId) throws IOException {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+    public ResponseEntity deleteToken(@RequestBody String fcmToken) throws IOException {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.deleteFcmToken(userId, fcmToken);
         return ResponseEntity.ok().build();
     }
