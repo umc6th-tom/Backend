@@ -70,6 +70,7 @@ public enum ErrorStatus implements BaseErrorCode {
     PIN_NOT_REPORT(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4006", "댓글을 신고하는데 실패하였습니다."),
     PIN_NOT_LIKE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4007", "댓글 좋아요 등록에 실패하였습니다."),
     PIN_NOT_UNLIKE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4008", "댓글 좋아요 취소하기를 실패하였습니다."),
+    PIN_NOT_NOTIFICATION(HttpStatus.BAD_REQUEST, "PIN4009", "댓글 알림 전송 실패하였습니다."),
 
     // 대댓글 관련 에러
     COMMENT_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "COMMENT4001", "대댓글 등록에 실패했습니다."),
