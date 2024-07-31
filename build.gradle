@@ -51,6 +51,10 @@ dependencies {
 
 	// 사진
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	//알람
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
 
 

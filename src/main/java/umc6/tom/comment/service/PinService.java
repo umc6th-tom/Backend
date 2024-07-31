@@ -3,9 +3,13 @@ package umc6.tom.comment.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import umc6.tom.alarm.model.AlarmSet;
+import umc6.tom.alarm.model.enums.AlarmOnOff;
+import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
+import umc6.tom.apiPayload.exception.handler.AlarmSetHandler;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
@@ -20,10 +24,12 @@ import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.*;
 import umc6.tom.comment.repository.*;
+import umc6.tom.firebase.service.PushMessage;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +45,8 @@ public class PinService {
     private final PinComplaintConverter pinComplaintConverter;
     private final PinComplaintRepository pinComplaintRepository;
     private final PinComplaintPictureRepository pinComplaintPictureRepository;
+    private final PushMessage pushMessage;
+    private final AlarmSetRepository alarmSetRepository;
 
     //댓글 등록
     @Transactional
@@ -58,6 +66,14 @@ public class PinService {
         }catch(Exception e){
             throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
         }
+
+        // 댓글 알림 유무
+        AlarmSet alarmSet = alarmSetRepository.findByUserId(board.getUser().getId()).orElseThrow(()
+                -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
+        //댓글 알림 보내기
+        if (alarmSet.getPinSet().equals(AlarmOnOff.ON))
+        pushMessage.pinNotification(board.getUser(), user, board.getTitle(), pinSaved.getComment());
+
         return ApiResponse.onSuccess(200);
     }
 

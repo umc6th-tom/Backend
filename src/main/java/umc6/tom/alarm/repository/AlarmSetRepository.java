@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface AlarmSetRepository extends JpaRepository<AlarmSet, Long> {
 
     Optional<AlarmSet> findByUser(User user);
+    Optional<AlarmSet> findByUserId(long userId);
 }
