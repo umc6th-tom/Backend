@@ -248,6 +248,10 @@ public class BoardServiceImpl implements BoardService{
             boardComplaintPicture= BoardConverter.toBoardComplaintPictureDto(boardComplaint, pic.getPic());
             boardComplaintPictureRepository.save(boardComplaintPicture);
         }
+        // 신고당한 유저 신고 누적 +1
+        User boardUser = userRepository.findById(board.getUser().getId()).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        boardUser.setReport(board.getUser().getReport()+1);
+        userRepository.save(boardUser);
         return boardComplaint;
     }
 

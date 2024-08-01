@@ -12,7 +12,7 @@ import umc6.tom.user.model.User;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
-public class FAG extends BaseEntity {
+public class FAQ extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
