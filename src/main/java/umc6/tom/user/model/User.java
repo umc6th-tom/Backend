@@ -8,12 +8,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.alarm.model.AlarmSet;
+import umc6.tom.board.model.BoardPicture;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
+import umc6.tom.fAQ.model.FAQ;
+import umc6.tom.inquiry.model.Inquiry;
 import umc6.tom.user.model.enums.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -74,6 +79,12 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AlarmSet alarmSet;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<FAQ> fAQList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Inquiry> inquiryList = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
