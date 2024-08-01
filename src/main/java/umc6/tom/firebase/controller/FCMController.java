@@ -50,16 +50,7 @@ public class FCMController {
 
     /**
      * 24.07.30 작성자 : 박재락
-     * 유저의 토큰 불러오기 (api가 필요한가?)
-     */
-    @GetMapping("/getFcmToken")
-    public ApiResponse<FCMResponseDto.fCMTokenAllListDto> getToken() {
-        Long userId = jwtTokenProvider.getUserIdFromToken();
-        return ApiResponse.onSuccess(fcmTokenService.getAllFcmToken(userId));
-    }
-    /**
-     * 24.07.30 작성자 : 박재락
-     * 한개의 토큰 삭제 (한 디바이스의 로그 아웃) (api가 필요한가?)
+     * 한개의 토큰 삭제 (한 디바이스의 로그 아웃)
      */
     @DeleteMapping("/deleteFcmToken")
     public ApiResponse<FCMResponseDto.deleteTokenDto> deleteToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
