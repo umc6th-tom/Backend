@@ -35,10 +35,10 @@ public class FCMController {
      * 서버에 토큰 저장
      */
     //서버에 토큰 등록 userId, 토큰
-    @PostMapping("/saveFcmToken/{user_id}")
-    public ResponseEntity saveToken(@RequestBody String fcmToken) throws IOException {
+    @PostMapping("/saveFcmToken")
+    public ResponseEntity saveToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        fcmTokenService.saveFcmToken(userId, fcmToken);
+        fcmTokenService.saveFcmToken(userId, fcmToken.getTargetToken());
         return ResponseEntity.ok().build();
     }
 
@@ -46,8 +46,8 @@ public class FCMController {
      * 24.07.30 작성자 : 박재락
      * 유저의 토큰 불러오기 (api가 필요한가?)
      */
-    @GetMapping("/getFcmToken/{user_id}")
-    public ResponseEntity getToken() throws IOException {
+    @GetMapping("/getFcmToken")
+    public ResponseEntity getToken() {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.getAllFcmToken(userId);
         return ResponseEntity.ok().build();
@@ -56,19 +56,19 @@ public class FCMController {
      * 24.07.30 작성자 : 박재락
      * 한개의 토큰 삭제 (한 디바이스의 로그 아웃) (api가 필요한가?)
      */
-    @DeleteMapping("/deleteFcmToken/{user_id}")
-    public ResponseEntity deleteToken(@RequestBody String fcmToken) throws IOException {
+    @DeleteMapping("/deleteFcmToken")
+    public ResponseEntity deleteToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        fcmTokenService.deleteFcmToken(userId, fcmToken);
+        fcmTokenService.deleteFcmToken(userId, fcmToken.getTargetToken());
         return ResponseEntity.ok().build();
     }
     /**
      * 24.07.30 작성자 : 박재락
      * 유저의 모든 토큰 삭제 (회원 탈퇴 등)
      */
-    @DeleteMapping("/deleteAllFcmToken/{user_id}")
-    public ResponseEntity deleteAllToken(@RequestParam(name = "user_id") Long userId) throws IOException {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+    @DeleteMapping("/deleteAllFcmToken")
+    public ResponseEntity deleteAllToken() {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.deleteAllFcmToken(userId);
         return ResponseEntity.ok().build();
     }
