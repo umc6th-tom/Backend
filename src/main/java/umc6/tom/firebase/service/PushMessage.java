@@ -24,7 +24,7 @@ public class PushMessage {
     @Async
     public void pinNotification(User boardUser, User pinUser, String title, String comment) {
         log.info("댓글알림");
-        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(boardUser.getId());
+        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(boardUser.getId()).getFCmTokens();
         for (String targetFcmToken : targetFcmTokens)
             Optional.ofNullable(targetFcmToken).ifPresent(token -> {
                         try {

@@ -3,6 +3,8 @@ package umc6.tom.firebase.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import umc6.tom.firebase.converter.FCMConverter;
+import umc6.tom.firebase.dto.FCMResponseDto;
 import umc6.tom.util.RedisUtil;
 
 import java.util.HashSet;
@@ -25,13 +27,14 @@ public class FcmTokenService {
         redisUtil.setDataAndExpire(key, fcmToken, FCM_TOKEN_VALID_TIME_IN_REDIS);
     }
 
-    public Set<String> getAllFcmToken(Long userId) {
+    public FCMResponseDto.fCMTokenAllListDto getAllFcmToken(Long userId) {
         String pattern = FCM_TOKEN_PREFIX + userId + ":*";
         Set<String> keys = redisUtil.getKeys(pattern);
         Set<String> values = new HashSet<>();
         for (String key : keys)
             values.add(redisUtil.getValue(key).replace("\"", ""));
-        return values;
+
+        return FCMConverter.toFCMTokenAllList(userId, values);
     }
 
     public void deleteFcmToken(Long userId, String fcmToken) {
