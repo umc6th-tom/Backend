@@ -17,7 +17,6 @@ public class FCMRequestDto {
     }
     @Getter
     public static class fcmTokenDto {
-
         @NotBlank
         String targetToken;
     }
