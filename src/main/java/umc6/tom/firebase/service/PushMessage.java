@@ -23,16 +23,16 @@ public class PushMessage {
 
     @Async
     public void pinNotification(User boardUser, User pinUser, String title, String comment) {
-        log.info("댓글알림");
+        log.info("userID:"+boardUser.getId()+"에게 알림");
         Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(boardUser.getId()).getFCmTokens();
         for (String targetFcmToken : targetFcmTokens)
             Optional.ofNullable(targetFcmToken).ifPresent(token -> {
                         try {
-                            log.info(token);
+                            log.info("sendMessage token:"+token);
                             firebaseService.sendMessageTo(
                                     token,
-                                    "new comment!",
-                                    boardUser.getName() + "of " + title + "board " + pinUser.getNickName() + "commented.");
+                                    "새 댓글이 달렸습니다!",
+                                    boardUser.getName() + "의 " + title + "게시판에 " + pinUser.getNickName() + "님이 댓글을 남겼습니다.");
                         } catch (IOException e) {
                             throw new CommentHandler(ErrorStatus.PIN_NOT_NOTIFICATION);
                         }
@@ -40,4 +40,5 @@ public class PushMessage {
             );
 
     }
+
 }

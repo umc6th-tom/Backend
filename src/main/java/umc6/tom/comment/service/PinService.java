@@ -30,7 +30,6 @@ import umc6.tom.user.repository.UserRepository;
 
 import java.util.Objects;
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class PinService {
@@ -71,7 +70,7 @@ public class PinService {
         AlarmSet alarmSet = alarmSetRepository.findByUserId(board.getUser().getId()).orElseThrow(()
                 -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
         //댓글 알림 보내기
-        if (alarmSet.getPinSet().equals(AlarmOnOff.ON))
+        if (alarmSet.getPinSet().equals(AlarmOnOff.ON) || !user.getId().equals(board.getUser().getId()))
         pushMessage.pinNotification(board.getUser(), user, board.getTitle(), pinSaved.getComment());
 
         return ApiResponse.onSuccess(200);

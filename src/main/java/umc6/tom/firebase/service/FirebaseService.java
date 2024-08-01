@@ -6,6 +6,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonParseException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import umc6.tom.firebase.converter.FirebaseConverter;
 import umc6.tom.firebase.dto.FCMMessageDto;
 import java.io.IOException;
 import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FirebaseService {
@@ -38,8 +39,8 @@ public class FirebaseService {
                 .build();
 
         Response response = client.newCall(request).execute();
-
-        System.out.println(response.body().string());
+        
+        log.info("전송완료");
     }
 
     private String makeMessage(String targetToken, String title, String body) throws JsonParseException, JsonProcessingException{
