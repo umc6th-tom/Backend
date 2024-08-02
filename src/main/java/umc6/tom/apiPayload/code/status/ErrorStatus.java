@@ -61,6 +61,8 @@ public enum ErrorStatus implements BaseErrorCode {
     BOARD_CANNOT_DELETE(HttpStatus.BAD_REQUEST, "BOARD4008", "삭제할 수 없는 게시글입니다."),
     BOARD_CANNOT_UPDATE(HttpStatus.BAD_REQUEST, "BOARD4009", "수정할 수 없는 게시글입니다."),
     BOARD_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "BOARD4010", "게시판 사진 업로드 실패입니다."),
+    BOARD_NOT_COMPLAINT(HttpStatus.BAD_REQUEST, "BOARD4011", "자신의 게시글은 신고할 수 없습니다."),
+    BOARD_NOT_LIKE(HttpStatus.BAD_REQUEST, "BOARD4012", "자신의 게시글은 좋아요 할 수 없습니다."),
 
     // 댓글 관련 에러
     PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),
