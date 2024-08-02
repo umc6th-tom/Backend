@@ -1,20 +1,16 @@
 package umc6.tom.firebase.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
-import umc6.tom.board.converter.BoardConverter;
-import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.firebase.converter.FCMConverter;
 import umc6.tom.firebase.dto.FCMRequestDto;
 import umc6.tom.firebase.dto.FCMResponseDto;
 import umc6.tom.firebase.service.FcmTokenService;
 import umc6.tom.firebase.service.FirebaseService;
 import umc6.tom.security.JwtTokenProvider;
-
 import java.io.IOException;
-import java.util.Set;
+
 
 
 @RestController

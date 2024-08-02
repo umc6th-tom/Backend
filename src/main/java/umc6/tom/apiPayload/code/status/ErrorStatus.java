@@ -93,6 +93,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 알람 관련 에러
     ALARM_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_SET4001", "알람셋이 없습니다! 관리자에게 문의하세요!"),
 
+    ALARM_READ_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALARM4001", "알림 읽음 유무 값이 잘 못 되었습니다."),
+    ALARM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALARM4002", "알림을 찾을 수 없습니다."),
+    ALARM_NOT_MATCH(HttpStatus.BAD_REQUEST, "ALARM4003", "자신의 알림이 아닙니다."),
 
     // 사진 관련 헤어
     PROFILE_IS_DEFAULT(HttpStatus.BAD_REQUEST, "PIC4001", "사진이 이미 기본값입니다."),

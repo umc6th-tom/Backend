@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -22,7 +23,7 @@ public class Alarm {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Field field;
+    private Field category;
 
     @Column(nullable = false, length = 50)
     private String alarm;
