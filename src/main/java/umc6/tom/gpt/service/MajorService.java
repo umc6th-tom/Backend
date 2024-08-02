@@ -26,10 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MajorService {
 
-    private final AnswerRepository answerRepository;
     private final ExampleRepository exampleRepository;
-    private final ExampleFavoriteRepository exampleFavoriteRepository;
-    private final ExampleConverter exampleConverter;
     private final UserRepository userRepository;
 
     @Value("${gpt.model}")
