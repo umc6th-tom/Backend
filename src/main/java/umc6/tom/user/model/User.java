@@ -8,7 +8,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import umc6.tom.alarm.model.AlarmSet;
-import umc6.tom.board.model.BoardPicture;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
 import umc6.tom.fAQ.model.FAQ;
