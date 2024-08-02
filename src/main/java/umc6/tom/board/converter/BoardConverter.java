@@ -50,6 +50,7 @@ public class BoardConverter {
             boardPreViewPic = board.getBoardPictureList().get(0).getPic();
 
         return BoardResponseDto.BoardListViewDto.builder()
+                .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .likeCount(board.getBoardLikeList().size())
@@ -118,6 +119,7 @@ public class BoardConverter {
             pinCommentSize += pin.getCommentList().size();
 
         return BoardResponseDto.BoardMainViewDto.builder()
+                .id(board.getId())
                 .title(board.getTitle())
                 .likeCount(board.getBoardLikeList().size())
                 .pinCount(board.getPinList().size() + pinCommentSize)
@@ -179,6 +181,7 @@ public class BoardConverter {
             newBoardPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewDto.builder()
+                .id(board.getId())
                 .userId(board.getUser().getId())
                 .userNickname(board.getUser().getNickName())
                 .userProfilePic(board.getUser().getPic())
