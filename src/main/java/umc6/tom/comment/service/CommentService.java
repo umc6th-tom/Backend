@@ -2,22 +2,19 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
+import umc6.tom.alarm.model.enums.Field;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.apiPayload.exception.handler.*;
-import umc6.tom.board.model.Board;
-import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.*;
 import umc6.tom.comment.dto.CommentResDto;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
-import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.*;
 import umc6.tom.comment.repository.*;
 import umc6.tom.firebase.service.PushMessage;
@@ -76,7 +73,7 @@ public class CommentService {
             alarmSet = alarmSetRepository.findByUserId(commentUserId).orElseThrow(()
                     -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
             if (alarmSet.getCommentSet().equals(AlarmOnOff.ON))
-                pushMessage.pinNotification(alarmSet.getUser(), user, pin.getBoard().getTitle(), commentSaved.getComment());
+                pushMessage.commentNotification(alarmSet.getUser(), pin.getBoard(), Field.commented);
         }
         return ApiResponse.onSuccess(200);
     }
