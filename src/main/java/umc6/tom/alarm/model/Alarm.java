@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.board.model.Board;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -31,4 +32,8 @@ public class Alarm {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 }
