@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
+import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.gpt.dto.ExampleDto;
+import umc6.tom.gpt.dto.MajorReq;
 import umc6.tom.gpt.service.FavoriteService;
 import umc6.tom.gpt.service.MajorService;
 import umc6.tom.security.JwtTokenProvider;
@@ -67,6 +69,15 @@ public class MajorController {
 
         return favoriteService.getFindById(id);
     }
+
+    @PostMapping("/find")
+    public String findMajor(@RequestBody MajorReq.SearchDto searchDto) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        return majorService.findMajor(searchDto, userId);
+    }
+
+
 
 
 }

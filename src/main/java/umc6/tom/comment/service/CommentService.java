@@ -60,7 +60,7 @@ public class CommentService {
                 commentPictureRepository.save(commentPicture);
             }
         }catch(Exception e){
-            throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
+            throw new CommentHandler(ErrorStatus.COMMENT_NOT_REGISTER);
         }
         return ApiResponse.onSuccess(200);
     }
