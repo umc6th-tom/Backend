@@ -2,14 +2,15 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import umc6.tom.alarm.model.AlarmSet;
+import umc6.tom.alarm.model.enums.AlarmOnOff;
+import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
-import umc6.tom.apiPayload.exception.handler.BoardHandler;
-import umc6.tom.apiPayload.exception.handler.CommentHandler;
-import umc6.tom.apiPayload.exception.handler.PinHandler;
-import umc6.tom.apiPayload.exception.handler.UserHandler;
+import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.*;
@@ -19,30 +20,26 @@ import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.*;
 import umc6.tom.comment.repository.*;
+import umc6.tom.firebase.service.PushMessage;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.Objects;
-
+import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
     private final UserRepository userRepository;
     private final PinRepository pinRepository;
-    private final BoardRepository boardRepository;
-    private final CommentRepository pinCommentRepository;
-    private final PinPictureRepository pinPictureRepository;
-    private final PinConverter pinConverter;
-    private final PinLikeRepository pinLikeRepository;
-    private final PinComplaintConverter pinComplaintConverter;
-    private final PinComplaintRepository pinComplaintRepository;
-    private final PinComplaintPictureRepository pinComplaintPictureRepository;
     private final CommentRepository commentRepository;
     private final CommentPictureRepository commentPictureRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final CommentComplaintRepository commentComplaintRepository;
     private final CommentComplaintPictureRepository commentComplaintPictureRepository;
+    private final PushMessage pushMessage;
+    private final AlarmSetRepository alarmSetRepository;
 
     //댓글 등록
     @Transactional
@@ -60,7 +57,26 @@ public class CommentService {
                 commentPictureRepository.save(commentPicture);
             }
         }catch(Exception e){
-            throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
+            throw new CommentHandler(ErrorStatus.COMMENT_NOT_REGISTER);
+        }
+
+        // 알림 유무
+        AlarmSet alarmSet;
+        //한 유저가 한 댓글에 여러 대댓글 달았을 경우 여러번 알림 보내기 방지. 중복값을 허용하지 않는 특성인 Set 자료형 이용
+        Set<Long> commentUsers = new HashSet<>();
+        Pin SavedPin = pinRepository.findById(pinId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+        commentUsers.add(pin.getUser().getId());
+        for(Comment commentOne :SavedPin.getCommentList())
+            commentUsers.add(commentOne.getUser().getId());
+        // 대댓글 단 본인은 제외
+        commentUsers.remove(userId);
+
+        //댓글, 이미 달린 대댓글 유저들에게 중복 제거된 유저에게 알림 보내기
+        for(Long commentUserId :commentUsers){
+            alarmSet = alarmSetRepository.findByUserId(commentUserId).orElseThrow(()
+                    -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
+            if (alarmSet.getCommentSet().equals(AlarmOnOff.ON))
+                pushMessage.pinNotification(alarmSet.getUser(), user, pin.getBoard().getTitle(), commentSaved.getComment());
         }
         return ApiResponse.onSuccess(200);
     }

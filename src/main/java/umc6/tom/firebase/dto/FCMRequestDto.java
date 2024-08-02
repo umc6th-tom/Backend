@@ -15,4 +15,9 @@ public class FCMRequestDto {
         @NotBlank
         String body;
     }
+    @Getter
+    public static class fcmTokenDto {
+        @NotBlank
+        String targetToken;
+    }
 }
