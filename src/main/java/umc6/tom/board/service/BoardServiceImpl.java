@@ -123,8 +123,12 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public BoardLike addBoardLike(Long userId, Long boardId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+        //자신의 글에는 좋아요 못함
+        if (board.getUser().getId().equals(userId))
+            throw new BoardHandler(ErrorStatus.BOARD_NOT_LIKE);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
         //좋아요 연타로 인한 api 여러번 실행 방지
         if (boardLikeRepository.existsBoardLikeByUserAndBoard(user, board))
             throw new BoardHandler(ErrorStatus.BOARDLIKE_DUPLICATED);
@@ -232,10 +236,13 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public BoardComplaint complaintBoard(BoardRequestDto.AddComplaintDto request, Long userId, Long boardId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+        //자기자신 신고 못함
+        if(board.getUser().getId().equals(userId))
+            throw new BoardHandler(ErrorStatus.BOARD_NOT_COMPLAINT);
 
-        board.setReport(board.getReport()+1);
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
         if (board.getReport()==10)
             board.setStatus(BoardStatus.OVERCOMPLAINT);
 
