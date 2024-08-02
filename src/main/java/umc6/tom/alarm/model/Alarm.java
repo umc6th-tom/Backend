@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.alarm.model.enums.IsRead;
 import umc6.tom.board.model.Board;
 import umc6.tom.user.model.User;
 
@@ -25,6 +26,10 @@ public class Alarm {
 
     @Column(nullable = false, length = 50)
     private String alarm;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(3) DEFAULT 'NO'")
+    private IsRead isRead;
 
     @CreatedDate
     private LocalDateTime createdAt;
