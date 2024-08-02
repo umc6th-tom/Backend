@@ -33,14 +33,6 @@ public class CommentService {
 
     private final UserRepository userRepository;
     private final PinRepository pinRepository;
-    private final BoardRepository boardRepository;
-    private final CommentRepository pinCommentRepository;
-    private final PinPictureRepository pinPictureRepository;
-    private final PinConverter pinConverter;
-    private final PinLikeRepository pinLikeRepository;
-    private final PinComplaintConverter pinComplaintConverter;
-    private final PinComplaintRepository pinComplaintRepository;
-    private final PinComplaintPictureRepository pinComplaintPictureRepository;
     private final CommentRepository commentRepository;
     private final CommentPictureRepository commentPictureRepository;
     private final CommentLikeRepository commentLikeRepository;
@@ -65,7 +57,7 @@ public class CommentService {
                 commentPictureRepository.save(commentPicture);
             }
         }catch(Exception e){
-            throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
+            throw new CommentHandler(ErrorStatus.COMMENT_NOT_REGISTER);
         }
 
         // 알림 유무

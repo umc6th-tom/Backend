@@ -62,8 +62,4 @@ public class PinController {
         return pinService.pinReport(pinId,reportDto,userId);
     }
 
-
-
-
-
 }
