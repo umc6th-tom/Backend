@@ -42,7 +42,7 @@ public class FavoriteService {
 
         List<Long> exampleId = exampleList.stream()
                 .map(ExampleFavorite -> ExampleFavorite.getExample().getId())
-                .toList();
+                .collect(Collectors.toList());
 
         List<Example> exampleEntity = exampleRepository.findAllById(exampleId);
 

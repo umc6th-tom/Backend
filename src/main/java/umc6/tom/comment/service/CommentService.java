@@ -33,14 +33,6 @@ public class CommentService {
 
     private final UserRepository userRepository;
     private final PinRepository pinRepository;
-    private final BoardRepository boardRepository;
-    private final CommentRepository pinCommentRepository;
-    private final PinPictureRepository pinPictureRepository;
-    private final PinConverter pinConverter;
-    private final PinLikeRepository pinLikeRepository;
-    private final PinComplaintConverter pinComplaintConverter;
-    private final PinComplaintRepository pinComplaintRepository;
-    private final PinComplaintPictureRepository pinComplaintPictureRepository;
     private final CommentRepository commentRepository;
     private final CommentPictureRepository commentPictureRepository;
     private final CommentLikeRepository commentLikeRepository;
