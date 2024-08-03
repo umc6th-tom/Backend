@@ -55,8 +55,7 @@ public class DateCalc {
 
     }
     public String formatDate2(LocalDateTime pastDateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
         return pastDateTime.format(formatter);
-
     }
 }
