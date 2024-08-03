@@ -89,6 +89,8 @@ public class UserConverter {
 
         return UserDtoRes.FindPasswordDto.builder()
                 .userId(user.getId())
+                .account(user.getAccount())
+                .name(user.getName())
                 .build();
     }
 
