@@ -3,9 +3,7 @@ package umc6.tom.board.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
-
 import java.time.LocalDateTime;
 
 @Entity

@@ -2,7 +2,6 @@ package umc6.tom.board.dto;
 
 import lombok.*;
 import umc6.tom.board.model.BoardComplaint;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
