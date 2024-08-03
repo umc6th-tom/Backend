@@ -13,9 +13,6 @@ import umc6.tom.alarm.model.enums.IsRead;
 import umc6.tom.alarm.repository.AlarmRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.AlarmHandler;
-import umc6.tom.apiPayload.exception.handler.BoardHandler;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
