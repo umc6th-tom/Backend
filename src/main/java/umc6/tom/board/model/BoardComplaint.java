@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
-
 import java.util.ArrayList;
 import java.util.List;
 

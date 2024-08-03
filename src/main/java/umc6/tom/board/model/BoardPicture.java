@@ -2,7 +2,7 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.common.BaseEntity;
+
 @Entity
 @Getter
 @Setter

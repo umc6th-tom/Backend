@@ -1,7 +1,6 @@
 package umc6.tom.board.functionClass;
 
 import org.springframework.util.ObjectUtils;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

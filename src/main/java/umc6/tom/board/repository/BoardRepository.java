@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.common.model.Majors;
-import umc6.tom.common.model.enums.Status;
-
 import java.util.List;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
