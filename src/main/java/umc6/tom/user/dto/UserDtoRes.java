@@ -64,6 +64,8 @@ public class UserDtoRes {
     public static class FindPasswordDto {
 
         private Long userId;
+        private String account;
+        private String name;
     }
 
     @Getter

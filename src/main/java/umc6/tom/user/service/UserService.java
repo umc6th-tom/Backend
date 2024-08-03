@@ -17,10 +17,6 @@ public interface UserService {
 
     User join(UserDtoReq.JoinDto request);
 
-    boolean checkNickName(UserDtoReq.CheckNickNameDto request);
-
-    boolean checkAccount(UserDtoReq.CheckAccountDto request);
-
     UserDtoRes.PhoneAuthDto phoneAuth(UserDtoReq.PhoneDto request);
 
     UserDtoRes.LoginDto login(HttpServletRequest request, HttpServletResponse response, UserDtoReq.LoginDto req);
@@ -39,9 +35,9 @@ public interface UserService {
 
     LocalDateTime convertToLocalDateTime(long timestampMillis);
 
-    UserDtoRes.FindAccountDto findAccount(UserDtoReq.FindAccountDto request);
+    UserDtoRes.FindAccountDto findAccount(String phone);
 
-    UserDtoRes.FindPasswordDto findPassword(UserDtoReq.FindPasswordDto request);
+    UserDtoRes.FindPasswordDto findPassword(String phone);
 
     void findRestorePassword(UserDtoReq.FindRestorePasswordDto request);
 
