@@ -17,7 +17,7 @@ public class BoardComplaintPicture {
     @Column(nullable = false, length = 100)
     private String pic;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "boardComplaint_id")
     private BoardComplaint boardComplaint;
 }
