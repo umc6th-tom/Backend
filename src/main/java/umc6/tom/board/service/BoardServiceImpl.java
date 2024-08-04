@@ -206,9 +206,9 @@ public class BoardServiceImpl implements BoardService{
         if (!board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_USER_NOT_MATCH);
 
-        //댓글 작성 됐거나, 핫한 게시글시 수정 못함.
-        //댓글 없고 대댓글만 있을 때 조건 추가야함*
-        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null )
+        //댓글 작성 됐거나, 핫한 게시글시 수정 못함. 게시글 삭제, 신고 누적으로 게시글 안보이게 되어도 못함
+        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null ||
+                !board.getStatus().equals(BoardStatus.ACTIVE))
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_UPDATE);
 
         board.setContent(request.getContent());
@@ -255,6 +255,7 @@ public class BoardServiceImpl implements BoardService{
 
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        board.setReport(board.getReport()+1);
         if (board.getReport()==10)
             board.setStatus(BoardStatus.OVERCOMPLAINT);
 
