@@ -37,7 +37,7 @@ public class FCMController {
      * 서버에 토큰 저장
      */
     //서버에 토큰 등록 userId, 토큰
-    @PostMapping("/fcm/saveFcmToken")
+    @PostMapping("/fcm/token")
     public ApiResponse<FCMResponseDto.saveTokenDto> saveToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.saveFcmToken(userId, fcmToken.getTargetToken());
@@ -48,7 +48,7 @@ public class FCMController {
      * 24.07.30 작성자 : 박재락
      * 한개의 토큰 삭제 (한 디바이스의 로그 아웃)
      */
-    @DeleteMapping("/fcm/deleteFcmToken")
+    @DeleteMapping("/fcm/token")
     public ApiResponse<FCMResponseDto.deleteTokenDto> deleteToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.deleteFcmToken(userId, fcmToken.getTargetToken());
@@ -58,7 +58,7 @@ public class FCMController {
      * 24.07.30 작성자 : 박재락
      * 유저의 모든 토큰 삭제 (회원 탈퇴 등)
      */
-    @DeleteMapping("/fcm/deleteAllFcmToken")
+    @DeleteMapping("/fcm/all-token")
     public ApiResponse<FCMResponseDto.fCMTokenAllListDto> deleteAllToken() {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.deleteAllFcmToken(userId);
