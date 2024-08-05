@@ -22,8 +22,8 @@ public class PinController {
     //댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
     @PostMapping("/{boardId}/register")
     public ApiResponse register(@PathVariable("boardId") Long boardId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
-        return pinService.pinRegister(pinReqDto,boardId,2L);
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return pinService.pinRegister(pinReqDto,boardId,userId);
     }
 
     //댓글 조회

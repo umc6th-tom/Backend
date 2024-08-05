@@ -24,9 +24,9 @@ public class FAQController {
     @GetMapping("/list-{category}")
     public ApiResponse<FAQResponseDto.FAQViewList> fAQViewList(@PathVariable(name = "category") String category,
                                                               @RequestParam(name = "page") Integer page) {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return ApiResponse.onSuccess(faqService.fAQViewList(1L, category, page));
+        return ApiResponse.onSuccess(faqService.fAQViewList(userId, category, page));
     }
 
     /**
@@ -37,8 +37,8 @@ public class FAQController {
     public ApiResponse<FAQResponseDto.FAQViewList> fAQSearchViewList(@PathVariable(name = "category") String category,
                                                                      @RequestParam(name = "content") String content,
                                                                      @RequestParam(name = "page") Integer page){
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return ApiResponse.onSuccess(faqService.fAQSearchViewList(1L, category, content, page));
+        return ApiResponse.onSuccess(faqService.fAQSearchViewList(userId, category, content, page));
     }
 }

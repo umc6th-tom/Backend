@@ -22,8 +22,8 @@ public class CommentController {
     //대댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
     @PostMapping("/{pinId}/register")
     public ApiResponse register(@PathVariable("pinId") Long pinId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
-        return commentService.commentRegister(pinReqDto,pinId,2L);
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return commentService.commentRegister(pinReqDto,pinId,userId);
     }
 
     //대댓글 조회
