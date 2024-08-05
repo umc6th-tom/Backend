@@ -31,7 +31,7 @@ public class BoardRestController {
     //사진 등록구현 필요
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<BoardResponseDto.RegisterResultDto> join(@RequestPart @Valid BoardRequestDto.RegisterDto request,
-                                                                @RequestPart MultipartFile[] files) {
+                                                                @RequestPart(required = false) MultipartFile[] files) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Board board = boardService.registerBoard(request, userId, files);
         return ApiResponse.onSuccess(BoardConverter.toRegisterResultDto(board));
@@ -174,7 +174,7 @@ public class BoardRestController {
      */
     @PatchMapping(value = "/{board_id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<BoardResponseDto.BoardUpdateDto> updateBoard(@RequestPart @Valid BoardRequestDto.UpdateBoardDto request,
-                                                                    @RequestPart MultipartFile[] files,
+                                                                    @RequestPart(required = false) MultipartFile[] files,
                                                                     @PathVariable(name = "board_id") Long boardId){
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Board board = boardService.updateBoard(request, userId, boardId, files);
