@@ -2,6 +2,7 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
@@ -14,6 +15,7 @@ import umc6.tom.apiPayload.exception.handler.AlarmSetHandler;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
+import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.PinComplaintConverter;
@@ -29,8 +31,8 @@ import umc6.tom.firebase.service.PushMessage;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
-
 @Service
 @RequiredArgsConstructor
 public class PinService {
@@ -64,12 +66,19 @@ public class PinService {
             throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
         }
 
+        //댓글+대댓글 15개 도달시 핫글
+        if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 15){
+            board.setPopularAt(LocalDateTime.now());
+            boardRepository.updateBoardPopularAt(boardId, LocalDateTime.now());
+        }
+
         // 댓글 알림 유무
         AlarmSet alarmSet = alarmSetRepository.findByUserId(board.getUser().getId()).orElseThrow(()
                 -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
         //댓글 알림 보내기
         if (alarmSet.getPinSet().equals(AlarmOnOff.ON) || !user.getId().equals(board.getUser().getId()))
             pushMessage.commentNotification(board.getUser(), board, Field.WrittenBoard);
+
 
         return ApiResponse.onSuccess(200);
     }

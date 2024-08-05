@@ -288,9 +288,16 @@ public class BoardConverter {
                 .build();
     }
 
-//    public static List<String> toDeleteBoardPicUrl(List<String> picList){
-//        List<String> deletePicList = new ArrayList<>();
-//
-//        return
-//    }
+    public static int toPinAndCommentCount(List<Pin> pinList){
+        int pinAndCommentSize = 0; // 댓글+대댓글 개수
+
+        for (Pin pin : pinList) {
+            pinAndCommentSize += 1;
+
+            if(!ObjectUtils.isEmpty(pin.getCommentList()))
+                for (Comment comment : pin.getCommentList())
+                    pinAndCommentSize += 1;
+        }
+        return pinAndCommentSize;
+    }
 }
