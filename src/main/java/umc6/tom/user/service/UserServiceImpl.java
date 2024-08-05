@@ -24,9 +24,12 @@ import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
+import umc6.tom.comment.model.Comment;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.repository.CommentRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
@@ -82,6 +85,7 @@ public class UserServiceImpl implements UserService {
     private final BoardRepository boardRepository;
     private final PinRepository pinRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final CommentRepository commentRepository;
 
 
     // 회원 가입
@@ -615,13 +619,25 @@ public class UserServiceImpl implements UserService {
 
         // 자기가 댓글 단 글
         Page<Pin> pinPage = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(), adjustedPageable);
+        Page<Comment> commentPage = commentRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(), adjustedPageable);
 
+        // 댓글 단 글 섞기
         List<BoardResponseDto.HistoryDto> pinBoardsDto = pinPage.stream()
                 .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
                         .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                 .distinct()
                 .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
                 .collect(Collectors.toList());
+
+        // 대댓글 단 글 섞기
+        List<BoardResponseDto.HistoryDto> commentBoardsDto = commentPage.stream()
+                .map(comment -> new CommentBoardDto(comment, boardRepository.findById(comment.getPin().getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(commentBoardDto -> UserConverter.toHistoryRes(commentBoardDto.getBoard(), "댓글 단 글", commentBoardDto.getPin().getCreatedAt()))
+                .collect(Collectors.toList());
+
+
 
         return new PageImpl<>(pinBoardsDto, adjustedPageable, pinPage.getTotalElements());
     }
@@ -644,6 +660,30 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(LikeBoardsDto, adjustedPageable, likePage.getTotalElements());
     }
 
+    public Page<BoardResponseDto.HistoryDto> findTextHistoryAll(Long userId, Pageable adjustedPageable,String content){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        //자기가 쓴 글
+        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrTitleContainingOrderByCreatedAtDesc(user.getId(),content,content).stream()
+                .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
+                .collect(Collectors.toList());
+        //자기가 댓글 단 글
+        List<BoardResponseDto.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
+                .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
+                .collect(Collectors.toList());
+        //자기가 좋아요 누른 글
+        List<BoardResponseDto.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
+                .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
+                .collect(Collectors.toList());
+
+        return new Page
+    }
 
 }

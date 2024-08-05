@@ -312,4 +312,15 @@ public class UserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findMyLikes(userId,adjustedPageable));
     }
+
+    //활동내역 전체 검색 조회 (내가 쓴글,댓글 단글, 좋아요)
+    @GetMapping("/find/history")
+    public ApiResponse<Page<BoardResponseDto.HistoryDto>> findTextHistoryAll(@RequestParam(defaultValue = "1") int page,
+                                                                         @PageableDefault(size = 15) Pageable pageable,
+                                                                             @RequestParam(name = "content") String content ) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findTextHistoryAll(userId,adjustedPageable,content));
+    }
+
 }
