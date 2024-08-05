@@ -64,6 +64,9 @@ public enum ErrorStatus implements BaseErrorCode {
     BOARD_NOT_COMPLAINT(HttpStatus.BAD_REQUEST, "BOARD4011", "자신의 게시글은 신고할 수 없습니다."),
     BOARD_NOT_LIKE(HttpStatus.BAD_REQUEST, "BOARD4012", "자신의 게시글은 좋아요 할 수 없습니다."),
 
+    // 자주 묻는 질문 관련 에러
+    FAQ_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ4001", "카테고리 값이 잘못 되었습니다."),
+
     // 댓글 관련 에러
     PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),
     PIN_NOT_FOUND(HttpStatus.NOT_FOUND, "PIN4002", "댓글을 찾을 수 없습니다."),

@@ -1,7 +1,6 @@
 package umc6.tom.board.functionClass;
 
 import org.springframework.util.ObjectUtils;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,8 +54,7 @@ public class DateCalc {
 
     }
     public String formatDate2(LocalDateTime pastDateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
         return pastDateTime.format(formatter);
-
     }
 }

@@ -7,7 +7,6 @@ import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.service.CommentService;
-import umc6.tom.comment.service.PinService;
 import umc6.tom.security.JwtTokenProvider;
 
 @Slf4j
@@ -23,8 +22,8 @@ public class CommentController {
     //대댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
     @PostMapping("/{pinId}/register")
     public ApiResponse register(@PathVariable("pinId") Long pinId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
-        Long userId = jwtTokenProvider.getUserIdFromToken();
-        return commentService.commentRegister(pinReqDto,pinId,userId);
+        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        return commentService.commentRegister(pinReqDto,pinId,2L);
     }
 
     //대댓글 조회

@@ -2,7 +2,6 @@ package umc6.tom.inquiry.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.user.model.User;
 
 @Entity
 @Getter
@@ -18,7 +17,7 @@ public class InquiryPicture {
     @Column(nullable = false, length = 100)
     public String pic;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "inquiry_id")
     private Inquiry inquiry;
 }

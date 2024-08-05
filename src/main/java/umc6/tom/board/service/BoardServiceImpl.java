@@ -2,6 +2,7 @@ package umc6.tom.board.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,11 +35,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-public class BoardServiceImpl implements BoardService{
+public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
@@ -61,19 +62,16 @@ public class BoardServiceImpl implements BoardService{
         Board newBoard = BoardConverter.toBoard(request, user, majors);
 
         String fileName = null;
-
-
-        if(!ObjectUtils.isEmpty(files)) {
+        if (!ObjectUtils.isEmpty(files)) {
             for (MultipartFile file : files) {
                 try {
                     String uuid = UUID.randomUUID().toString();
                     Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
-
-                    fileName = amazonS3Util.upload(file, amazonConfig.getProfilePath(), savedUuid);
+                    fileName = amazonS3Util.upload(file, amazonConfig.getBoardPath(), savedUuid);
                 } catch (IOException e) {
                     throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
                 }
-                BoardPicture newboardPicture= BoardConverter.toBoardPicture(newBoard, fileName);
+                BoardPicture newboardPicture = BoardConverter.toBoardPicture(newBoard, fileName);
                 boardPictureRepository.save(newboardPicture);
             }
         }
@@ -92,7 +90,7 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public Page<Board> getBoardAllList(Integer page) {
-        Page<Board> boardPage= boardRepository.findAllByStatusOrderByCreatedAtDesc
+        Page<Board> boardPage = boardRepository.findAllByStatusOrderByCreatedAtDesc
                 (BoardStatus.ACTIVE, PageRequest.of(page, 12));
 
         return boardPage;
@@ -100,7 +98,7 @@ public class BoardServiceImpl implements BoardService{
 
     @Override
     public Page<Board> getBoardHotList(Integer page, Long majorId) {
-        Page<Board> boardPage= boardRepository.findAllByStatusAndMajorsIdAndPopularAtIsNotNullOrderByCreatedAtDesc
+        Page<Board> boardPage = boardRepository.findAllByStatusAndMajorsIdAndPopularAtIsNotNullOrderByCreatedAtDesc
                 (BoardStatus.ACTIVE, majorId, PageRequest.of(page, 12));
 
         return boardPage;
@@ -112,7 +110,6 @@ public class BoardServiceImpl implements BoardService{
         //신고로 안보이게 된 게시글 조회 방지
         if (!board.getStatus().equals(BoardStatus.ACTIVE))
             throw new BoardHandler(ErrorStatus.BOARD_NOT_FOUND);
-
         return BoardConverter.toBoardViewDto(board);
     }
 
@@ -120,7 +117,7 @@ public class BoardServiceImpl implements BoardService{
     public BoardResponseDto.BoardMainViewListDto getBoardMainList(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         List<Board> boardMajorList = boardRepository.findTop5ByStatusAndMajorsOrderByCreatedAtDesc
-                (BoardStatus.ACTIVE,user.getMajors());
+                (BoardStatus.ACTIVE, user.getMajors());
         List<Board> boardhotList = boardRepository.findTop5ByStatusAndPopularAtNotNullOrderByCreatedAtDesc(BoardStatus.ACTIVE);
         List<Board> boardAllList = boardRepository.findTop5ByStatusOrderByCreatedAtDesc(BoardStatus.ACTIVE);
         BoardResponseDto.BoardMainViewListDto boardMainList = BoardConverter.toBoardMainListViewListDto
@@ -140,7 +137,7 @@ public class BoardServiceImpl implements BoardService{
         if (boardLikeRepository.existsBoardLikeByUserAndBoard(user, board))
             throw new BoardHandler(ErrorStatus.BOARDLIKE_DUPLICATED);
         //핫한 게시글 조건이 만족 -> 불만족 -> 만족 되었을 때 핫한 게시글 시간 갱신되는 경우 대비
-        if (board.getPopularAt()==null) {
+        if (board.getPopularAt() == null && board.getBoardLikeList().size() >= 10) {
             board.setPopularAt(LocalDateTime.now());
             boardRepository.save(board);
         }
@@ -155,9 +152,10 @@ public class BoardServiceImpl implements BoardService{
         return boardLikeRepository.save(boardLike);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public BoardLike deleteBoardLike(Long userId, Long boardId) {
+        log.info(amazonConfig.getRegion());
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
         BoardLike boardLike = BoardConverter.toBoardLike(user, board);
@@ -174,23 +172,22 @@ public class BoardServiceImpl implements BoardService{
     @Transactional
     public Board deleteBoard(Long userId, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
-        List<String> boardPicList=BoardConverter.toStringList(board.getBoardPictureList());
+        List<String> boardPicList = BoardConverter.toPicStringList(board.getBoardPictureList());
         //타인 게시글 삭제 못하게
         if (!board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_USER_NOT_MATCH);
 
         //댓글 작성 됐거나, 핫한 게시글, 신고 상태에선 삭제 못함.
         //댓글 없고 대댓글만 있을 때 조건 추가야함*
-        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null)
+        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt() != null)
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_DELETE);
         //신고 기록없을 때만 실제 데이터 삭제
         //신고 상태에서 삭제하면 화면에만 안보이고 실제 데이터 보존
-        if (board.getStatus().equals(BoardStatus.ACTIVE) || board.getReport()==0) {
+        if (board.getStatus().equals(BoardStatus.ACTIVE) || board.getReport() == 0) {
             for (String deletedPic : boardPicList)
                 amazonS3Util.deleteFile(deletedPic);
             boardRepository.delete(board);
-        }
-        else if(board.getReport()>=1) {
+        } else if (board.getReport() >= 1) {
             board.setStatus(BoardStatus.COMPLAINTDELETE);
             boardRepository.save(board);
         }
@@ -207,56 +204,60 @@ public class BoardServiceImpl implements BoardService{
         if (!board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_USER_NOT_MATCH);
 
-        //댓글 작성 됐거나, 핫한 게시글시 수정 못함.
-        //댓글 없고 대댓글만 있을 때 조건 추가야함*
-        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt()!=null )
+        //댓글 작성 됐거나, 핫한 게시글시 수정 못함. 게시글 삭제, 신고 누적으로 게시글 안보이게 되어도 못함
+        if (!ObjectUtils.isEmpty(board.getPinList()) || board.getPopularAt() != null ||
+                !board.getStatus().equals(BoardStatus.ACTIVE))
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_UPDATE);
 
         board.setContent(request.getContent());
         board.setTitle(request.getTitle());
+        Board savedBoard = boardRepository.save(board);
 
         String fileName = null;
-        if(!ObjectUtils.isEmpty(files)) {
+        if (!ObjectUtils.isEmpty(files)) {
+            BoardPicture newboardPicture = null;
             for (MultipartFile file : files) {
                 try {
                     String uuid = UUID.randomUUID().toString();
                     Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
 
-                    fileName = amazonS3Util.upload(file, amazonConfig.getProfilePath(), savedUuid);
+                    fileName = amazonS3Util.upload(file, amazonConfig.getBoardPath(), savedUuid);
                 } catch (IOException e) {
                     throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
                 }
-                BoardPicture newboardPicture= BoardConverter.toBoardPicture(board, fileName);
-                boardPictureRepository.save(newboardPicture);
+                newboardPicture = BoardConverter.toBoardPicture(board, fileName);
             }
-            if(!ObjectUtils.isEmpty(board.getBoardPictureList())){
+            if (!ObjectUtils.isEmpty(board.getBoardPictureList())) {
                 //수정으로 삭제된 사진만 남음(중복안된 값)
-                List<String> deletedUrl = BoardConverter.toStringList(board.getBoardPictureList()).stream().
+                List<String> PicUrl = BoardConverter.toPicStringIdList(board.getBoardPictureList()).stream().
                         filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
-                        .collect(Collectors.toList());
-                //삭제시 신고 된 경우 DB에 연결된 url만 삭제.
-                for (String deletedPic : deletedUrl) {
+                        .toList();
+                for (String pic : PicUrl) {
                     //신고된적 없을시 실제 버킷 사진 데이터 삭제
                     if (board.getStatus().equals(BoardStatus.ACTIVE))
-                        amazonS3Util.deleteFile(deletedPic);
-                    boardPictureRepository.deleteByPic(deletedPic);
-                }
+                        amazonS3Util.deleteFileNoPreUrl(amazonConfig.getBoardPath() + "/" + pic);
 
+                    String deletePic = fileName.substring(0, 52) + pic;
+                    boardPictureRepository.deleteByPicUrl(deletePic);
+                }
             }
+            boardPictureRepository.save(newboardPicture);
         }
-        return boardRepository.save(board);
+
+        return savedBoard;
     }
 
     @Override
     public BoardComplaint complaintBoard(BoardRequestDto.AddComplaintDto request, Long userId, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
         //자기자신 신고 못함
-        if(board.getUser().getId().equals(userId))
+        if (board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_NOT_COMPLAINT);
 
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-        if (board.getReport()==10)
+        board.setReport(board.getReport() + 1);
+        if (board.getReport() == 10)
             board.setStatus(BoardStatus.OVERCOMPLAINT);
 
         boardRepository.save(board);
@@ -264,13 +265,13 @@ public class BoardServiceImpl implements BoardService{
         BoardComplaint boardComplaint = BoardConverter.toBoardComplaint(request, user, board);
         boardComplaintRepository.save(boardComplaint);
         BoardComplaintPicture boardComplaintPicture;
-        for (BoardPicture pic : board.getBoardPictureList()){
-            boardComplaintPicture= BoardConverter.toBoardComplaintPictureDto(boardComplaint, pic.getPic());
+        for (BoardPicture pic : board.getBoardPictureList()) {
+            boardComplaintPicture = BoardConverter.toBoardComplaintPictureDto(boardComplaint, pic.getPic());
             boardComplaintPictureRepository.save(boardComplaintPicture);
         }
         // 신고당한 유저 신고 누적 +1
         User boardUser = userRepository.findById(board.getUser().getId()).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-        boardUser.setReport(board.getUser().getReport()+1);
+        boardUser.setReport(board.getUser().getReport() + 1);
         userRepository.save(boardUser);
         return boardComplaint;
     }
@@ -318,10 +319,10 @@ public class BoardServiceImpl implements BoardService{
 
         else if (searchType.equals("title-content"))
             boardPage = boardRepository.findAllByStatusAndMajorsIdAndTitleContainingOrContentContainingOrderByCreatedAtDesc
-                    (BoardStatus.ACTIVE, majorId, searchKeyword,searchKeyword, PageRequest.of(page, 12));
+                    (BoardStatus.ACTIVE, majorId, searchKeyword, searchKeyword, PageRequest.of(page, 12));
 
         else if (searchType.equals("nickname"))
-            boardPage = boardRepository. findAllByStatusAndMajorsIdAndUser_NickNameContainingOrderByCreatedAtDesc
+            boardPage = boardRepository.findAllByStatusAndMajorsIdAndUser_NickNameContainingOrderByCreatedAtDesc
                     (BoardStatus.ACTIVE, majorId, searchKeyword, PageRequest.of(page, 12));
         else
             throw new BoardHandler(ErrorStatus.BOARD_SEARCHTYPE_NOT_FOUND);

@@ -3,9 +3,8 @@ package umc6.tom.board.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import umc6.tom.common.BaseEntity;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import umc6.tom.user.model.User;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,6 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class BoardLike {
 
     @Id
