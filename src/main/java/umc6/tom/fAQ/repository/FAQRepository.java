@@ -7,6 +7,12 @@ import umc6.tom.fAQ.model.FAQ;
 import umc6.tom.fAQ.model.enums.Category;
 
 public interface FAQRepository extends JpaRepository<FAQ, Long> {
-    Page<FAQ> findByUserIdOrderByUpdatedAtDesc(Long userId, PageRequest pageRequest);
-    Page<FAQ> findByUserIdAndCategoryOrderByUpdatedAtDesc(Long userId, Category category, PageRequest pageRequest);
+    Page<FAQ> findAllByOrderByUpdatedAtDesc(PageRequest pageRequest);
+    Page<FAQ> findAllByCategoryOrderByUpdatedAtDesc(Category category, PageRequest pageRequest);
+
+    Page<FAQ> findAllByTitleContainingOrderByUpdatedAtDesc(String title, PageRequest pageRequest);
+    Page<FAQ> findAllByCategoryAndTitleContainingOrderByUpdatedAtDesc
+            (Category category, String title,PageRequest pageRequest);
+
+
 }
