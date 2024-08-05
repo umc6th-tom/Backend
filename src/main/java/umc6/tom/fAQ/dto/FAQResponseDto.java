@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import umc6.tom.fAQ.model.enums.Category;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FAQResponseDto {
@@ -34,6 +35,27 @@ public class FAQResponseDto {
         Long totalElements;
         Boolean isFirst;
         Boolean isLast;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RootFAQAddDto{
+        Long fAQId;
+        Category category;
+        String title;
+        String content;
+        LocalDateTime createAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RootFAQDeleteDto{
+        Long fAQId;
+        LocalDateTime deletedDate;
     }
 
 }
