@@ -137,7 +137,7 @@ public class BoardServiceImpl implements BoardService {
         if (boardLikeRepository.existsBoardLikeByUserAndBoard(user, board))
             throw new BoardHandler(ErrorStatus.BOARDLIKE_DUPLICATED);
         //핫한 게시글 조건이 만족 -> 불만족 -> 만족 되었을 때 핫한 게시글 시간 갱신되는 경우 대비
-        if (board.getPopularAt() == null) {
+        if (board.getPopularAt() == null && board.getBoardLikeList().size() >= 10) {
             board.setPopularAt(LocalDateTime.now());
             boardRepository.save(board);
         }
@@ -228,7 +228,7 @@ public class BoardServiceImpl implements BoardService {
                 newboardPicture = BoardConverter.toBoardPicture(board, fileName);
             }
             if (!ObjectUtils.isEmpty(board.getBoardPictureList())) {
-//        수정으로 삭제된 사진만 남음(중복안된 값)
+                //수정으로 삭제된 사진만 남음(중복안된 값)
                 List<String> PicUrl = BoardConverter.toPicStringIdList(board.getBoardPictureList()).stream().
                         filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
                         .toList();

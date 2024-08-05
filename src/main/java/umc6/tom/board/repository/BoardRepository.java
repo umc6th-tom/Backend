@@ -1,15 +1,27 @@
 package umc6.tom.board.repository;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.common.model.Majors;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Board b SET b.popularAt = :now WHERE b.id = :boardId")
+    void updateBoardPopularAt(Long boardId, LocalDateTime now);
 
     Page<Board> findAllByStatusAndMajorsOrderByCreatedAtDesc(BoardStatus status, Majors majors, PageRequest pageRequest);
 
