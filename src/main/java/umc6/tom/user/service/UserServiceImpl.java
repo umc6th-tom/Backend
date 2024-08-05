@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -15,20 +14,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.alarm.converter.AlarmSetConverter;
 import umc6.tom.alarm.repository.AlarmSetRepository;
+import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
+import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
-import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
-import umc6.tom.comment.model.Comment;
 import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.repository.CommentRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
@@ -40,14 +38,13 @@ import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
-import umc6.tom.user.model.Prohibit;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
-import umc6.tom.user.model.enums.Role;
 import umc6.tom.user.model.enums.UserStatus;
-import umc6.tom.user.model.mapping.ProhibitBoard;
-import umc6.tom.user.repository.*;
+import umc6.tom.user.repository.MajorsRepository;
+import umc6.tom.user.repository.ResignRepository;
+import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.AmazonS3Util;
 import umc6.tom.util.CookieUtil;
 import umc6.tom.util.RedisUtil;
@@ -85,14 +82,11 @@ public class UserServiceImpl implements UserService {
     private final BoardRepository boardRepository;
     private final PinRepository pinRepository;
     private final BoardLikeRepository boardLikeRepository;
-    private final CommentRepository commentRepository;
-    private final ProhibitRepository prohibitRepository;
-    private final ProhibitBoardRepository prohibitBoardRepository;
 
 
     // 회원 가입
     @Override
-    public User join(@NotNull UserDtoReq.JoinDto request) {
+    public User join(UserDtoReq.JoinDto request) {
 
         if (duplicatedNickName(request.getNickName())) {
             throw new UserHandler(ErrorStatus.USER_NICKNAME_DUPLICATED);
@@ -150,11 +144,16 @@ public class UserServiceImpl implements UserService {
         String account = req.getAccount();
         String password = req.getPassword();
 
-        List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW);
+        List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW, UserStatus.SUSPENSION);
 
         User user = userRepository.findByAccountAndStatusIn(account, statuses)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         log.info("로그인 유저 : {} {}", user.getUsername(), user.getStatus());
+
+        if (user.getStatus().equals(UserStatus.SUSPENSION)) {
+
+            throw new UserHandler(ErrorStatus.USER_IS_SUSPENSION);
+        }
 
         // 비밀번호 불일치
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -511,7 +510,6 @@ public class UserServiceImpl implements UserService {
         return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
     }
 
-    // 타인 게시 글 조회
     @Override
     public Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable){
         User user = userRepository.findById(userId)
@@ -526,15 +524,13 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(boardList, adjustedPageable, boardList.size());
     }
 
-    // 타인이 댓글단 글 조회
-    @Override
     public Page<BoardResponseDto.FindUserBoardsDto> findProfileComments(Long userId, Pageable adjustedPageable){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         Page<Pin> pagePinEntity = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
 
-        //map 으로 Board 를 조회하고 조회한 값들을 pagePin 과 같이 dto 에 넣는다.
+        //map으로 Board를 조회하고 조회한 값들을 pagePin과 같이 dto에 넣는다.
         List<BoardResponseDto.FindUserBoardsDto> boardsDto = pagePinEntity.stream()
                                     .distinct()
                                     .map(pin -> new PinBoardDto(pin,boardRepository.findAllById(pin.getBoard().getId())))
@@ -545,7 +541,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    // 활동내역 전체 조회 (내가 쓴글,댓글 단글, 좋아요)
     @Override
     public Page<BoardResponseDto.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
         User user = userRepository.findById(userId)
@@ -554,21 +549,21 @@ public class UserServiceImpl implements UserService {
         //자기가 쓴 글
         List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                                         .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
-                                        .toList();
+                                        .collect(Collectors.toList());
         //자기가 댓글 단 글
         List<BoardResponseDto.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                                         .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
                                                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
                                         .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
-                                        .toList();
+                                        .collect(Collectors.toList());
         //자기가 좋아요 누른 글
         List<BoardResponseDto.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
                                         .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
                                                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
                                         .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
-                                        .toList();
+                                        .collect(Collectors.toList());
 
         // 세 개의 리스트를 합치고 시간 순으로 정렬
         List<BoardResponseDto.HistoryDto> mergedList = Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
