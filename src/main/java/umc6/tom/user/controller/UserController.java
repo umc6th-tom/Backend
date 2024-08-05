@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -312,4 +313,25 @@ public class UserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findMyLikes(userId,adjustedPageable));
     }
+
+    /**
+     * 24.08.03 작성자 : 류기현
+     * 회원 제제 : 경고
+     */
+    /*@PatchMapping("/warning")
+    public ApiResponse<UserDtoRes.GiveWarnDto> giveWarning(@RequestParam(name = "userId") Long userId) {
+
+        return ApiResponse.onSuccess(userService.giveWarning(userId));
+    }*/
+
+    /**
+     * 24.08.03 작성자 : 류기현
+     * 회원 제제 : 정지
+     */
+    /*@PatchMapping("/suspension")
+    public ApiResponse<SuccessStatus> gieSuspension(@RequestParam(name = "userId") Long userId,
+                                                    @RequestParam(name = "period") Integer period) {
+        userService.giveSuspension(userId, period);
+        return ApiResponse.onSuccess(SuccessStatus._OK);
+    }*/
 }

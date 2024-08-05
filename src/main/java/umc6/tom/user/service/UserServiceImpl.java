@@ -51,6 +51,7 @@ import umc6.tom.util.RedisUtil;
 import umc6.tom.util.SmsUtil;
 
 import java.io.IOException;
+import java.security.Key;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -114,6 +115,8 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         alarmSetRepository.save(AlarmSetConverter.convertAlarmSetToAlarmSet(user));
 
+        // 제재 테이블 재작
+
         return user;
     }
 
@@ -144,11 +147,16 @@ public class UserServiceImpl implements UserService {
         String account = req.getAccount();
         String password = req.getPassword();
 
-        List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW);
+        List<UserStatus> statuses = List.of(UserStatus.ACTIVE, UserStatus.INACTIVE, UserStatus.WITHDRAW, UserStatus.SUSPENSION);
 
         User user = userRepository.findByAccountAndStatusIn(account, statuses)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         log.info("로그인 유저 : {} {}", user.getUsername(), user.getStatus());
+
+        if (user.getStatus().equals(UserStatus.SUSPENSION)) {
+
+            throw new UserHandler(ErrorStatus.USER_IS_SUSPENSION);
+        }
 
         // 비밀번호 불일치
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -175,9 +183,11 @@ public class UserServiceImpl implements UserService {
         // 쿠키 저장
         CookieUtil.deleteCookie(request, response, "refreshToken");
         CookieUtil.addCookie(response, "refreshToken", refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_COOKIE);
-        // DB 의 refreshToken 삭제 후 저장 변경
 
-        redisUtil.setDataAndExpire("RT:" + user.getId(), refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
+        // redis 의 refreshToken 삭제 후 저장
+        String redisKey = "RT:" + user.getId();
+//        redisUtil.deleteData(redisKey);
+        redisUtil.setDataAndExpire(redisKey, refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
 
         return UserConverter.signInRes(user, accessToken, refreshToken);
     }
@@ -623,6 +633,28 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(LikeBoardsDto, adjustedPageable, likePage.getTotalElements());
     }
 
+    // 회원 제제 : 경고 - 미완
+    @Override
+    public UserDtoRes.GiveWarnDto giveWarning(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        user.setWarn(user.getWarn() + 1);
+        return UserConverter.giveWarnRes(user);
+    }
 
+    // 회원 제제 : 정지 - 미완
+    // 로그인시 알람 처리
+    @Override
+    public void giveSuspension(Long userId, Integer period) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        user.setStatus(UserStatus.SUSPENSION);
+        LocalDateTime suspendedAt = LocalDateTime.now().plusDays(period);
+        user.setSuspensionDue(suspendedAt);
+
+        // refreshToken 불능
+        redisUtil.deleteData("RT:" + userId);
+    }
 }

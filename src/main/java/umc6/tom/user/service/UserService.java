@@ -70,4 +70,8 @@ public interface UserService {
     Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable);
 
     Page<BoardResponseDto.FindUserBoardsDto> findProfileComments(Long userId, Pageable adjustedPageable);
+
+    UserDtoRes.GiveWarnDto giveWarning(Long userId);
+
+    void giveSuspension(Long userId, Integer period);
 }

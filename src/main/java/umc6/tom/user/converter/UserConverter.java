@@ -149,4 +149,13 @@ public class UserConverter {
                 .header(header)
                 .build();
     }
+
+    // 경고 응답
+    public static UserDtoRes.GiveWarnDto giveWarnRes(User user) {
+
+        return UserDtoRes.GiveWarnDto.builder()
+                .userId(user.getId())
+                .warn(user.getWarn())
+                .build();
+    }
 }
