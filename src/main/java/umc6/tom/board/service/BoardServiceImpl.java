@@ -183,7 +183,7 @@ public class BoardServiceImpl implements BoardService {
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_DELETE);
         //신고 기록없을 때만 실제 데이터 삭제
         //신고 상태에서 삭제하면 화면에만 안보이고 실제 데이터 보존
-        if (board.getStatus().equals(BoardStatus.ACTIVE) || board.getReport() == 0) {
+        if (board.getStatus().equals(BoardStatus.ACTIVE) && board.getReport() == 0) {
             for (String deletedPic : boardPicList)
                 amazonS3Util.deleteFile(deletedPic);
             boardRepository.delete(board);
