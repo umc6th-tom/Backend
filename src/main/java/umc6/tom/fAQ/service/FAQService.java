@@ -4,5 +4,7 @@ import umc6.tom.fAQ.dto.FAQResponseDto;
 
 public interface FAQService {
 
-    FAQResponseDto.FAQViewList listAll(Long userId, Integer page);
+    FAQResponseDto.FAQViewList fAQViewList(Long userId, String category, Integer page);
+
+    FAQResponseDto.FAQViewList fAQSearchViewList(Long userId, String category, String content, Integer page);
 }
