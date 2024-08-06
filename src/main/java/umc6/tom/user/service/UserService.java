@@ -78,4 +78,6 @@ public interface UserService {
     Page<BoardResponseDto.HistoryDto> findTextHistoryComments(Long userId, Pageable adjustedPageable, String content);
 
     Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content);
+
+    UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnsDto request);
 }

@@ -1,10 +1,12 @@
 package umc6.tom.user.model.mapping;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import umc6.tom.board.model.Board;
 import umc6.tom.user.model.Prohibit;
 
 @Entity
+@Builder
 public class ProhibitBoard {
 
     @Id

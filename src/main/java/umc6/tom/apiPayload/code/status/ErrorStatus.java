@@ -34,6 +34,14 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
 
 
+    // 관리자 관련 에러
+    NOT_ADMIN(HttpStatus.UNAUTHORIZED, "ADMIN4001", "관리자의 권한이 없습니다."),
+
+
+    // 제재 관련 에러
+    PROHIBIT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROHIBIT4001", "해당하는 유저의 제재가 없습니다."),
+
+
     // 인증 관련 에러
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH4001", "휴대폰 인증이 필요합니다."),
 

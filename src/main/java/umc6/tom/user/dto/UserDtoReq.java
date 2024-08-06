@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 public class UserDtoReq {
 
 
@@ -116,6 +118,14 @@ public class UserDtoReq {
     @Getter
     public static class RestorePicDto {
         private MultipartFile userPic;
+    }
+
+    @Getter
+    public static class WarnsDto {
+
+        private List<Long> boardIds;
+        private String message;
+        private String division;
     }
 
 }

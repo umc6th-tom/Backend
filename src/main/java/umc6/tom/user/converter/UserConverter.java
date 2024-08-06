@@ -173,4 +173,15 @@ public class UserConverter {
                 .header(header)
                 .build();
     }
+
+    // 경고 부여
+    public static UserDtoRes.warnDto toWarnDto(Long userId, String nickName, String message) {
+
+        return UserDtoRes.warnDto.builder()
+                .userId(userId)
+                .nickName(nickName)
+                .message(message)
+                .build();
+    }
+
 }

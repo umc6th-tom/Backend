@@ -75,4 +75,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     Board findAllById(Long id);
 
+    List<Board> findByIdIn(List<Long> ids);
 }
