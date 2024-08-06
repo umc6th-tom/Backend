@@ -257,7 +257,7 @@ public class BoardConverter {
                 .comment(comment.getComment())
                 .pinCommentDate(new DateCalc().boardListDate(comment.getCreatedAt()))
                 .pinLikeCount(comment.getCommentLikeList().size())
-                .pinPicList(newPinCommentPicList)
+                .pinCommentPicList(newPinCommentPicList)
                 .build();
     }
 
