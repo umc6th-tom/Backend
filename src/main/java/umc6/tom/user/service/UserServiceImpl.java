@@ -693,7 +693,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         //자기가 쓴 글
-        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrTitleContainingOrderByCreatedAtDesc(user.getId(),content,content,adjustedPageable).stream()
+        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrUserIdAndTitleContainingOrderByCreatedAtDesc(user.getId(),content,user.getId(),content,adjustedPageable).stream()
                 .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
                 .collect(Collectors.toList());
         //자기가 댓글 단 글
@@ -750,7 +750,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         //자기가 쓴 글
-        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrTitleContainingOrderByCreatedAtDesc(user.getId(),content,content,adjustedPageable).stream()
+        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrUserIdAndTitleContainingOrderByCreatedAtDesc(user.getId(),content,user.getId(),content,adjustedPageable).stream()
                 .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
                 .collect(Collectors.toList());
 
@@ -762,6 +762,7 @@ public class UserServiceImpl implements UserService {
      * 24.08.06 작성자 : 서정호
      */
     @Override
+    @Transactional
     public Page<BoardResponseDto.HistoryDto> findTextHistoryComments(Long userId, Pageable adjustedPageable, String content) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
@@ -797,6 +798,7 @@ public class UserServiceImpl implements UserService {
      * 24.08.06 작성자 : 서정호
      */
     @Override
+    @Transactional
     public Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));

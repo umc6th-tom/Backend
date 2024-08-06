@@ -352,7 +352,7 @@ public class UserController {
     /**
      * 24.08.06 작성자 : 서정호
      */
-    @GetMapping("/find/history")
+    @GetMapping("/find/myboards")
     public ApiResponse<Page<BoardResponseDto.HistoryDto>> findTextHistoryBoards(@RequestParam(defaultValue = "1") int page,
                                                                              @PageableDefault(size = 15) Pageable pageable,
                                                                              @RequestParam(name = "content") String content ) {
@@ -365,7 +365,7 @@ public class UserController {
     /**
      * 24.08.06 작성자 : 서정호
      */
-    @GetMapping("/find/history")
+    @GetMapping("/find/mycomments")
     public ApiResponse<Page<BoardResponseDto.HistoryDto>> findTextHistoryComments(@RequestParam(defaultValue = "1") int page,
                                                                                 @PageableDefault(size = 15) Pageable pageable,
                                                                                 @RequestParam(name = "content") String content ) {
@@ -378,7 +378,7 @@ public class UserController {
     /**
      * 24.08.06 작성자 : 서정호
      */
-    @GetMapping("/find/history")
+    @GetMapping("/find/mylikes")
     public ApiResponse<Page<BoardResponseDto.HistoryDto>> findTextHistoryLikes(@RequestParam(defaultValue = "1") int page,
                                                                                 @PageableDefault(size = 15) Pageable pageable,
                                                                                 @RequestParam(name = "content") String content ) {
