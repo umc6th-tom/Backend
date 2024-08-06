@@ -7,9 +7,12 @@ import org.springframework.stereotype.Repository;
 import umc6.tom.comment.model.Comment;
 import umc6.tom.user.model.User;
 
+import java.util.List;
+
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Page<Comment> findAllByUserIdOrderByCreatedAtDesc(Long id, Pageable pageable);
 
+    List<Comment> findAllByUserIdAndCommentContainingOrderByCreatedAtDesc(Long id, String comment, Pageable pageable);
 }
