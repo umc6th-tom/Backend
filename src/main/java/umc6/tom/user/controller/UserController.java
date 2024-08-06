@@ -361,7 +361,7 @@ public class UserController {
         return ApiResponse.onSuccess(userService.findTextHistoryBoards(userId,adjustedPageable,content));
     }
 
-    //활동내역 내가쓴글 검색 조회
+    //활동내역 댓글 검색 조회
     /**
      * 24.08.06 작성자 : 서정호
      */
@@ -374,7 +374,7 @@ public class UserController {
         return ApiResponse.onSuccess(userService.findTextHistoryComments(userId,adjustedPageable,content));
     }
 
-    //활동내역 내가쓴글 검색 조회
+    //활동내역 좋아요 검색 조회
     /**
      * 24.08.06 작성자 : 서정호
      */

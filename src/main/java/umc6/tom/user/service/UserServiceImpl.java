@@ -478,6 +478,10 @@ public class UserServiceImpl implements UserService {
         user.setPic(DEFAULT_PROFILE_PATH);
     }
 
+    //타인 프로필 조회
+    /**
+     * 24.07.28 작성자 : 서정호
+     */
     @Override
     @Transactional
     public UserDtoRes.FindProfileDto findProfile(Long userId) {
@@ -509,6 +513,10 @@ public class UserServiceImpl implements UserService {
         return UserConverter.findProfileRes(user,findProfileBoardDto,findProfilePinDto);
     }
 
+    //타인 게시 글 조회
+    /**
+     * 24.07.29 작성자 : 서정호
+     */
     @Override
     @Transactional
     public Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable){
@@ -524,6 +532,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(boardList, adjustedPageable, boardList.size());
     }
 
+    //타인이 댓글단 글 조회
+    /**
+     * 24.07.289 작성자 : 서정호
+     */
     @Transactional
     public Page<BoardResponseDto.FindUserBoardsDto> findProfileComments(Long userId, Pageable adjustedPageable){
         User user = userRepository.findById(userId)
@@ -542,6 +554,10 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    //활동내역 전체 조회 (내가 쓴글,댓글 단글, 좋아요)
+    /**
+     * 24.07.29 작성자 : 서정호
+     */
     @Override
     @Transactional
     public Page<BoardResponseDto.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
@@ -580,6 +596,11 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(mergedList.subList(start, end), pageable, mergedList.size());
     }
 
+
+    //내가 쓴글 조회
+    /**
+     * 24.07.29 작성자 : 서정호
+     */
     @Override
     @Transactional
     public Page<BoardResponseDto.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
@@ -596,6 +617,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(historyDtoList, adjustedPageable, boardPage.getTotalElements());
     }
 
+    //내가 쓴 댓글 글 조회
+    /**
+     * 24.07.29 작성자 : 서정호
+     */
     @Override
     @Transactional
     public Page<BoardResponseDto.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
@@ -635,6 +660,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(sortedList, adjustedPageable, sortedList.size());
     }
 
+    //내가 좋아요 단 글 조회
+    /**
+     * 24.07.29 작성자 : 서정호
+     */
     @Override
     @Transactional
     public Page<BoardResponseDto.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable) {
@@ -654,7 +683,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(LikeBoardsDto, adjustedPageable, likePage.size());
     }
 
-    //검색 전체 조회
+    //활동내역 전체 검색 조회 (내가 쓴글,댓글 단글, 좋아요)
+    /**
+     * 24.08.06 작성자 : 서정호
+     */
     @Transactional
     public Page<BoardResponseDto.HistoryDto> findTextHistoryAll(Long userId, Pageable adjustedPageable,String content){
         User user = userRepository.findById(userId)
@@ -707,7 +739,10 @@ public class UserServiceImpl implements UserService {
 
         return new PageImpl<>(sortedList, adjustedPageable, sortedList.size());
     }
-
+    //활동내역 내가쓴글 검색 조회
+    /**
+     * 24.08.06 작성자 : 서정호
+     */
     //검색 전체 조회
     @Transactional
     public Page<BoardResponseDto.HistoryDto> findTextHistoryBoards(Long userId, Pageable adjustedPageable, String content){
@@ -722,6 +757,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(boardsDto, adjustedPageable, boardsDto.size());
     }
 
+    //활동내역 댓글 검색 조회
+    /**
+     * 24.08.06 작성자 : 서정호
+     */
     @Override
     public Page<BoardResponseDto.HistoryDto> findTextHistoryComments(Long userId, Pageable adjustedPageable, String content) {
         User user = userRepository.findById(userId)
@@ -753,6 +792,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(sortedList, adjustedPageable, sortedList.size());
     }
 
+    //활동내역 좋아요 검색 조회
+    /**
+     * 24.08.06 작성자 : 서정호
+     */
     @Override
     public Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content) {
         User user = userRepository.findById(userId)
