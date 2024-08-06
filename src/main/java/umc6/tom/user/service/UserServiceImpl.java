@@ -605,7 +605,7 @@ public class UserServiceImpl implements UserService {
                 .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
                         .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                 .distinct()
-                .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
+                .map(pinBoardDto -> UserConverter.toHistoryCommentRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt(), pinBoardDto.getPin().getComment()))
                 .collect(Collectors.toList());
 
         // 대댓글 단 글 섞기
@@ -613,12 +613,20 @@ public class UserServiceImpl implements UserService {
                 .map(comment -> new CommentBoardDto(comment, boardRepository.findById(comment.getPin().getBoard().getId())
                         .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                 .distinct()
-                .map(commentBoardDto -> UserConverter.toHistoryRes(commentBoardDto.getBoard(), "댓글 단 글", commentBoardDto.getPin().getCreatedAt()))
+                .map(commentBoardDto -> UserConverter.toHistoryCommentRes(commentBoardDto.getBoard(), "댓글 단 글", commentBoardDto.getComment().getCreatedAt(), commentBoardDto.getComment().getComment()))
                 .collect(Collectors.toList());
 
+        // 두 리스트 합치기
+        List<BoardResponseDto.HistoryDto> combinedList = new ArrayList<>();
+        combinedList.addAll(pinBoardsDto);
+        combinedList.addAll(commentBoardsDto);
 
+        // 최신순으로 정렬
+        List<BoardResponseDto.HistoryDto> sortedList = combinedList.stream()
+                .sorted(Comparator.comparing(BoardResponseDto.HistoryDto::getCreatedAt).reversed())
+                .collect(Collectors.toList());
 
-        return new PageImpl<>(pinBoardsDto, adjustedPageable, pinPage.getTotalElements());
+        return new PageImpl<>(sortedList, adjustedPageable, sortedList.size());
     }
 
     @Override
@@ -662,7 +670,7 @@ public class UserServiceImpl implements UserService {
                 .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
                 .collect(Collectors.toList());
 
-        return new Page
+        return new PageImpl<>(likeBoardsDto, adjustedPageable, likeBoardsDto.size());
     }
 
 }
