@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.gpt.dto.ExampleDto;
+import umc6.tom.gpt.dto.MajorReq;
+import umc6.tom.gpt.model.Answer;
 import umc6.tom.gpt.model.Example;
+import umc6.tom.user.model.User;
 
 @Slf4j
 @Component
@@ -37,6 +40,22 @@ public class ExampleConverter {
                 .problem(exampleDto.getProblem())
                 .answer(exampleDto.getAnswer())
                 .tag(exampleDto.getTag())
+                .build();
+    }
+
+    public static Example toExampleEntity(MajorReq.exampleRegisterDto responseDto) {
+        return Example.builder()
+                .problem(responseDto.getExampleQuestion())
+                .answer(responseDto.getCorrectAnswer())
+                .tag(responseDto.getTag())
+                .build();
+    }
+
+    public static Answer toAnswerEntity(String question, String content, User user){
+        return Answer.builder()
+                .question(question)
+                .content(content)
+                .user(user)
                 .build();
     }
 }

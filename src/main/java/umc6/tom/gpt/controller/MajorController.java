@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.gpt.dto.ExampleDto;
+import umc6.tom.gpt.dto.GptRes;
 import umc6.tom.gpt.dto.MajorReq;
 import umc6.tom.gpt.service.FavoriteService;
 import umc6.tom.gpt.service.MajorService;
@@ -31,13 +32,6 @@ public class MajorController {
 //        return ApiResponse.onSuccess(dto);
 //    }
 
-    //예제로 글 작성창 가기 , 예제 데이터 뿌려주기!
-    @GetMapping("/{id}")
-    public ApiResponse<ExampleDto> getExampleById(@PathVariable long id) {
-
-            return ApiResponse.onSuccess(majorService.exampleFindId(id));
-    }
-
     //즐겨찾기 조회
     @GetMapping("/myfavorite")
     public ApiResponse<List<ExampleDto>> getFindAllFavorite() {
@@ -48,7 +42,7 @@ public class MajorController {
     }
 
     //즐겨찾기 등록
-    @PostMapping("/{exampleId}/register")
+    @PostMapping("/{exampleId}")
     public ApiResponse registerNewFavorite(@PathVariable("exampleId") long exampleId) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return favoriteService.save(userId, exampleId);
@@ -64,20 +58,32 @@ public class MajorController {
     }
 
     //즐겨찾기에서 예제 보기 즐겨찾기 ID로 검색함 예제데이터 넘겨주기
-    @GetMapping("/{favoriteId}/favorite")
+    @GetMapping("/{favoriteId}/detail")
     public ApiResponse<ExampleDto> getFavoriteById(@PathVariable("favoriteId") long id) {
 
         return favoriteService.getFindById(id);
     }
 
+    //전공 검색하기(GPT 활용)
     @PostMapping("/find")
-    public String findMajor(@RequestBody MajorReq.SearchDto searchDto) {
+    public ApiResponse<GptRes.responseText> findMajor(@RequestBody MajorReq.SearchDto searchDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return majorService.findMajor(searchDto, userId);
+        return ApiResponse.onSuccess(majorService.findMajor(searchDto, userId));
     }
 
+    //예제 보기
+    @PostMapping("/example")
+    public ApiResponse<ExampleDto> exampleRegister(@RequestBody MajorReq.exampleRegisterDto responseDto) {
 
+        return ApiResponse.onSuccess(majorService.exampleRegister(responseDto));
+    }
 
+    //예제로 글 작성창 가기 , 예제 데이터 뿌려주기!
+    @GetMapping("/{id}")
+    public ApiResponse<ExampleDto> getExampleById(@PathVariable long id) {
+
+        return ApiResponse.onSuccess(majorService.exampleFindId(id));
+    }
 
 }

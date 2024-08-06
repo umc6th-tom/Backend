@@ -1,9 +1,6 @@
 package umc6.tom.gpt.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 public class MajorReq {
 
@@ -13,5 +10,16 @@ public class MajorReq {
     @NoArgsConstructor
     public static class SearchDto {
         private String question;
+    }
+
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @ToString
+    public static class exampleRegisterDto {
+        private String tag;
+        private String exampleQuestion;
+        private String correctAnswer;
     }
 }

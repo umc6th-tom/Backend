@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
+@Setter
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,9 +25,6 @@ public class Answer {
 
     @Column(nullable = false, length = 100)
     private String question;
-
-    @Column(nullable = false, length = 50)
-    private String questionTag;
 
     @Column(nullable = false, length = 1000)
     private String content;
