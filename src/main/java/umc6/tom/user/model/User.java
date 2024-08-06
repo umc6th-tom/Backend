@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.beans.factory.parsing.Problem;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,11 +67,17 @@ public class User extends BaseEntity implements UserDetails {
     private Role role;
 
     @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer warn;
+
+    @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
     private Integer report;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'INACTIVE'")
     private UserStatus status;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Prohibit prohibit;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "majors_id")
