@@ -47,8 +47,8 @@ public class QNAServiceImpl implements QNAService{
         Inquiry qna =inquiryRepository.save(QNAConverter.toQNA(request, user));
 
         if (!ObjectUtils.isEmpty(files)) {
-            String fileName = null;
             for (MultipartFile file : files) {
+                String fileName;
                 try {
                     String uuid = UUID.randomUUID().toString();
                     Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
