@@ -2,11 +2,12 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import umc6.tom.alarm.model.Alarm;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.Majors;
-import umc6.tom.common.model.enums.Status;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class Board extends BaseEntity {
@@ -51,6 +53,9 @@ public class Board extends BaseEntity {
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<BoardLike> boardLikeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    private List<Alarm> alarmList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -61,6 +61,12 @@ public enum ErrorStatus implements BaseErrorCode {
     BOARD_CANNOT_DELETE(HttpStatus.BAD_REQUEST, "BOARD4008", "삭제할 수 없는 게시글입니다."),
     BOARD_CANNOT_UPDATE(HttpStatus.BAD_REQUEST, "BOARD4009", "수정할 수 없는 게시글입니다."),
     BOARD_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "BOARD4010", "게시판 사진 업로드 실패입니다."),
+    BOARD_NOT_COMPLAINT(HttpStatus.BAD_REQUEST, "BOARD4011", "자신의 게시글은 신고할 수 없습니다."),
+    BOARD_NOT_LIKE(HttpStatus.BAD_REQUEST, "BOARD4012", "자신의 게시글은 좋아요 할 수 없습니다."),
+
+    // 자주 묻는 질문 관련 에러
+    FAQ_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ4001", "카테고리 값이 잘못 되었습니다."),
+    FAQ_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ4002", "자주 묻는 질문을 찾을 수 없습니다."),
 
     // 댓글 관련 에러
     PIN_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4001", "댓글 등록에 실패했습니다."),
@@ -91,6 +97,9 @@ public enum ErrorStatus implements BaseErrorCode {
     // 알람 관련 에러
     ALARM_SET_NOT_FOUND(HttpStatus.NOT_FOUND, "ALARM_SET4001", "알람셋이 없습니다! 관리자에게 문의하세요!"),
 
+    ALARM_READ_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALARM4001", "알림 읽음 유무 값이 잘 못 되었습니다."),
+    ALARM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALARM4002", "알림을 찾을 수 없습니다."),
+    ALARM_NOT_MATCH(HttpStatus.BAD_REQUEST, "ALARM4003", "자신의 알림이 아닙니다."),
 
     // 사진 관련 헤어
     PROFILE_IS_DEFAULT(HttpStatus.BAD_REQUEST, "PIC4001", "사진이 이미 기본값입니다."),

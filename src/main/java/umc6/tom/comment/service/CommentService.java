@@ -3,30 +3,37 @@ package umc6.tom.comment.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
+import umc6.tom.alarm.model.enums.Field;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.apiPayload.exception.handler.*;
+import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.repository.BoardRepository;
-import umc6.tom.comment.converter.*;
+import umc6.tom.comment.converter.CommentComplaintConverter;
+import umc6.tom.comment.converter.CommentConverter;
+import umc6.tom.comment.converter.CommentLikeConverter;
+import umc6.tom.comment.converter.CommentPictureConverter;
 import umc6.tom.comment.dto.CommentResDto;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
-import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.*;
 import umc6.tom.comment.repository.*;
 import umc6.tom.firebase.service.PushMessage;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -40,6 +47,7 @@ public class CommentService {
     private final CommentComplaintPictureRepository commentComplaintPictureRepository;
     private final PushMessage pushMessage;
     private final AlarmSetRepository alarmSetRepository;
+    private final BoardRepository boardRepository;
 
     //댓글 등록
     @Transactional
@@ -60,6 +68,15 @@ public class CommentService {
             throw new CommentHandler(ErrorStatus.COMMENT_NOT_REGISTER);
         }
 
+        Board board = boardRepository.findById(pin.getBoard().getId())
+                .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        //댓글+대댓글 15개 도달시 핫글
+        if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 15){
+            board.setPopularAt(LocalDateTime.now());
+            boardRepository.updateBoardPopularAt(pin.getBoard().getId(), LocalDateTime.now());
+        }
+
         // 알림 유무
         AlarmSet alarmSet;
         //한 유저가 한 댓글에 여러 대댓글 달았을 경우 여러번 알림 보내기 방지. 중복값을 허용하지 않는 특성인 Set 자료형 이용
@@ -76,7 +93,7 @@ public class CommentService {
             alarmSet = alarmSetRepository.findByUserId(commentUserId).orElseThrow(()
                     -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
             if (alarmSet.getCommentSet().equals(AlarmOnOff.ON))
-                pushMessage.pinNotification(alarmSet.getUser(), user, pin.getBoard().getTitle(), commentSaved.getComment());
+                pushMessage.commentNotification(alarmSet.getUser(), pin.getBoard(), Field.commented);
         }
         return ApiResponse.onSuccess(200);
     }

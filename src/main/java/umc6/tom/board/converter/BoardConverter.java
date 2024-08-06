@@ -47,7 +47,7 @@ public class BoardConverter {
 
         //list는 없는 index 참조시 나는 오류를 제거
         if(!ObjectUtils.isEmpty(board.getBoardPictureList()))
-            boardPreViewPic = board.getBoardPictureList().get(0).getPic();
+            boardPreViewPic = board.getBoardPictureList().get(0).getPic().substring(52);
 
         return BoardResponseDto.BoardListViewDto.builder()
                 .id(board.getId())
@@ -153,13 +153,29 @@ public class BoardConverter {
                 .build();
     }
 
-    public static List<String> toStringList(List<BoardPicture> boardPictureList){
+    public static List<String> toPicStringIdList(List<BoardPicture> boardPictureList){
+        List<String> picList = new ArrayList<>();
+        for(BoardPicture boardPicture : boardPictureList){
+            picList.add(boardPicture.getPic().substring(52));
+        }
+        return picList;
+    }
+    public static List<String> toPicStringPathList(List<BoardPicture> boardPictureList){
+        List<String> picList = new ArrayList<>();
+        for(BoardPicture boardPicture : boardPictureList){
+            picList.add(boardPicture.getPic().substring(46));
+        }
+        return picList;
+    }
+
+    public static List<String> toPicStringList(List<BoardPicture> boardPictureList){
         List<String> picList = new ArrayList<>();
         for(BoardPicture boardPicture : boardPictureList){
             picList.add(boardPicture.getPic());
         }
         return picList;
     }
+
 
     public static BoardResponseDto.BoardUpdateDto toUpdateBoardDto(Board board){
         return BoardResponseDto.BoardUpdateDto.builder()
@@ -178,13 +194,13 @@ public class BoardConverter {
 
         List<String> newBoardPicList = new ArrayList<>();
         for (BoardPicture picture : board.getBoardPictureList())
-            newBoardPicList.add(picture.getPic());
+            newBoardPicList.add(picture.getPic().substring(52)); // -> board/picName
 
         return BoardResponseDto.BoardViewDto.builder()
                 .id(board.getId())
                 .userId(board.getUser().getId())
                 .userNickname(board.getUser().getNickName())
-                .userProfilePic(board.getUser().getPic())
+                .userProfilePic(board.getUser().getPic().substring(54))
                 .title(board.getTitle())
                 .content(board.getContent())
                 .pinCount(board.getPinList().size() + pinCommentSize)
@@ -270,5 +286,18 @@ public class BoardConverter {
                 .content(board.getContent())
                 .createdAt(new DateCalc().formatDate(pin.getCreatedAt()))
                 .build();
+    }
+
+    public static int toPinAndCommentCount(List<Pin> pinList){
+        int pinAndCommentSize = 0; // 댓글+대댓글 개수
+
+        for (Pin pin : pinList) {
+            pinAndCommentSize += 1;
+
+            if(!ObjectUtils.isEmpty(pin.getCommentList()))
+                for (Comment comment : pin.getCommentList())
+                    pinAndCommentSize += 1;
+        }
+        return pinAndCommentSize;
     }
 }

@@ -3,7 +3,8 @@ package umc6.tom.inquiry.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
-import umc6.tom.board.model.BoardPicture;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import umc6.tom.inquiry.model.enums.Status;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class Inquiry {
@@ -24,6 +26,10 @@ public class Inquiry {
 
     @Column
     public Long adminUserId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'WAITING'")
+    private Status status;
 
     @Column(nullable = false, length = 50)
     public String title;

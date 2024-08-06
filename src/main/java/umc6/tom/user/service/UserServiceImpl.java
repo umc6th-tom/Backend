@@ -121,20 +121,6 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    // 닉네임 중복 확인
-    @Override
-    public boolean checkNickName(UserDtoReq.CheckNickNameDto request) {
-
-        return duplicatedNickName(request.getNickName());
-    }
-
-    // 아이디 중복 확인
-    @Override
-    public boolean checkAccount(UserDtoReq.CheckAccountDto request) {
-
-        return duplicatedAccount(request.getAccount());
-    }
-
     // 휴대폰 인증
     @Override
     public UserDtoRes.PhoneAuthDto phoneAuth(UserDtoReq.PhoneDto request) {
@@ -309,8 +295,8 @@ public class UserServiceImpl implements UserService {
 
     // 아이디 찾기
     @Override
-    public UserDtoRes.FindAccountDto findAccount(UserDtoReq.FindAccountDto request) {
-        User user = userRepository.findByPhone(request.getPhone())
+    public UserDtoRes.FindAccountDto findAccount(String phone) {
+        User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         return UserConverter.findAccountRes(user);
@@ -318,16 +304,9 @@ public class UserServiceImpl implements UserService {
 
     // 비밀번호 찾기
     @Override
-    public UserDtoRes.FindPasswordDto findPassword(UserDtoReq.FindPasswordDto request) {
-        User user = userRepository.findByPhone(request.getPhone())
+    public UserDtoRes.FindPasswordDto findPassword(String phone) {
+        User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        if (!user.getAccount().equals(request.getAccount())) {
-            throw new UserHandler(ErrorStatus.USER_ACCOUNT_NOT_MATCHED);
-        }
-        if (!user.getName().equals(request.getName())) {
-            throw new UserHandler(ErrorStatus.USER_NAME_NOT_MATCHED);
-        }
 
         return UserConverter.findPasswordRes(user);
     }

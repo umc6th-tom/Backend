@@ -6,10 +6,8 @@ import org.springframework.stereotype.Component;
 import umc6.tom.firebase.converter.FCMConverter;
 import umc6.tom.firebase.dto.FCMResponseDto;
 import umc6.tom.util.RedisUtil;
-
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor

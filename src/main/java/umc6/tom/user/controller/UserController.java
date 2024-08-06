@@ -50,9 +50,9 @@ public class UserController {
      * 닉네임 중복 확인
      */
     @GetMapping("/nickname-dup")
-    public ApiResponse<Boolean> checkNickName(@RequestBody @Valid UserDtoReq.CheckNickNameDto request) {
+    public ApiResponse<Boolean> checkNickName(@RequestParam(name = "nickName") String nickName) {
 
-        return ApiResponse.onSuccess(userService.checkNickName(request));
+        return ApiResponse.onSuccess(userService.duplicatedNickName(nickName));
     }
 
     /**
@@ -60,9 +60,9 @@ public class UserController {
      * 아이디 중복 확인
      */
     @GetMapping("/account-dup")
-    public ApiResponse<Boolean> checkAccount(@RequestBody @Valid UserDtoReq.CheckAccountDto request) {
+    public ApiResponse<Boolean> checkAccount(@RequestParam(name = "account") String account) {
 
-        return ApiResponse.onSuccess(userService.checkAccount(request));
+        return ApiResponse.onSuccess(userService.duplicatedAccount(account));
     }
 
     /**
@@ -128,9 +128,9 @@ public class UserController {
      * 아이디 찾기
      */
     @GetMapping("/find-id")
-    public ApiResponse<UserDtoRes.FindAccountDto> findAccount(@RequestBody UserDtoReq.FindAccountDto request) {
+    public ApiResponse<UserDtoRes.FindAccountDto> findAccount(@RequestParam(name = "phone") String phone) {
 
-        return ApiResponse.onSuccess(userService.findAccount(request));
+        return ApiResponse.onSuccess(userService.findAccount(phone));
     }
 
     /**
@@ -138,9 +138,9 @@ public class UserController {
      * 비밀번호 찾기
      */
     @GetMapping("/find-pwd")
-    public ApiResponse<UserDtoRes.FindPasswordDto> findPassword(@RequestBody UserDtoReq.FindPasswordDto request) {
+    public ApiResponse<UserDtoRes.FindPasswordDto> findPassword(@RequestParam(name = "phone") String phone) {
 
-        return ApiResponse.onSuccess(userService.findPassword(request));
+        return ApiResponse.onSuccess(userService.findPassword(phone));
     }
 
     /**

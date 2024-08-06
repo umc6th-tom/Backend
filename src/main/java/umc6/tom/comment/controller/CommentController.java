@@ -7,7 +7,6 @@ import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.service.CommentService;
-import umc6.tom.comment.service.PinService;
 import umc6.tom.security.JwtTokenProvider;
 
 @Slf4j

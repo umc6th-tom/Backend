@@ -1,25 +1,21 @@
 package umc6.tom.firebase.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
-import umc6.tom.board.converter.BoardConverter;
-import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.firebase.converter.FCMConverter;
 import umc6.tom.firebase.dto.FCMRequestDto;
 import umc6.tom.firebase.dto.FCMResponseDto;
 import umc6.tom.firebase.service.FcmTokenService;
 import umc6.tom.firebase.service.FirebaseService;
 import umc6.tom.security.JwtTokenProvider;
-
 import java.io.IOException;
-import java.util.Set;
+
 
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/fcm")
+@RequestMapping("/alarm")
 public class FCMController {
     private final FirebaseService firebaseService;
     private final FcmTokenService fcmTokenService;
@@ -29,7 +25,7 @@ public class FCMController {
      * 24.07.29 작성자 : 박재락
      * 해당 토큰 디바이스에 메세지 보내기
      */
-    @PostMapping("/alarm-message")
+    @PostMapping("/fcm/alarm-message")
     public ApiResponse<FCMResponseDto.sendMessageDto> pushMessage(@RequestBody FCMRequestDto.AlarmPushDto request) throws IOException {
         firebaseService.sendMessageTo(request.getTargetToken(), request.getTitle(), request.getBody());
 
@@ -41,7 +37,7 @@ public class FCMController {
      * 서버에 토큰 저장
      */
     //서버에 토큰 등록 userId, 토큰
-    @PostMapping("/saveFcmToken")
+    @PostMapping("/fcm/token")
     public ApiResponse<FCMResponseDto.saveTokenDto> saveToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.saveFcmToken(userId, fcmToken.getTargetToken());
@@ -52,7 +48,7 @@ public class FCMController {
      * 24.07.30 작성자 : 박재락
      * 한개의 토큰 삭제 (한 디바이스의 로그 아웃)
      */
-    @DeleteMapping("/deleteFcmToken")
+    @DeleteMapping("/fcm/token")
     public ApiResponse<FCMResponseDto.deleteTokenDto> deleteToken(@RequestBody FCMRequestDto.fcmTokenDto fcmToken) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.deleteFcmToken(userId, fcmToken.getTargetToken());
@@ -62,7 +58,7 @@ public class FCMController {
      * 24.07.30 작성자 : 박재락
      * 유저의 모든 토큰 삭제 (회원 탈퇴 등)
      */
-    @DeleteMapping("/deleteAllFcmToken")
+    @DeleteMapping("/fcm/all-token")
     public ApiResponse<FCMResponseDto.fCMTokenAllListDto> deleteAllToken() {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         fcmTokenService.deleteAllFcmToken(userId);
