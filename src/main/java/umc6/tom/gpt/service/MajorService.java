@@ -1,23 +1,18 @@
 package umc6.tom.gpt.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.gpt.converter.ExampleConverter;
 import umc6.tom.gpt.dto.ExampleDto;
-import umc6.tom.gpt.dto.GptReq;
 import umc6.tom.gpt.dto.GptRes;
 import umc6.tom.gpt.dto.MajorReq;
-import umc6.tom.gpt.function.Function;
-import umc6.tom.gpt.model.Answer;
 import umc6.tom.gpt.model.Example;
 import umc6.tom.gpt.repository.AnswerRepository;
-import umc6.tom.gpt.repository.ExampleFavoriteRepository;
 import umc6.tom.gpt.repository.ExampleRepository;
 import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
@@ -86,5 +81,11 @@ public class MajorService {
 
 //      이후에 활성화하기  return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer);
         return new GptRes.responseText("자바", answer,exampleQuestion,correctAnswer);
+    }
+
+    public ExampleDto exampleRegister(MajorReq.exampleRegisterDto exampleDto) {
+        Long exampleId = exampleRepository.save(ExampleConverter.toExampleEntity(exampleDto)).getId();
+
+        return ExampleConverter.toDto2(exampleRepository.findById(exampleId).orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND)));
     }
 }

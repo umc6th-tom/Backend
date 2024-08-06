@@ -81,10 +81,9 @@ public class MajorController {
 
     //예제 보기
     @PostMapping("/example")
-    public ApiResponse<GptRes.responseText> exampleRegister(@RequestBody MajorReq.responseText responseDto) {
-        Long userId = jwtTokenProvider.getUserIdFromToken();
+    public ApiResponse<ExampleDto> exampleRegister(@RequestBody MajorReq.exampleRegisterDto responseDto) {
 
-        return ApiResponse.onSuccess(majorService.exampleRegister(searchDto, userId));
+        return ApiResponse.onSuccess(majorService.exampleRegister(responseDto));
     }
 
 

@@ -15,7 +15,7 @@ public class MajorReq {
 
     @AllArgsConstructor
     @NoArgsConstructor
-    @Setter
+    @Getter
     @ToString
     public static class exampleRegisterDto {
         private String tag;
