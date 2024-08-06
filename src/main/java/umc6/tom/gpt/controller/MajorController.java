@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.gpt.dto.ExampleDto;
+import umc6.tom.gpt.dto.GptRes;
 import umc6.tom.gpt.dto.MajorReq;
 import umc6.tom.gpt.service.FavoriteService;
 import umc6.tom.gpt.service.MajorService;
@@ -70,11 +71,20 @@ public class MajorController {
         return favoriteService.getFindById(id);
     }
 
+    //전공 검색하기(GPT 활용)
     @PostMapping("/find")
-    public String findMajor(@RequestBody MajorReq.SearchDto searchDto) {
+    public ApiResponse<GptRes.responseText> findMajor(@RequestBody MajorReq.SearchDto searchDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return majorService.findMajor(searchDto, userId);
+        return ApiResponse.onSuccess(majorService.findMajor(searchDto, userId));
+    }
+
+    //예제 보기
+    @PostMapping("/example")
+    public ApiResponse<GptRes.responseText> exampleRegister(@RequestBody MajorReq.responseText responseDto) {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+
+        return ApiResponse.onSuccess(majorService.exampleRegister(searchDto, userId));
     }
 
 
