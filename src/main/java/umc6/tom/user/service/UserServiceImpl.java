@@ -705,12 +705,75 @@ public class UserServiceImpl implements UserService {
                 .sorted(Comparator.comparing(BoardResponseDto.HistoryDto::getCreatedAt).reversed())
                 .collect(Collectors.toList());
 
-        // 페이지 정보 적용
-        int start = (int) adjustedPageable.getOffset();
-        int end = Math.min((start + adjustedPageable.getPageSize()), sortedList.size());
-        List<BoardResponseDto.HistoryDto> pageContent = sortedList.subList(start, end);
+        return new PageImpl<>(sortedList, adjustedPageable, sortedList.size());
+    }
 
-        return new PageImpl<>(pageContent, adjustedPageable, sortedList.size());
+    //검색 전체 조회
+    @Transactional
+    public Page<BoardResponseDto.HistoryDto> findTextHistoryBoards(Long userId, Pageable adjustedPageable, String content){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 쓴 글
+        List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrTitleContainingOrderByCreatedAtDesc(user.getId(),content,content,adjustedPageable).stream()
+                .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(boardsDto, adjustedPageable, boardsDto.size());
+    }
+
+    @Override
+    public Page<BoardResponseDto.HistoryDto> findTextHistoryComments(Long userId, Pageable adjustedPageable, String content) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 댓글 단 글
+        List<BoardResponseDto.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdAndCommentContainingOrderByCreatedAtDesc(user.getId(),content, adjustedPageable).stream()
+                .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(pinBoardDto -> UserConverter.toHistoryCommentRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt(), pinBoardDto.getPin().getComment()))
+                .collect(Collectors.toList());
+        // 대댓글 단 글 섞기
+        List<BoardResponseDto.HistoryDto> commentBoardsDto = commentRepository.findAllByUserIdAndCommentContainingOrderByCreatedAtDesc(user.getId(),content, adjustedPageable).stream()
+                .map(comment -> new CommentBoardDto(comment, boardRepository.findById(comment.getPin().getBoard().getId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
+                .distinct()
+                .map(commentBoardDto -> UserConverter.toHistoryCommentRes(commentBoardDto.getBoard(), "댓글 단 글", commentBoardDto.getComment().getCreatedAt(), commentBoardDto.getComment().getComment()))
+                .collect(Collectors.toList());
+
+        List<BoardResponseDto.HistoryDto> combinedList = new ArrayList<>();
+        combinedList.addAll(commentBoardsDto);
+        combinedList.addAll(pinBoardsDto);
+
+        List<BoardResponseDto.HistoryDto> sortedList = combinedList.stream()
+                .sorted(Comparator.comparing(BoardResponseDto.HistoryDto::getCreatedAt).reversed())
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(sortedList, adjustedPageable, sortedList.size());
+    }
+
+    @Override
+    public Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        //자기가 좋아요 누른 글
+        List<BoardResponseDto.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId(), adjustedPageable).stream()
+                .map(like -> {
+                    Board board = boardRepository.findById(like.getBoard().getId())
+                            .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+                    if(board.getContent().contains(content) || board.getTitle().contains(content)){
+                        return new LikeBoardDto(like, board);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(likeBoardsDto, adjustedPageable, likeBoardsDto.size());
     }
 
 }
