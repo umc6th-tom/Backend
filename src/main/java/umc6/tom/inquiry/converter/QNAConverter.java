@@ -66,7 +66,7 @@ public class QNAConverter {
 
     public static String toQNAPicture(InquiryPicture qnaPic){
 
-        return qnaPic.getPic().substring(54);
+        return qnaPic.getPic().substring(46);
     }
 
     public static QNAResponseDto.QNAViewDto toQNAView(Inquiry qna){
