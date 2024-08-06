@@ -237,7 +237,7 @@ public class BoardServiceImpl implements BoardService {
                     if (board.getStatus().equals(BoardStatus.ACTIVE))
                         amazonS3Util.deleteFileNoPreUrl(amazonConfig.getBoardPath() + "/" + pic);
 
-                    String deletePic = fileName.substring(0, 52) + pic;
+                    String deletePic = fileName.substring(0, 46) + pic;
                     boardPictureRepository.deleteByPicUrl(deletePic);
                 }
             }

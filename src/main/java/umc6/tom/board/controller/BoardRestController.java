@@ -41,7 +41,6 @@ public class BoardRestController {
      * 24.07.20 작성자 : 박재락
      * 전공 게시물 리스트 조회
      */
-    //사진 미리보기 구현 필요
     @GetMapping("/{majorId}/major")
     public ApiResponse<BoardResponseDto.BoardListViewListDto> getBoardMajorList(@PathVariable(name = "majorId") Long majorId,
                                                                         @RequestParam(name = "page") Integer page){
@@ -53,7 +52,6 @@ public class BoardRestController {
      * 24.07.21 작성자 : 박재락
      * 모든 게시물 리스트 조회
      */
-    //사진 미리보기 구현 필요
     @GetMapping("/list")
     public ApiResponse<BoardResponseDto.BoardListViewListDto> getBoardAllList(@RequestParam(name = "page") Integer page){
         Page<Board> boardPage = boardService.getBoardAllList(page);
