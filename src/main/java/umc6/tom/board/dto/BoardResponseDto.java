@@ -142,8 +142,8 @@ public class BoardResponseDto {
         String pinDate;
         Integer pinLikeCount;
         Integer pinCommentCount;
-        List<BoardViewPinCommentListDto> pinCommentList;
         List<String> pinPictureList;
+        List<BoardViewPinCommentListDto> pinCommentList;
     }
 
     @Builder
@@ -166,7 +166,7 @@ public class BoardResponseDto {
         String comment;
         String pinCommentDate;
         Integer pinLikeCount;
-        List<String> pinPicList;
+        List<String> pinCommentPicList;
     }
 
     @Builder
