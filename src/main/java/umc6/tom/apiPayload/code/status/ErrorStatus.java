@@ -106,7 +106,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // 내부 서버 에러
-    USER_FILE_CHANGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR5004", "파일 전환에 실패하였습니다.")
+    USER_FILE_CHANGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR5004", "파일 전환에 실패하였습니다."),
+
+    //문의 관련 에러
+    QNA_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "QNA4001", "문의 사진 업로드 실패입니다."),
+    QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4002", "문의사항을 찾을 수 없습니다")
     ;
 
 
