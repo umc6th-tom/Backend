@@ -54,6 +54,8 @@ public class DateCalc {
 
     }
     public String formatDate2(LocalDateTime pastDateTime) {
+        if(ObjectUtils.isEmpty(pastDateTime))
+            return null;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
         return pastDateTime.format(formatter);
     }

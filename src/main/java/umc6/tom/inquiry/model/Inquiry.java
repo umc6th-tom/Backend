@@ -2,6 +2,7 @@ package umc6.tom.inquiry.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import umc6.tom.inquiry.model.enums.Status;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@DynamicInsert
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor

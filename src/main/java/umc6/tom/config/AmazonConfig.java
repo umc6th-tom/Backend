@@ -43,6 +43,8 @@ public class AmazonConfig {
 
     private final String noticePath = "notice";
 
+    private final String inquiryPath = "inquiry";
+
 
     @PostConstruct
     public void init() {
