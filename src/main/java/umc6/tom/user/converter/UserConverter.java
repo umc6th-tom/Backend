@@ -149,4 +149,28 @@ public class UserConverter {
                 .header(header)
                 .build();
     }
+
+    //나의 내역 보기
+    public static BoardResponseDto.HistoryDto toHistoryCommentRes(Board board, String header, LocalDateTime createdAt, String comment) {
+
+        return BoardResponseDto.HistoryDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .content(comment)
+                .createdAt(new DateCalc().formatDate(createdAt))
+                .header(header)
+                .build();
+    }
+
+    //나의 내역 보기
+    public static BoardResponseDto.HistoryCommentDto toHistoryRes(Board board, String header, LocalDateTime createdAt,String comment) {
+
+        return BoardResponseDto.HistoryCommentDto.builder()
+                .boardId(board.getId())
+                .title(board.getTitle())
+                .comment(comment)
+                .createdAt(new DateCalc().formatDate(createdAt))
+                .header(header)
+                .build();
+    }
 }

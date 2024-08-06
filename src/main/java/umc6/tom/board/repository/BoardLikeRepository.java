@@ -17,5 +17,6 @@ public interface BoardLikeRepository extends JpaRepository<BoardLike, Long> {
 
     List<BoardLike> findAllByUserIdOrderByIdDesc(Long userId);
 
-    Page<BoardLike> findAllByUserIdOrderByIdDesc(Long userId, Pageable pageable);
+    List<BoardLike> findAllByUserIdOrderByIdDesc(Long userId, Pageable pageable);
+
 }

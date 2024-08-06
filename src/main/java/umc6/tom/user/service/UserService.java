@@ -70,4 +70,12 @@ public interface UserService {
     Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable);
 
     Page<BoardResponseDto.FindUserBoardsDto> findProfileComments(Long userId, Pageable adjustedPageable);
+
+    Page<BoardResponseDto.HistoryDto> findTextHistoryAll(Long userId, Pageable adjustedPageable,String content );
+
+    Page<BoardResponseDto.HistoryDto> findTextHistoryBoards(Long userId, Pageable adjustedPageable, String content);
+
+    Page<BoardResponseDto.HistoryDto> findTextHistoryComments(Long userId, Pageable adjustedPageable, String content);
+
+    Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content);
 }

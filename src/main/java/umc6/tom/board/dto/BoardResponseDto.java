@@ -210,4 +210,15 @@ public class BoardResponseDto {
         private String createdAt;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    public static class HistoryCommentDto {
+        private Long boardId;
+        private String header;
+        private String createdAt;
+        private String title;
+        private String comment;
+    }
+
 }
