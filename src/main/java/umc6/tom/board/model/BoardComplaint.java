@@ -2,6 +2,7 @@ package umc6.tom.board.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import umc6.tom.board.model.enums.BoardComplaintStatus;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class BoardComplaint extends BaseEntity {
