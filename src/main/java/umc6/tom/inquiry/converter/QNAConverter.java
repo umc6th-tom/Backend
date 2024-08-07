@@ -8,6 +8,7 @@ import umc6.tom.inquiry.model.Inquiry;
 import umc6.tom.inquiry.model.InquiryPicture;
 import umc6.tom.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,25 @@ public class QNAConverter {
                 .answer(qna.getAnswer())
                 .answeredAt(new DateCalc().formatDate2(qna.getAnsweredAt()))
                 .picList(qnaPicList)
+                .build();
+    }
+
+    public static QNAResponseDto.AnswerQNADto toQNAAnswer (Inquiry qna){
+
+        return QNAResponseDto.AnswerQNADto.builder()
+                .qnaId(qna.getId())
+                .answer(qna.getAnswer())
+                .answeredAdminId(qna.getAdminUserId())
+                .answeredAt(qna.getAnsweredAt())
+                .build();
+    }
+
+    public static QNAResponseDto.DeleteQNAAnswerDto toDeleteQNAAnswer (Inquiry qna){
+
+        return QNAResponseDto.DeleteQNAAnswerDto.builder()
+                .qnaId(qna.getId())
+                .answeredAdminId(qna.getAdminUserId())
+                .deletedAnswerAt(LocalDateTime.now())
                 .build();
     }
 }
