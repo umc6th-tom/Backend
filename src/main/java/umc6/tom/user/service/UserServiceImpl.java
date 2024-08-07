@@ -810,4 +810,14 @@ public class UserServiceImpl implements UserService {
 
         return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
     }
+
+    public Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNameContainingOrAccountContainingOrNickNameContainingOrderByCreatedAtDesc(keyword,keyword,keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                                .map(UserConverter::toUsersFindDto)
+                                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
 }

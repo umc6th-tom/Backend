@@ -8,6 +8,7 @@ import umc6.tom.board.model.Board;
 import umc6.tom.comment.model.Pin;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public class UserDtoRes {
@@ -129,5 +130,20 @@ public class UserDtoRes {
         private Long userId;
         private String nickName;
         private String message;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    public static class userFindAllDto {
+        private Long userId;
+        private String name;
+        private String nickName;
+        private String account;
+        private String createdAt;
+        private String pic;
+        private Long warn;
+        private Long report;
+//        private 신고 보류
     }
 }

@@ -15,6 +15,7 @@ import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.UserStatus;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -181,6 +182,22 @@ public class UserConverter {
                 .userId(userId)
                 .nickName(nickName)
                 .message(message)
+                .build();
+    }
+
+    public static UserDtoRes.userFindAllDto toUsersFindDto(User user){
+
+        String date = DateCalc.formatDate2(user.getCreatedAt());
+
+        return UserDtoRes.userFindAllDto.builder()
+                .userId(user.getId())
+                .name(user.getName())
+                .nickName(user.getNickName())
+                .account(user.getAccount())
+                .pic(user.getPic())
+                .createdAt(date)
+                .warn(Long.valueOf(user.getWarn()))
+                .report(Long.valueOf(user.getReport()))
                 .build();
     }
 
