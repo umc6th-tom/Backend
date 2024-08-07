@@ -27,4 +27,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByStatusAndUpdatedAtBefore(UserStatus status, LocalDateTime updatedAt);
 
     Page<User> findAllByNameContainingOrAccountContainingOrNickNameContainingOrderByCreatedAtDesc(String name, String account, String nickName, Pageable pageable);
+
+    Page<User> findAllByNickNameContainingOrderByCreatedAtDesc(String keyword, Pageable adjustedPageable);
+
+    Page<User> findAllByNameContainingOrderByCreatedAtDesc(String keyword, Pageable adjustedPageable);
+
+    Page<User> findAllByAccountContainingOrderByCreatedAtDesc(String keyword, Pageable adjustedPageable);
 }

@@ -82,4 +82,6 @@ public interface UserService {
     UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnsDto request);
 
     Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable);
+
+    Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable);
 }

@@ -820,4 +820,34 @@ public class UserServiceImpl implements UserService {
 
         return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
     }
+
+    public Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNickNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findNameUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findAccountUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByAccountContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
 }

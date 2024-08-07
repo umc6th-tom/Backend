@@ -32,4 +32,20 @@ public class RootUserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findAllUser(keyword,adjustedPageable));
     }
+
+    /**
+     * 24.08.07 작성자 : 서정호
+     * 회원 검색 (닉네임) + 페이징
+     */
+    @GetMapping("/find/nickname")
+    public ApiResponse<Page<UserDtoRes.userFindAllDto>> findNicknameUser(@RequestParam(name = "keyword") String keyword,
+                                                                    @RequestParam(defaultValue = "1") int page,
+                                                                    @PageableDefault(size = 12) Pageable pageable) {
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findNicknameUser(keyword,adjustedPageable));
+    }
+
+
+
+
 }
