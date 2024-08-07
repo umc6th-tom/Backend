@@ -66,8 +66,8 @@ public class PinService {
             throw new PinHandler(ErrorStatus.PIN_NOT_REGISTER);
         }
 
-        //댓글+대댓글 15개 도달시 핫글
-        if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 15){
+        //댓글+대댓글 20개 도달시 핫글
+        if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 20){
             board.setPopularAt(LocalDateTime.now());
             boardRepository.updateBoardPopularAt(boardId, LocalDateTime.now());
         }
