@@ -84,4 +84,6 @@ public interface UserService {
     Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable);
 
     Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable);
+
+    Page<UserDtoRes.userFindAllDto> findNameUser(String keyword, Pageable adjustedPageable);
 }
