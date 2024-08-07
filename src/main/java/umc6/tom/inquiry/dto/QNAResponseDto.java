@@ -78,4 +78,44 @@ public class QNAResponseDto {
         LocalDateTime deletedAnswerAt;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RootQNAListViewDto{
+        Long id;
+        String status;
+        String title;
+        String content;
+        String createdAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RootQNAListViewListDto{
+        List<QNAResponseDto.RootQNAListViewDto> rootQNAList;
+        Integer listSize;
+        Integer totalPage;
+        Long totalElements;
+        Boolean isFirst;
+        Boolean isLast;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RootQNAViewDto{
+        Long id;
+        Long userId;
+        String userNickname;
+        String userprofile;
+        String createdAt;
+        String title;
+        String content;
+        List<String> picList;
+        String answer;
+    }
 }

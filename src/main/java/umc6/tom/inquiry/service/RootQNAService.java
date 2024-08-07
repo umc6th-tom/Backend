@@ -9,4 +9,10 @@ public interface RootQNAService {
 
     QNAResponseDto.DeleteQNAAnswerDto deleteQNA(Long userId, Long qnaId);
 
+    QNAResponseDto.RootQNAListViewListDto rootQNAListViewList(Long userId, String status, Integer page);
+
+    QNAResponseDto.RootQNAListViewListDto rootQNASearchList(Long userId, String status, Integer page, String content);
+
+    QNAResponseDto.RootQNAViewDto rootQNAView(Long userId, Long qnaId);
+
 }
