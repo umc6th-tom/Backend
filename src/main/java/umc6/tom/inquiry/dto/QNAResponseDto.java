@@ -57,4 +57,25 @@ public class QNAResponseDto {
         String answeredAt;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AnswerQNADto{
+        Long qnaId;
+        Long answeredAdminId;
+        String answer;
+        LocalDateTime answeredAt;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteQNAAnswerDto{
+        Long qnaId;
+        Long answeredAdminId;
+        LocalDateTime deletedAnswerAt;
+    }
+
 }

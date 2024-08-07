@@ -12,4 +12,10 @@ public class QNARequestDto {
         @NotBlank
         String content;
     }
+
+    @Getter
+    public static class AnswerDto {
+        @NotBlank
+        String answer;
+    }
 }
