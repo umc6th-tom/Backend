@@ -21,4 +21,17 @@ public class GptRes {
         private Message message;
 
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Setter
+    @ToString
+    public static class responseText {
+
+        private String question;
+        private String answer;
+        private String exampleQuestion;
+        private String correctAnswer;
+    }
 }

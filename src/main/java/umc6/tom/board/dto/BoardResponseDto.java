@@ -142,8 +142,8 @@ public class BoardResponseDto {
         String pinDate;
         Integer pinLikeCount;
         Integer pinCommentCount;
-        List<BoardViewPinCommentListDto> pinCommentList;
         List<String> pinPictureList;
+        List<BoardViewPinCommentListDto> pinCommentList;
     }
 
     @Builder
@@ -166,7 +166,7 @@ public class BoardResponseDto {
         String comment;
         String pinCommentDate;
         Integer pinLikeCount;
-        List<String> pinPicList;
+        List<String> pinCommentPicList;
     }
 
     @Builder
@@ -208,6 +208,17 @@ public class BoardResponseDto {
         private String title;
         private String content;
         private String createdAt;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class HistoryCommentDto {
+        private Long boardId;
+        private String header;
+        private String createdAt;
+        private String title;
+        private String comment;
     }
 
 }

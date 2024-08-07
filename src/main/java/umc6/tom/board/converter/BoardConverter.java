@@ -47,7 +47,7 @@ public class BoardConverter {
 
         //list는 없는 index 참조시 나는 오류를 제거
         if(!ObjectUtils.isEmpty(board.getBoardPictureList()))
-            boardPreViewPic = board.getBoardPictureList().get(0).getPic().substring(52);
+            boardPreViewPic = board.getBoardPictureList().get(0).getPic().substring(46);
 
         return BoardResponseDto.BoardListViewDto.builder()
                 .id(board.getId())
@@ -156,7 +156,7 @@ public class BoardConverter {
     public static List<String> toPicStringIdList(List<BoardPicture> boardPictureList){
         List<String> picList = new ArrayList<>();
         for(BoardPicture boardPicture : boardPictureList){
-            picList.add(boardPicture.getPic().substring(52));
+            picList.add(boardPicture.getPic().substring(46));
         }
         return picList;
     }
@@ -194,13 +194,13 @@ public class BoardConverter {
 
         List<String> newBoardPicList = new ArrayList<>();
         for (BoardPicture picture : board.getBoardPictureList())
-            newBoardPicList.add(picture.getPic().substring(52)); // -> board/picName
+            newBoardPicList.add(picture.getPic().substring(46)); // -> board/picName
 
         return BoardResponseDto.BoardViewDto.builder()
                 .id(board.getId())
                 .userId(board.getUser().getId())
                 .userNickname(board.getUser().getNickName())
-                .userProfilePic(board.getUser().getPic().substring(54))
+                .userProfilePic(board.getUser().getPic().substring(46))
                 .title(board.getTitle())
                 .content(board.getContent())
                 .pinCount(board.getPinList().size() + pinCommentSize)
@@ -257,7 +257,7 @@ public class BoardConverter {
                 .comment(comment.getComment())
                 .pinCommentDate(new DateCalc().boardListDate(comment.getCreatedAt()))
                 .pinLikeCount(comment.getCommentLikeList().size())
-                .pinPicList(newPinCommentPicList)
+                .pinCommentPicList(newPinCommentPicList)
                 .build();
     }
 

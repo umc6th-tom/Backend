@@ -122,4 +122,12 @@ public class UserDtoRes {
         private String pic;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    public static class warnDto {
+        private Long userId;
+        private String nickName;
+        private String message;
+    }
 }

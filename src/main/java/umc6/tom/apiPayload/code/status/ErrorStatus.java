@@ -34,6 +34,14 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
 
 
+    // 관리자 관련 에러
+    NOT_ADMIN(HttpStatus.UNAUTHORIZED, "ADMIN4001", "관리자의 권한이 없습니다."),
+
+
+    // 제재 관련 에러
+    PROHIBIT_NOT_FOUND(HttpStatus.NOT_FOUND, "PROHIBIT4001", "해당하는 유저의 제재가 없습니다."),
+
+
     // 인증 관련 에러
     USER_NOT_AUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH4001", "휴대폰 인증이 필요합니다."),
 
@@ -106,7 +114,12 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // 내부 서버 에러
-    USER_FILE_CHANGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR5004", "파일 전환에 실패하였습니다.")
+    USER_FILE_CHANGE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "ERROR5004", "파일 전환에 실패하였습니다."),
+
+    //문의 관련 에러
+    QNA_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "QNA4001", "문의 사진 업로드 실패입니다."),
+    QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4002", "문의사항을 찾을 수 없습니다"),
+    QNA_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4003", "문의사항 상태가 잘 못 되었습니다.")
     ;
 
 

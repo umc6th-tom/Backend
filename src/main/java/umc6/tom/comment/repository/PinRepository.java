@@ -16,4 +16,6 @@ public interface PinRepository extends JpaRepository<Pin, Long> {
     List<Pin> findAllByUserIdOrderByCreatedAtDesc(Long id);
 
     Page<Pin> findAllByUserIdOrderByCreatedAtDesc(Long id, Pageable pageable);
+
+    List<Pin> findAllByUserIdAndCommentContainingOrderByCreatedAtDesc(Long id, String comment, Pageable pageable);
 }

@@ -72,7 +72,7 @@ public class CommentService {
                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
         //댓글+대댓글 15개 도달시 핫글
-        if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 15){
+        if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 20){
             board.setPopularAt(LocalDateTime.now());
             boardRepository.updateBoardPopularAt(pin.getBoard().getId(), LocalDateTime.now());
         }
