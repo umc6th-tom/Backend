@@ -184,12 +184,12 @@ public class BoardConverter {
                 .build();
     }
 
-    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board){
+    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board, Page<Pin> pinPage){
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
             pinCommentSize += pin.getCommentList().size();
 
-        List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = board.getPinList().stream()
+        List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = pinPage.stream()
                 .map(BoardConverter::toBoardViewPinListDto).collect(Collectors.toList());
 
         List<String> newBoardPicList = new ArrayList<>();
@@ -219,9 +219,14 @@ public class BoardConverter {
         List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getCommentList().stream()
                 .map(BoardConverter::toBoardPinCommentListDto).collect(Collectors.toList());
 
+        //나중에 댓글 사진 구현시 미구현 시점 오류 방지용
         List<String> newPinPicList = new ArrayList<>();
-        for (PinPicture picture : pin.getPinPictureList())
-            newPinPicList.add(picture.getPic());
+        for (PinPicture picture : pin.getPinPictureList()) {
+            if (picture.getPic().length() >= 47)
+                newPinPicList.add(picture.getPic().substring(46));
+            else
+                newPinPicList.add(picture.getPic());
+        }
 
         return BoardResponseDto.BoardViewPinListDto.builder()
                 .id(pin.getId())
@@ -246,9 +251,14 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(Comment comment){
         List<String> newPinCommentPicList = new ArrayList<>();
-
-        for (CommentPicture picture : comment.getCommentPictureList())
-            newPinCommentPicList.add(picture.getPic());
+        
+        //나중에 댓글 사진 구현시 미구현 시점 오류 방지용
+        for (CommentPicture picture : comment.getCommentPictureList()){
+            if(picture.getPic().length()>=47)
+                newPinCommentPicList.add(picture.getPic().substring(46));
+            else
+                newPinCommentPicList.add(picture.getPic());
+        }
 
         return BoardResponseDto.BoardViewPinCommentListDto.builder()
                 .id(comment.getId())
