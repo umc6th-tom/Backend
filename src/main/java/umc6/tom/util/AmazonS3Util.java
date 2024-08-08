@@ -59,11 +59,6 @@ public class AmazonS3Util {
         amazonS3Client.deleteObject(bucket, targetFileName);
     }
 
-    //앞 url 없이 바로 삭제 ex) fileName: board/???
-    public void deleteFileNoPreUrl(String targetFileName) {
-        log.info("targetFileUrlNoPreUrl {} : ", targetFileName);
-        amazonS3Client.deleteObject(bucket, targetFileName);
-    }
 
     private Optional<File> convert(MultipartFile file) throws IOException {
         File convertFile = new File(System.getProperty("java.io.tmpdir") + "/" + Objects.requireNonNull(file.getOriginalFilename()));
