@@ -30,6 +30,7 @@ public class BoardRequestDto {
     public static class UpdateBoardDto {
         @NotBlank
         String title;
+        @NotBlank
         String content;
         List<String> pic;
     }

@@ -47,7 +47,7 @@ public class BoardConverter {
 
         //list는 없는 index 참조시 나는 오류를 제거
         if(!ObjectUtils.isEmpty(board.getBoardPictureList()))
-            boardPreViewPic = board.getBoardPictureList().get(0).getPic().substring(46);
+            boardPreViewPic = board.getBoardPictureList().get(0).getPic();
 
         return BoardResponseDto.BoardListViewDto.builder()
                 .id(board.getId())
@@ -156,18 +156,10 @@ public class BoardConverter {
     public static List<String> toPicStringIdList(List<BoardPicture> boardPictureList){
         List<String> picList = new ArrayList<>();
         for(BoardPicture boardPicture : boardPictureList){
-            picList.add(boardPicture.getPic().substring(46));
+            picList.add(boardPicture.getPic());
         }
         return picList;
     }
-    public static List<String> toPicStringPathList(List<BoardPicture> boardPictureList){
-        List<String> picList = new ArrayList<>();
-        for(BoardPicture boardPicture : boardPictureList){
-            picList.add(boardPicture.getPic().substring(46));
-        }
-        return picList;
-    }
-
     public static List<String> toPicStringList(List<BoardPicture> boardPictureList){
         List<String> picList = new ArrayList<>();
         for(BoardPicture boardPicture : boardPictureList){
@@ -184,23 +176,23 @@ public class BoardConverter {
                 .build();
     }
 
-    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board){
+    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board, Page<Pin> pinPage){
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
             pinCommentSize += pin.getCommentList().size();
 
-        List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = board.getPinList().stream()
+        List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = pinPage.stream()
                 .map(BoardConverter::toBoardViewPinListDto).collect(Collectors.toList());
 
         List<String> newBoardPicList = new ArrayList<>();
         for (BoardPicture picture : board.getBoardPictureList())
-            newBoardPicList.add(picture.getPic().substring(46)); // -> board/picName
+            newBoardPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewDto.builder()
                 .id(board.getId())
                 .userId(board.getUser().getId())
                 .userNickname(board.getUser().getNickName())
-                .userProfilePic(board.getUser().getPic().substring(46))
+                .userProfilePic(board.getUser().getPic())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .pinCount(board.getPinList().size() + pinCommentSize)
@@ -219,9 +211,10 @@ public class BoardConverter {
         List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getCommentList().stream()
                 .map(BoardConverter::toBoardPinCommentListDto).collect(Collectors.toList());
 
+        //나중에 댓글 사진 구현시 미구현 시점 오류 방지용
         List<String> newPinPicList = new ArrayList<>();
         for (PinPicture picture : pin.getPinPictureList())
-            newPinPicList.add(picture.getPic());
+                newPinPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewPinListDto.builder()
                 .id(pin.getId())
@@ -246,9 +239,10 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(Comment comment){
         List<String> newPinCommentPicList = new ArrayList<>();
-
+        
+        //나중에 댓글 사진 구현시 미구현 시점 오류 방지용
         for (CommentPicture picture : comment.getCommentPictureList())
-            newPinCommentPicList.add(picture.getPic());
+                newPinCommentPicList.add(picture.getPic());
 
         return BoardResponseDto.BoardViewPinCommentListDto.builder()
                 .id(comment.getId())

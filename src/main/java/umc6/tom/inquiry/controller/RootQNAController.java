@@ -61,10 +61,10 @@ public class RootQNAController {
     @GetMapping("/qna/list-{status}")
     public ApiResponse<QNAResponseDto.RootQNAListViewListDto> RootQNAList(@PathVariable("status") String status,
                                                                   @RequestParam(name = "page") Integer page) {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        Long userId = jwtTokenProvider.getUserIdFromToken();
 
 
-        return ApiResponse.onSuccess(rootQNAService.rootQNAListViewList(4L, status, page));
+        return ApiResponse.onSuccess(rootQNAService.rootQNAListViewList(userId, status, page));
     }
 
     /**
@@ -75,9 +75,9 @@ public class RootQNAController {
     public ApiResponse<QNAResponseDto.RootQNAListViewListDto> RootQNASearchList(@PathVariable("status") String status,
                                                                       @RequestParam(name = "page") Integer page,
                                                                       @RequestParam(name = "content") String content) {
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return ApiResponse.onSuccess(rootQNAService.rootQNASearchList(4L, status, page, content));
+        return ApiResponse.onSuccess(rootQNAService.rootQNASearchList(userId, status, page, content));
     }
 
     /**
@@ -86,8 +86,8 @@ public class RootQNAController {
      */
     @GetMapping("/qna/{qna-id}")
     public ApiResponse<QNAResponseDto.RootQNAViewDto> RootQNAView(@PathVariable("qna-id") Long qnaId){
-        //Long userId = jwtTokenProvider.getUserIdFromToken();
+        Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return ApiResponse.onSuccess(rootQNAService.rootQNAView(4L, qnaId));
+        return ApiResponse.onSuccess(rootQNAService.rootQNAView(userId, qnaId));
     }
 }
