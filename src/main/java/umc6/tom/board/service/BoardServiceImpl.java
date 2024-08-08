@@ -34,6 +34,7 @@ import umc6.tom.util.AmazonS3Util;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -64,8 +65,16 @@ public class BoardServiceImpl implements BoardService {
                 -> new BoardHandler(ErrorStatus.MAJORS_NOR_FOUND));
         Board newBoard = BoardConverter.toBoard(request, user, majors);
 
-        String fileName = null;
+        // 빈 파일 필터링. 안하면 파일 없어도 length값 1 됨
+        files = Arrays.stream(files)
+                .filter(file -> !file.isEmpty())
+                .toArray(MultipartFile[]::new);
+
         if (!ObjectUtils.isEmpty(files)) {
+            if(files.length>3)
+                throw new BoardHandler(ErrorStatus.BOARD_PICTURE_OVERED);
+
+            String fileName = null;
             for (MultipartFile file : files) {
                 try {
                     String uuid = UUID.randomUUID().toString();
@@ -213,13 +222,25 @@ public class BoardServiceImpl implements BoardService {
                 !board.getStatus().equals(BoardStatus.ACTIVE))
             throw new BoardHandler(ErrorStatus.BOARD_CANNOT_UPDATE);
 
+
+
         board.setContent(request.getContent());
         board.setTitle(request.getTitle());
         Board savedBoard = boardRepository.save(board);
 
-        String fileName = null;
+        // 빈 파일 필터링. 안하면 파일 없어도 length값 1 됨
+        files = Arrays.stream(files)
+                .filter(file -> !file.isEmpty())
+                .toArray(MultipartFile[]::new);
+
+        List<BoardPicture> boardPictureList = boardPictureRepository.findAllByBoardId(boardId);
+
         if (!ObjectUtils.isEmpty(files)) {
+            if(files.length+savedBoard.getBoardPictureList().size()>3)
+                throw new BoardHandler(ErrorStatus.BOARD_PICTURE_OVERED);
+
             BoardPicture newboardPicture = null;
+            String fileName = null;
             for (MultipartFile file : files) {
                 try {
                     String uuid = UUID.randomUUID().toString();
@@ -230,23 +251,23 @@ public class BoardServiceImpl implements BoardService {
                     throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
                 }
                 newboardPicture = BoardConverter.toBoardPicture(board, fileName);
+                boardPictureRepository.save(newboardPicture);
             }
+        }
             if (!ObjectUtils.isEmpty(board.getBoardPictureList())) {
                 //수정으로 삭제된 사진만 남음(중복안된 값)
-                List<String> PicUrl = BoardConverter.toPicStringIdList(board.getBoardPictureList()).stream().
+                List<String> PicUrl = BoardConverter.toPicStringIdList(boardPictureList).stream().
                         filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
                         .toList();
                 for (String pic : PicUrl) {
                     //신고된적 없을시 실제 버킷 사진 데이터 삭제
                     if (board.getStatus().equals(BoardStatus.ACTIVE))
-                        amazonS3Util.deleteFileNoPreUrl(amazonConfig.getBoardPath() + "/" + pic);
+                        amazonS3Util.deleteFile(pic);
 
-                    String deletePic = fileName.substring(0, 46) + pic;
-                    boardPictureRepository.deleteByPicUrl(deletePic);
+                    boardPictureRepository.deleteByPicUrl(pic);
                 }
             }
-            boardPictureRepository.save(newboardPicture);
-        }
+
 
         return savedBoard;
     }

@@ -69,7 +69,7 @@ public class QNAConverter {
 
     public static String toQNAPicture(InquiryPicture qnaPic){
 
-        return qnaPic.getPic().substring(46);
+        return qnaPic.getPic();
     }
 
     public static QNAResponseDto.QNAViewDto toQNAView(Inquiry qna){
@@ -138,7 +138,7 @@ public class QNAConverter {
     public static QNAResponseDto.RootQNAViewDto toRootQNAView(Inquiry qna) {
         List<String> qnaPic = new ArrayList<>();
         for(InquiryPicture inquiryPicture :qna.getInquiryPictureList())
-            qnaPic.add(inquiryPicture.getPic().substring(46));
+            qnaPic.add(inquiryPicture.getPic());
 
         return QNAResponseDto.RootQNAViewDto.builder()
                 .id(qna.getId())

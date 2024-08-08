@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.QNAHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Uuid;
@@ -24,6 +25,7 @@ import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.AmazonS3Util;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -46,7 +48,15 @@ public class QNAServiceImpl implements QNAService{
 
         Inquiry qna =inquiryRepository.save(QNAConverter.toQNA(request, user));
 
+        // 빈 파일 필터링. 안하면 파일 없어도 length값 1 됨
+        files = Arrays.stream(files)
+                .filter(file -> !file.isEmpty())
+                .toArray(MultipartFile[]::new);
+
         if (!ObjectUtils.isEmpty(files)) {
+            if(files.length>3)
+                throw new BoardHandler(ErrorStatus.BOARD_PICTURE_OVERED);
+
             for (MultipartFile file : files) {
                 String fileName;
                 try {
