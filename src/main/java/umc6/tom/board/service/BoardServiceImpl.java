@@ -21,6 +21,8 @@ import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.*;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.board.repository.*;
+import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
 import umc6.tom.common.repository.UuidRepository;
@@ -53,6 +55,7 @@ public class BoardServiceImpl implements BoardService {
     private final AmazonConfig amazonConfig;
     private final AlarmSetRepository alarmSetRepository;
     private final PushMessage pushMessage;
+    private final PinRepository pinRepository;
 
     @Override
     public Board registerBoard(BoardRequestDto.RegisterDto request, Long userId, MultipartFile[] files) {
@@ -105,12 +108,13 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponseDto.BoardViewDto getBoardView(Long boardId) {
+    public BoardResponseDto.BoardViewDto getBoardView(Long boardId, Integer page) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
         //신고로 안보이게 된 게시글 조회 방지
         if (!board.getStatus().equals(BoardStatus.ACTIVE))
             throw new BoardHandler(ErrorStatus.BOARD_NOT_FOUND);
-        return BoardConverter.toBoardViewDto(board);
+        Page<Pin> pinPage= pinRepository.findAllByBoardIdOrderByCreatedAtAsc(boardId, PageRequest.of(page, 10));
+        return BoardConverter.toBoardViewDto(board, pinPage);
     }
 
     @Override

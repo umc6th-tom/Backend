@@ -185,9 +185,10 @@ public class BoardRestController {
      * 게시글 조회
      */
     @GetMapping("/{board_id}")
-    public ApiResponse<BoardResponseDto.BoardViewDto> boardView(@PathVariable(name = "board_id") Long boardId) {
+    public ApiResponse<BoardResponseDto.BoardViewDto> boardView(@PathVariable(name = "board_id") Long boardId,
+                                                                @RequestParam(name = "page") Integer page) {
 
-        return ApiResponse.onSuccess(boardService.getBoardView(boardId));
+        return ApiResponse.onSuccess(boardService.getBoardView(boardId, page));
     }
 
 }
