@@ -49,9 +49,11 @@ public class QNAServiceImpl implements QNAService{
         Inquiry qna =inquiryRepository.save(QNAConverter.toQNA(request, user));
 
         // 빈 파일 필터링. 안하면 파일 없어도 length값 1 됨
-        files = Arrays.stream(files)
-                .filter(file -> !file.isEmpty())
-                .toArray(MultipartFile[]::new);
+        files = (files != null && files.length > 0) ?
+                Arrays.stream(files)
+                        .filter(file -> !file.isEmpty())
+                        .toArray(MultipartFile[]::new) :
+                new MultipartFile[0];
 
         if (!ObjectUtils.isEmpty(files)) {
             if(files.length>3)
