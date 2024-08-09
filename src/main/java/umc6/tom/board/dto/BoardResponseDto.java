@@ -125,6 +125,7 @@ public class BoardResponseDto {
         String content;
         Integer pinCount;
         Integer likeCount;
+        Boolean isLiked;
         String boardDate; // 21분전
         List<String> boardPic;
         List<BoardViewPinListDto> pinList;
@@ -142,6 +143,7 @@ public class BoardResponseDto {
         String pinDate;
         Integer pinLikeCount;
         Integer pinCommentCount;
+        Boolean isLiked;
         List<String> pinPictureList;
         List<BoardViewPinCommentListDto> pinCommentList;
     }
@@ -166,6 +168,7 @@ public class BoardResponseDto {
         String comment;
         String pinCommentDate;
         Integer pinLikeCount;
+        Boolean isLiked;
         List<String> pinCommentPicList;
     }
 

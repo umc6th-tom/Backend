@@ -71,7 +71,7 @@ public class CommentService {
         Board board = boardRepository.findById(pin.getBoard().getId())
                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
-        //댓글+대댓글 15개 도달시 핫글
+        //댓글+대댓글 20개 도달시 핫글
         if(ObjectUtils.isEmpty(board.getPopularAt()) && BoardConverter.toPinAndCommentCount(board.getPinList()) >= 20){
             board.setPopularAt(LocalDateTime.now());
             boardRepository.updateBoardPopularAt(pin.getBoard().getId(), LocalDateTime.now());
