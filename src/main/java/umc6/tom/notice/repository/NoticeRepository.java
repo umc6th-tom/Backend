@@ -6,4 +6,5 @@ import umc6.tom.notice.model.Notice;
 
 @Repository
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
+    Notice findAllById(Long id);
 }
