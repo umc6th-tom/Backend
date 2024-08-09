@@ -209,7 +209,7 @@ public class UserServiceImpl implements UserService {
 
         String newAccessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
         // 새로운 refreshToken 발급하는 로직 -> 보안 강화! (작성 예정)
-        return UserConverter.reissueRes(newAccessToken);
+        return UserConverter.reissueRes(newAccessToken, user);
     }
 
     // 닉네임 중복 확인 - 중복이 있다면 true
@@ -810,4 +810,7 @@ public class UserServiceImpl implements UserService {
 
         return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
     }
+
+    // 회원 정지
+
 }

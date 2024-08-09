@@ -74,7 +74,7 @@ public class User extends BaseEntity implements UserDetails {
     private Integer report;
 
     @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
-    private Integer warn;
+    private Integer suspension;
 
     @Column
     private LocalDateTime suspensionDue;
