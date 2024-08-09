@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardComplaint;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
@@ -17,6 +20,7 @@ import umc6.tom.user.model.enums.UserStatus;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -203,6 +207,22 @@ public class UserConverter {
                 .createdAt(date)
                 .warn(Long.valueOf(user.getWarn()))
                 .report(Long.valueOf(user.getReport()))
+                .build();
+    }
+
+    public static UserDtoRes.userFindDetailDto userFindDetailDto(User user, List<BoardComplaint> top3Boards, List<PinResDto.RootUserDetailPinsDto> top3PinComments, int boardSize, int pinCommentSize){
+
+        return UserDtoRes.userFindDetailDto.builder()
+                .userId(user.getId())
+                .nickName(user.getNickName())
+                .name(user.getName())
+                .pic(user.getPic())
+                .warn(user.getWarn())
+                .report(user.getReport())
+                .boards(top3Boards.stream().map(BoardConverter::titleBoardIdDto).toList())
+                .boardReportCount(boardSize)
+                .pins(top3PinComments)
+                .pinsReportCount(pinCommentSize)
                 .build();
     }
 

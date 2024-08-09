@@ -69,6 +69,11 @@ public class RootUserController {
         return ApiResponse.onSuccess(userService.findAccountUser(keyword,adjustedPageable));
     }
 
+    @GetMapping("/{userId}")
+    public ApiResponse<UserDtoRes.userFindDetailDto> findUserDetail(@PathVariable(name = "userId") Long userId){
+        return ApiResponse.onSuccess(userService.findUserDetail(userId));
+    }
+
 
 
 

@@ -4,15 +4,31 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-@Builder
+
 public class PinResDto {
-    private Long id;
-    private Long userId;
-    private Long boardId;
-    private String comment;
-    private List<String> pic;
+
+    @Getter
+    @Setter
+    @Builder
+    public static class DetailPin {
+        private Long id;
+        private Long userId;
+        private Long boardId;
+        private String comment;
+        private List<String> pic;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class RootUserDetailPinsDto {
+        private Long id;
+        private Long boardId;
+        private String comment;
+        private LocalDateTime createdAt;
+    }
+
 }

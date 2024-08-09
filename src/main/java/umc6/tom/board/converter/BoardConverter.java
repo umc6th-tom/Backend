@@ -295,4 +295,11 @@ public class BoardConverter {
         }
         return pinAndCommentSize;
     }
+
+    public static BoardResponseDto.RootUserDetailDto titleBoardIdDto(BoardComplaint boardComplaint){
+        return BoardResponseDto.RootUserDetailDto.builder()
+                .boardId(boardComplaint.getBoard().getId())
+                .title(boardComplaint.getBoardTitle())
+                .build();
+    }
 }

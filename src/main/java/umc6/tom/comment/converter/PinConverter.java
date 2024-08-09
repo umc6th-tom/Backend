@@ -32,12 +32,12 @@ public class PinConverter {
                 .build();
     }
 
-    public static PinResDto toPinDto(Pin pin) {
+    public static PinResDto.DetailPin toPinDto(Pin pin) {
         List<String> pictureUrls = pin.getPinPictureList().stream()
                 .map(PinPicture::getPic)
                 .toList();
 
-        return PinResDto.builder()
+        return PinResDto.DetailPin.builder()
                 .id(pin.getId())
                 .boardId(pin.getBoard().getId())
                 .userId(pin.getUser().getId())
