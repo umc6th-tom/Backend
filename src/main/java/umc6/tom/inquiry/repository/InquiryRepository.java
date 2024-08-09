@@ -18,9 +18,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
 
     Page<Inquiry> findAllByTitleContainingOrContentContainingOrderByCreatedAtDesc
             (String title, String content, PageRequest pageRequest);
-    Page<Inquiry> findAllByStatusAndTitleContainingOrContentContainingOrderByCreatedAtDesc
-            (Status status, String content, String title, PageRequest pageRequest);
 
-    @Query("SELECT inq FROM Inquiry inq WHERE inq.status = :status AND (inq.title LIKE %:content% OR inq.content LIKE %:title%) ORDER BY inq.createdAt DESC")
+    @Query("SELECT inq FROM Inquiry inq WHERE inq.status = :status AND (inq.title LIKE %:title% OR inq.content LIKE %:content%) ORDER BY inq.createdAt DESC")
     Page<Inquiry> findAllByStatusContentTitle(Status status, String content, String title, PageRequest pageRequest);
 }
