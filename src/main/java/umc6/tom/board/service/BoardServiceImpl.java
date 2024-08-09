@@ -66,9 +66,11 @@ public class BoardServiceImpl implements BoardService {
         Board newBoard = BoardConverter.toBoard(request, user, majors);
 
         // 빈 파일 필터링. 안하면 파일 없어도 length값 1 됨
-        files = Arrays.stream(files)
-                .filter(file -> !file.isEmpty())
-                .toArray(MultipartFile[]::new);
+            files = (files != null && files.length > 0) ?
+                    Arrays.stream(files)
+                    .filter(file -> !file.isEmpty())
+                    .toArray(MultipartFile[]::new) :
+                    new MultipartFile[0];
 
         if (!ObjectUtils.isEmpty(files)) {
             if(files.length>3)
@@ -229,9 +231,11 @@ public class BoardServiceImpl implements BoardService {
         Board savedBoard = boardRepository.save(board);
 
         // 빈 파일 필터링. 안하면 파일 없어도 length값 1 됨
-        files = Arrays.stream(files)
-                .filter(file -> !file.isEmpty())
-                .toArray(MultipartFile[]::new);
+        files = (files != null && files.length > 0) ?
+                Arrays.stream(files)
+                        .filter(file -> !file.isEmpty())
+                        .toArray(MultipartFile[]::new) :
+                new MultipartFile[0];
 
         List<BoardPicture> boardPictureList = boardPictureRepository.findAllByBoardId(boardId);
 
