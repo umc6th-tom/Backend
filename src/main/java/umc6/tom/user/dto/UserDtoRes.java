@@ -150,7 +150,7 @@ public class UserDtoRes {
         private String pic;
         private Long warn;
         private Long report;
-//        private 신고 보류
+        private Long stop;
     }
 
     @Setter
@@ -163,6 +163,7 @@ public class UserDtoRes {
         private String pic;
         private Integer warn;
         private Integer report;
+        private Integer stop;
         private List<BoardResponseDto.RootUserDetailDto> boards;
         private int boardReportCount;
         private List<PinResDto.RootUserDetailPinsDto> pins;

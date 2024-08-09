@@ -207,6 +207,7 @@ public class UserConverter {
                 .createdAt(date)
                 .warn(Long.valueOf(user.getWarn()))
                 .report(Long.valueOf(user.getReport()))
+                .stop(Long.valueOf(user.getStop()))
                 .build();
     }
 
@@ -223,6 +224,7 @@ public class UserConverter {
                 .boardReportCount(boardSize)
                 .pins(top3PinComments)
                 .pinsReportCount(pinCommentSize)
+                .stop(user.getStop())
                 .build();
     }
 

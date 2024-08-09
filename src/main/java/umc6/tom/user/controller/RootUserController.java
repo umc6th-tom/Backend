@@ -69,6 +69,10 @@ public class RootUserController {
         return ApiResponse.onSuccess(userService.findAccountUser(keyword,adjustedPageable));
     }
 
+    /**
+     * 24.08.07 작성자 : 서정호
+     * 회원 상세 보기
+     */
     @GetMapping("/{userId}")
     public ApiResponse<UserDtoRes.userFindDetailDto> findUserDetail(@PathVariable(name = "userId") Long userId){
         return ApiResponse.onSuccess(userService.findUserDetail(userId));

@@ -71,6 +71,9 @@ public class User extends BaseEntity implements UserDetails {
     private Integer warn;
 
     @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer stop;
+
+    @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
     private Integer report;
 
     @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
