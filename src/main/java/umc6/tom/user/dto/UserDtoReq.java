@@ -106,6 +106,7 @@ public class UserDtoReq {
     }
 
     @Getter
+    @Setter
     public static class RestoreNickNameDto {
         private String nickName;
     }

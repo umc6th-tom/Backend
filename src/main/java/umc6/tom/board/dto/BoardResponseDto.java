@@ -224,4 +224,12 @@ public class BoardResponseDto {
         private String comment;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    public static class RootUserDetailDto {
+        private Long boardId;
+        private String title;
+    }
+
 }

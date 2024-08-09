@@ -45,7 +45,7 @@ public class NoticeService {
                                                         .collect(Collectors.toList());
 
         return optionalNotice
-                .map(notice -> NoticeDto.toNoticeDTO(notice, pictureDtos))
+                .map(notice -> NoticeDto.toNoticeDTO(notice))
                 .orElse(null);
     }
 }

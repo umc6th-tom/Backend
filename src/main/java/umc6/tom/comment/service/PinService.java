@@ -87,7 +87,7 @@ public class PinService {
     @Transactional
     public ApiResponse getDetailPin(Long commentId) {
         Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
-        PinResDto pinResDto = PinConverter.toPinDto(pin);
+        PinResDto.DetailPin pinResDto = PinConverter.toPinDto(pin);
 
         return ApiResponse.onSuccess(pinResDto);
     }

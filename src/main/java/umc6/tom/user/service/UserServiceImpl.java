@@ -21,15 +21,23 @@ import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardComplaint;
 import umc6.tom.board.model.BoardLike;
+import umc6.tom.board.repository.BoardComplaintRepository;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.converter.CommentComplaintConverter;
 import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Comment;
+import umc6.tom.comment.model.CommentComplaint;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinComplaint;
+import umc6.tom.comment.repository.CommentComplaintRepository;
 import umc6.tom.comment.repository.CommentRepository;
+import umc6.tom.comment.repository.PinComplaintRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
@@ -89,6 +97,9 @@ public class UserServiceImpl implements UserService {
     private final CommentRepository commentRepository;
     private final ProhibitRepository prohibitRepository;
     private final ProhibitBoardRepository prohibitBoardRepository;
+    private final BoardComplaintRepository boardComplaintRepository;
+    private final PinComplaintRepository pinComplaintRepository;
+    private final CommentComplaintRepository commentComplaintRepository;
 
 
     // 회원 가입
@@ -813,6 +824,81 @@ public class UserServiceImpl implements UserService {
         return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
     }
 
+    public Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNameContainingOrAccountContainingOrNickNameContainingOrderByCreatedAtDesc(keyword,keyword,keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                                .map(UserConverter::toUsersFindDto)
+                                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNickNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findNameUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findAccountUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByAccountContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    //root 유저 프로필 조회
+    public UserDtoRes.userFindDetailDto findUserDetail(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        List<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserId(user.getId());
+        List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserId(user.getId());
+        List<CommentComplaint> commentComplaints = commentComplaintRepository.findAllByCommentUserId(user.getId());
+
+        //게시판 3개
+        List<BoardComplaint> boardComplaintList = boardComplaints.stream()
+                                        .sorted(Comparator.comparing(BoardComplaint::getCreatedAt).reversed())
+                                        .limit(3)
+                                        .toList();
+
+        List<PinResDto.RootUserDetailPinsDto> complaintPin = pinComplaints.stream()
+                                .sorted(Comparator.comparing(PinComplaint::getCreatedAt).reversed())
+                                .limit(3)
+                                .map(pinComplaint -> CommentComplaintConverter.rootUserFindDetail(pinComplaint.getId(), pinComplaint.getPin().getBoard().getId(), pinComplaint.getPinComment(),pinComplaint.getCreatedAt()))
+                                .toList();
+
+        List<PinResDto.RootUserDetailPinsDto> complaintComment = commentComplaints.stream()
+                .sorted(Comparator.comparing(CommentComplaint::getCreatedAt).reversed())
+                .limit(3)
+                .map(CommentComplaint -> CommentComplaintConverter.rootUserFindDetail(CommentComplaint.getId(), CommentComplaint.getComment().getPin().getBoard().getId(), CommentComplaint.getCommentComment(),CommentComplaint.getCreatedAt()))
+                .toList();
+
+        List<PinResDto.RootUserDetailPinsDto> top3ComplaintPinCommentList = Stream.concat(complaintPin.stream(), complaintComment.stream())
+                .sorted(Comparator.comparing(PinResDto.RootUserDetailPinsDto::getCreatedAt).reversed())
+                .limit(3)
+                .toList();
+
+
+        return UserConverter.userFindDetailDto(user,boardComplaintList,top3ComplaintPinCommentList,boardComplaints.size(),pinComplaints.size() + commentComplaints.size());
+    }
     // 회원 정지
 
 }
