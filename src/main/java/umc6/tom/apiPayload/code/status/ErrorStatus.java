@@ -32,6 +32,7 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_NICKNAME_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4012", "본인이 사용중인 닉네임입니다."),
     USER_PHONE_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4013", "본인이 사용중인 휴대폰번호입니다."),
     USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
+    USER_IS_SUSPENSION(HttpStatus.BAD_REQUEST, "USER4015", "정지된 계정입니다."),
 
 
     // 관리자 관련 에러
@@ -71,6 +72,7 @@ public enum ErrorStatus implements BaseErrorCode {
     BOARD_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "BOARD4010", "게시판 사진 업로드 실패입니다."),
     BOARD_NOT_COMPLAINT(HttpStatus.BAD_REQUEST, "BOARD4011", "자신의 게시글은 신고할 수 없습니다."),
     BOARD_NOT_LIKE(HttpStatus.BAD_REQUEST, "BOARD4012", "자신의 게시글은 좋아요 할 수 없습니다."),
+    BOARD_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "BOARD4013", "사진 개수를 초과하였습니다."),
 
     // 자주 묻는 질문 관련 에러
     FAQ_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "FAQ4001", "카테고리 값이 잘못 되었습니다."),
@@ -119,7 +121,8 @@ public enum ErrorStatus implements BaseErrorCode {
     //문의 관련 에러
     QNA_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "QNA4001", "문의 사진 업로드 실패입니다."),
     QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4002", "문의사항을 찾을 수 없습니다"),
-    QNA_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4003", "문의사항 상태가 잘 못 되었습니다.")
+    QNA_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4003", "문의사항 상태가 잘 못 되었습니다."),
+    QNA_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "BOARD4013", "사진 개수를 초과하였습니다.")
     ;
 
 

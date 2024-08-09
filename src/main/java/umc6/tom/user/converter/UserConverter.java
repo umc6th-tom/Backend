@@ -62,6 +62,8 @@ public class UserConverter {
 
         return UserDtoRes.LoginDto.builder()
                 .userId(user.getId())
+                .nickName(user.getNickName())
+                .majorId(user.getMajors().getId())
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .createdAt(user.getCreatedAt())
@@ -69,9 +71,12 @@ public class UserConverter {
     }
 
     // accessToken 재발급 응답
-    public static UserDtoRes.ReissueDto reissueRes(String accessToken) {
+    public static UserDtoRes.ReissueDto reissueRes(String accessToken, User user) {
 
         return UserDtoRes.ReissueDto.builder()
+                .userId(user.getId())
+                .nickName(user.getNickName())
+                .majorId(user.getMajors().getId())
                 .accessToken(accessToken)
                 .build();
     }

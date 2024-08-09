@@ -28,7 +28,6 @@ public class BoardRestController {
      * 24.07.19 작성자 : 박재락
      * 게시물 등록
      */
-    //사진 등록구현 필요
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<BoardResponseDto.RegisterResultDto> join(@RequestPart @Valid BoardRequestDto.RegisterDto request,
                                                                 @RequestPart(required = false) MultipartFile[] files) {
@@ -185,9 +184,10 @@ public class BoardRestController {
      * 게시글 조회
      */
     @GetMapping("/{board_id}")
-    public ApiResponse<BoardResponseDto.BoardViewDto> boardView(@PathVariable(name = "board_id") Long boardId) {
+    public ApiResponse<BoardResponseDto.BoardViewDto> boardView(@PathVariable(name = "board_id") Long boardId,
+                                                                @RequestParam(name = "page") Integer page) {
 
-        return ApiResponse.onSuccess(boardService.getBoardView(boardId));
+        return ApiResponse.onSuccess(boardService.getBoardView(boardId, page));
     }
 
 }

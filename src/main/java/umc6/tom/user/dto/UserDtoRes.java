@@ -37,6 +37,8 @@ public class UserDtoRes {
     public static class LoginDto {
 
         private Long userId;
+        private String nickName;
+        private Long majorId;
         private String accessToken;
         private String refreshToken;
         private LocalDateTime createdAt;
@@ -47,6 +49,9 @@ public class UserDtoRes {
     @Builder
     public static class ReissueDto {
 
+        private Long userId;
+        private String nickName;
+        private Long majorId;
         private String accessToken;
     }
 
