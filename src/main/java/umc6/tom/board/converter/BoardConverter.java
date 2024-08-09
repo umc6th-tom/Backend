@@ -198,6 +198,7 @@ public class BoardConverter {
                 .pinCount(board.getPinList().size() + pinCommentSize)
                 .likeCount(board.getBoardLikeList().size())
                 .boardDate(new DateCalc().boardListDate(board.getCreatedAt()))
+                .isLiked(!ObjectUtils.isEmpty(board.getBoardLikeList()))
                 .boardPic(newBoardPicList)
                 .pinList(toBoardViewPinListDtoList)
                 .build();
@@ -211,7 +212,6 @@ public class BoardConverter {
         List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getCommentList().stream()
                 .map(BoardConverter::toBoardPinCommentListDto).collect(Collectors.toList());
 
-        //나중에 댓글 사진 구현시 미구현 시점 오류 방지용
         List<String> newPinPicList = new ArrayList<>();
         for (PinPicture picture : pin.getPinPictureList())
                 newPinPicList.add(picture.getPic());
@@ -224,6 +224,7 @@ public class BoardConverter {
                 .pinDate(new DateCalc().boardListDate(pin.getCreatedAt()))
                 .pinLikeCount(pin.getPinLikeList().size())
                 .pinCommentCount(pinCommentSize)
+                .isLiked(!ObjectUtils.isEmpty(pin.getPinLikeList()))
                 .pinCommentList(toBoardViewPinCommentListDtoList)
                 .pinPictureList(newPinPicList)
                 .build();
@@ -239,8 +240,7 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(Comment comment){
         List<String> newPinCommentPicList = new ArrayList<>();
-        
-        //나중에 댓글 사진 구현시 미구현 시점 오류 방지용
+
         for (CommentPicture picture : comment.getCommentPictureList())
                 newPinCommentPicList.add(picture.getPic());
 
@@ -251,6 +251,7 @@ public class BoardConverter {
                 .comment(comment.getComment())
                 .pinCommentDate(new DateCalc().boardListDate(comment.getCreatedAt()))
                 .pinLikeCount(comment.getCommentLikeList().size())
+                .isLiked(!ObjectUtils.isEmpty(comment.getCommentLikeList()))
                 .pinCommentPicList(newPinCommentPicList)
                 .build();
     }

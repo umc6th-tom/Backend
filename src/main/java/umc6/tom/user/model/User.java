@@ -15,6 +15,7 @@ import umc6.tom.fAQ.model.FAQ;
 import umc6.tom.inquiry.model.Inquiry;
 import umc6.tom.user.model.enums.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -71,6 +72,12 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
     private Integer report;
+
+    @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
+    private Integer suspension;
+
+    @Column
+    private LocalDateTime suspensionDue;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'INACTIVE'")
