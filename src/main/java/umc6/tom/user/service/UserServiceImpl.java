@@ -24,9 +24,12 @@ import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
+import umc6.tom.comment.model.Comment;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.repository.CommentRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
@@ -38,13 +41,14 @@ import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
+import umc6.tom.user.model.Prohibit;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
+import umc6.tom.user.model.enums.Role;
 import umc6.tom.user.model.enums.UserStatus;
-import umc6.tom.user.repository.MajorsRepository;
-import umc6.tom.user.repository.ResignRepository;
-import umc6.tom.user.repository.UserRepository;
+import umc6.tom.user.model.mapping.ProhibitBoard;
+import umc6.tom.user.repository.*;
 import umc6.tom.util.AmazonS3Util;
 import umc6.tom.util.CookieUtil;
 import umc6.tom.util.RedisUtil;
@@ -82,6 +86,9 @@ public class UserServiceImpl implements UserService {
     private final BoardRepository boardRepository;
     private final PinRepository pinRepository;
     private final BoardLikeRepository boardLikeRepository;
+    private final CommentRepository commentRepository;
+    private final ProhibitRepository prohibitRepository;
+    private final ProhibitBoardRepository prohibitBoardRepository;
 
 
     // 회원 가입
