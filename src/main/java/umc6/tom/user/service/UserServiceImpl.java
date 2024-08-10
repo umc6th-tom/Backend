@@ -14,22 +14,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.alarm.converter.AlarmSetConverter;
 import umc6.tom.alarm.repository.AlarmSetRepository;
-import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
-import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardComplaint;
 import umc6.tom.board.model.BoardLike;
+import umc6.tom.board.repository.BoardComplaintRepository;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
+import umc6.tom.comment.converter.CommentComplaintConverter;
+import umc6.tom.comment.converter.PinConverter;
 import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Comment;
+import umc6.tom.comment.model.CommentComplaint;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinComplaint;
+import umc6.tom.comment.repository.CommentComplaintRepository;
 import umc6.tom.comment.repository.CommentRepository;
+import umc6.tom.comment.repository.PinComplaintRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
@@ -60,6 +67,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,6 +97,9 @@ public class UserServiceImpl implements UserService {
     private final CommentRepository commentRepository;
     private final ProhibitRepository prohibitRepository;
     private final ProhibitBoardRepository prohibitBoardRepository;
+    private final BoardComplaintRepository boardComplaintRepository;
+    private final PinComplaintRepository pinComplaintRepository;
+    private final CommentComplaintRepository commentComplaintRepository;
 
 
     // 회원 가입
@@ -233,8 +244,8 @@ public class UserServiceImpl implements UserService {
     // 회원 탈퇴 UserStatus ACTIVE -> WITHDRAW
     @Override
     public void withDraw(Long userId, UserDtoReq.WithDrawDto request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         // 기존 비밀번호와 일치하는지 확인
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -322,9 +333,8 @@ public class UserServiceImpl implements UserService {
     // 비밀번호 찾기 후 재설정
     @Override
     public void findRestorePassword(UserDtoReq.FindRestorePasswordDto request) {
-        User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        User user = findUser(request.getId());
         if (!request.getPassword().equals(request.getPasswordCheck())) {
             throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCHED);
         }
@@ -335,8 +345,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restoreAccount(Long userId, UserDtoReq.RestoreAccountDto request) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         if (user.getAccount().equals(request.getAccount())) {   // 본인이 사용중인 아이디 확인
             throw new UserHandler(ErrorStatus.USER_ACCOUNT_IS_YOURS);
@@ -350,8 +359,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restorePassword(Long userId, UserDtoReq.RestorePasswordDto request) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         if (!passwordEncoder.matches(request.getUsedPassword(), user.getPassword())) {
             throw new UserHandler(ErrorStatus.USER_PASSWORD_NOT_EQUAL);
@@ -367,8 +375,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restoreNickName(Long userId, UserDtoReq.RestoreNickNameDto request) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         if (user.getNickName().equals(request.getNickName())) {
             throw new UserHandler(ErrorStatus.USER_NICKNAME_IS_YOURS);
@@ -384,8 +391,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void restorePhone(Long userId, UserDtoReq.PhoneDto request) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         // 휴대폰 번호 "-" 제거
         request.setPhone(request.getPhone().replaceAll("-", ""));
@@ -426,8 +432,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoRes.ChangeAgreementDto changeAgreement(Long userId) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         // 다른 값으로 저장되어 있다면 AGREE 로 설정
         if (user.getAgreement() == Agreement.AGREE) {
@@ -444,8 +449,7 @@ public class UserServiceImpl implements UserService {
 
         String fileName;
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(userId);
 
         // 사진 변경
         if (request != null) {
@@ -476,8 +480,8 @@ public class UserServiceImpl implements UserService {
     // 프로필 사진 기본값으로 변경
     @Override
     public void restorePicDef(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         if (user.getPic().equals(DEFAULT_PROFILE_PATH)) {
             throw new UserHandler(ErrorStatus.PROFILE_IS_DEFAULT);
@@ -489,8 +493,8 @@ public class UserServiceImpl implements UserService {
     // 타인 프로필 조회
     @Override
     public UserDtoRes.FindProfileDto findProfile(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         if(user.getAgreement() == Agreement.DISAGREE) {
             return UserConverter.findProfileRes(user,null,null);
@@ -519,8 +523,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<BoardResponseDto.FindUserBoardsDto> findProfileBoards(Long userId, Pageable adjustedPageable){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         Page<Board> boardPageEntity = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
 
@@ -550,27 +554,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<BoardResponseDto.HistoryDto> findHistoryAll(Long userId, Pageable pageable){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         //자기가 쓴 글
         List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                                         .map(board -> UserConverter.toHistoryRes(board, "내가 쓴 글", board.getCreatedAt()))
-                                        .collect(Collectors.toList());
+                                        .toList();
         //자기가 댓글 단 글
         List<BoardResponseDto.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId()).stream()
                                         .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
                                                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
                                         .map(pinBoardDto -> UserConverter.toHistoryRes(pinBoardDto.getBoard(), "댓글 단 글", pinBoardDto.getPin().getCreatedAt()))
-                                        .collect(Collectors.toList());
+                                        .toList();
         //자기가 좋아요 누른 글
         List<BoardResponseDto.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId()).stream()
                                         .map(like -> new LikeBoardDto(like, boardRepository.findById(like.getBoard().getId())
                                                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND))))
                                         .distinct()
                                         .map(likeBoardDto -> UserConverter.toHistoryRes(likeBoardDto.getBoard(), "좋아요 단 글",likeBoardDto.getLike().getCreatedAt()))
-                                        .collect(Collectors.toList());
+                                        .toList();
 
         // 세 개의 리스트를 합치고 시간 순으로 정렬
         List<BoardResponseDto.HistoryDto> mergedList = Stream.concat(Stream.concat(boardsDto.stream(), pinBoardsDto.stream()), likeBoardsDto.stream())
@@ -588,9 +592,8 @@ public class UserServiceImpl implements UserService {
     // 내가 쓴글 조회
     @Override
     public Page<BoardResponseDto.HistoryDto> findMyBoards(Long userId, Pageable adjustedPageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        User user = findUser(userId);
         //자기가 쓴 글
         Page<Board> boardPage = boardRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(),adjustedPageable);
 
@@ -604,8 +607,8 @@ public class UserServiceImpl implements UserService {
     // 내가 쓴 댓글 글 조회
     @Override
     public Page<BoardResponseDto.HistoryDto> findMyComments(Long userId, Pageable adjustedPageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         // 자기가 댓글 단 글
         Page<Pin> pinPage = pinRepository.findAllByUserIdOrderByCreatedAtDesc(user.getId(), adjustedPageable);
@@ -643,8 +646,8 @@ public class UserServiceImpl implements UserService {
     // 내가 좋아요 단 글 조회
     @Override
     public Page<BoardResponseDto.HistoryDto> findMyLikes(Long userId, Pageable adjustedPageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         //자기가 좋아요 누른 글
         List<BoardLike> likePage = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId(),adjustedPageable);
@@ -662,8 +665,8 @@ public class UserServiceImpl implements UserService {
     // 활동내역 전체 검색 조회 (내가 쓴글,댓글 단글, 좋아요)
     @Override
     public Page<BoardResponseDto.HistoryDto> findTextHistoryAll(Long userId, Pageable adjustedPageable,String content){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         //자기가 쓴 글
         List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrUserIdAndTitleContainingOrderByCreatedAtDesc(user.getId(),content,user.getId(),content,adjustedPageable).stream()
@@ -716,8 +719,8 @@ public class UserServiceImpl implements UserService {
     // 활동내역 내가쓴글 검색 조회
     @Override
     public Page<BoardResponseDto.HistoryDto> findTextHistoryBoards(Long userId, Pageable adjustedPageable, String content){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         //자기가 쓴 글
         List<BoardResponseDto.HistoryDto> boardsDto = boardRepository.findAllByUserIdAndContentContainingOrUserIdAndTitleContainingOrderByCreatedAtDesc(user.getId(),content,user.getId(),content,adjustedPageable).stream()
@@ -730,9 +733,8 @@ public class UserServiceImpl implements UserService {
     // 활동내역 댓글 검색 조회
     @Override
     public Page<BoardResponseDto.HistoryDto> findTextHistoryComments(Long userId, Pageable adjustedPageable, String content) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        User user = findUser(userId);
         //자기가 댓글 단 글
         List<BoardResponseDto.HistoryDto> pinBoardsDto = pinRepository.findAllByUserIdAndCommentContainingOrderByCreatedAtDesc(user.getId(),content, adjustedPageable).stream()
                 .map(pin -> new PinBoardDto(pin, boardRepository.findById(pin.getBoard().getId())
@@ -762,8 +764,8 @@ public class UserServiceImpl implements UserService {
     // 활동내역 좋아요 검색 조회
     @Override
     public Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        User user = findUser(userId);
 
         //자기가 좋아요 누른 글
         List<BoardResponseDto.HistoryDto> likeBoardsDto = boardLikeRepository.findAllByUserIdOrderByIdDesc(user.getId(), adjustedPageable).stream()
@@ -785,17 +787,11 @@ public class UserServiceImpl implements UserService {
 
     // 경고 부여
     @Override
-    public UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnsDto request) {
+    public UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnDto request) {
 
-        User manager = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        managerAuth(userId);
 
-        if (!manager.getRole().equals(Role.ADMIN)) {
-            throw new AdminHandler(ErrorStatus.NOT_ADMIN);
-        }
-
-        User user = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        User user = findUser(targetUserId);
 
         Prohibit prohibit = prohibitRepository.findById(targetUserId)
                 .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
@@ -813,6 +809,184 @@ public class UserServiceImpl implements UserService {
         return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
     }
 
-    // 회원 정지
+    public Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNameContainingOrAccountContainingOrNickNameContainingOrderByCreatedAtDesc(keyword,keyword,keyword,adjustedPageable);
 
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                                .map(UserConverter::toUsersFindDto)
+                                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNickNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findNameUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    public Page<UserDtoRes.userFindAllDto> findAccountUser(String keyword, Pageable adjustedPageable){
+        Page<User> userPageEntity = userRepository.findAllByAccountContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
+
+        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
+                .map(UserConverter::toUsersFindDto)
+                .toList();
+
+        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
+    }
+
+    //root 유저 프로필 조회
+    public UserDtoRes.userFindDetailDto findUserDetail(Long userId){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        List<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserId(user.getId());
+        List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserId(user.getId());
+        List<CommentComplaint> commentComplaints = commentComplaintRepository.findAllByCommentUserId(user.getId());
+
+        //게시판 3개
+        List<BoardComplaint> boardComplaintList = boardComplaints.stream()
+                                        .sorted(Comparator.comparing(BoardComplaint::getCreatedAt).reversed())
+                                        .limit(3)
+                                        .toList();
+
+        List<PinResDto.RootUserDetailPinsDto> complaintPin = pinComplaints.stream()
+                                .sorted(Comparator.comparing(PinComplaint::getCreatedAt).reversed())
+                                .limit(3)
+                                .map(pinComplaint -> CommentComplaintConverter.rootUserFindDetail(pinComplaint.getId(), pinComplaint.getPin().getBoard().getId(), pinComplaint.getPinComment(),pinComplaint.getCreatedAt()))
+                                .toList();
+
+        List<PinResDto.RootUserDetailPinsDto> complaintComment = commentComplaints.stream()
+                .sorted(Comparator.comparing(CommentComplaint::getCreatedAt).reversed())
+                .limit(3)
+                .map(CommentComplaint -> CommentComplaintConverter.rootUserFindDetail(CommentComplaint.getId(), CommentComplaint.getComment().getPin().getBoard().getId(), CommentComplaint.getCommentComment(),CommentComplaint.getCreatedAt()))
+                .toList();
+
+        List<PinResDto.RootUserDetailPinsDto> top3ComplaintPinCommentList = Stream.concat(complaintPin.stream(), complaintComment.stream())
+                .sorted(Comparator.comparing(PinResDto.RootUserDetailPinsDto::getCreatedAt).reversed())
+                .limit(3)
+                .toList();
+
+
+        return UserConverter.userFindDetailDto(user,boardComplaintList,top3ComplaintPinCommentList,boardComplaints.size(),pinComplaints.size() + commentComplaints.size());
+    }
+    // 회원 정지
+    @Override
+    public UserDtoRes.suspendDto suspension(Long userId, Long targetUserId, UserDtoReq.SuspendDto request) {
+
+        managerAuth(userId);
+
+        User user = findUser(targetUserId);
+
+        Prohibit prohibit = prohibitRepository.findById(targetUserId)
+                .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
+
+        prohibit.setDivision(request.getDivision());
+
+        List<Board> boards = boardRepository.findByIdIn(request.getBoardId());
+        boards.forEach(board -> prohibitBoardRepository.save(ProhibitBoard.builder()
+                .prohibit(prohibit)
+                .board(board)
+                .build()));
+
+        prohibit.setSuspensionDue(LocalDateTime.now().plusDays(request.getSuspensionDueInt()));
+
+        return UserDtoRes.suspendDto.builder()
+                .message("귀하는 " + request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 " + request.getSuspensionDueInt() + "일 정지에 해당하는 조취를 취하는 바이다.")
+                .nickName(user.getNickName())
+                .userId(targetUserId)
+                .build();
+    }
+
+    // 관리자의 권한을 갖는지 검증하는 메서드
+    @Override
+    public void managerAuth(Long userId) {
+        if (!Role.ADMIN.equals(userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND))
+                .getRole())) {
+            throw new UserHandler(ErrorStatus.NOT_ADMIN);
+        }
+    }
+
+    // 사용자 찾기
+    @Override
+    public User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    //유저의 신고당한 글 리스트 보기
+    public Page<BoardResponseDto.RootUserReportBoardsDto> findUserReportBoards(Long boardUserId, Pageable adjustPageable){
+        Page<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserIdOrderByCreatedAtDesc(boardUserId,adjustPageable);
+
+        List<BoardResponseDto.RootUserReportBoardsDto> reportBoards = boardComplaints.stream()
+                                        .collect(Collectors.toMap(
+                                                BoardComplaint::getId, // 중복을 제거할 기준이 되는 키
+                                                Function.identity(),                           // 값을 그대로 사용
+                                                (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
+                                        ))
+                                        .values().stream() // 중복이 제거된 값들을 스트림으로 변환
+                                        .map(BoardConverter::rootUserReportBoardsDto)
+                                        .sorted(Comparator.comparing(BoardResponseDto.RootUserReportBoardsDto::getTestCreatedAt).reversed()) // 시간순으로 정렬
+                                        .toList();
+
+        return new PageImpl<>(reportBoards, adjustPageable, boardComplaints.getTotalElements());
+    }
+
+    //유저의 신고당한 댓글 리스트 보기
+    public Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long writeUserId, Pageable adjustedPageable){
+        List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserIdOrderByCreatedAtDesc(writeUserId);
+        List<CommentComplaint> commentComplaints = commentComplaintRepository.findAllByCommentUserIdOrderByCreatedAtDesc(writeUserId);
+
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> pinComplaintDtos = pinComplaints.stream()
+                .collect(Collectors.toMap(
+                        pinComplaint -> pinComplaint.getPin().getId(), // 중복을 제거할 기준이 되는 키
+                        Function.identity(),                           // 값을 그대로 사용
+                        (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
+                ))
+                .values().stream() // 중복이 제거된 값들을 스트림으로 변환
+                .map(pinComplaint -> PinConverter.rootUserReportPinsOrCommentsPinsDto(pinComplaint.getPin().getId(),pinComplaint.getPinComment(),pinComplaint.getCreatedAt(),"pin"))
+                .toList();
+
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> commentComplaintDtos = commentComplaints.stream()
+                .collect(Collectors.toMap(
+                        commentComplaint -> commentComplaint.getComment().getId(), // 중복을 제거할 기준이 되는 키
+                        Function.identity(),                           // 값을 그대로 사용
+                        (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
+                ))
+                .values().stream() // 중복이 제거된 값들을 스트림으로 변환
+                .map(commentComplaint -> PinConverter.rootUserReportPinsOrCommentsPinsDto(commentComplaint.getComment().getId(),commentComplaint.getCommentComment(),commentComplaint.getCreatedAt(),"comment"))
+                .toList();
+
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> complaintPinCommentList = Stream.concat(pinComplaintDtos.stream(), commentComplaintDtos.stream())
+                .sorted(Comparator.comparing(PinResDto.RootUserReportPinsOrCommentsPinsDto::getCreatedAt).reversed())
+                .toList();
+
+        // 총 데이터 개수
+        int totalElements = complaintPinCommentList.size();
+
+        // 현재 페이지에 대한 시작 인덱스 계산
+        int startIndex = (int) adjustedPageable.getOffset();
+        int endIndex = Math.min((startIndex + adjustedPageable.getPageSize()), totalElements);
+
+        // 부분 리스트 생성
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> pageContent = complaintPinCommentList.subList(startIndex, endIndex);
+
+        // PageImpl 생성
+        return new PageImpl<>(pageContent, adjustedPageable, totalElements);
+    }
 }

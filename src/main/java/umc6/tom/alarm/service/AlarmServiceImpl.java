@@ -8,7 +8,7 @@ import umc6.tom.alarm.converter.AlarmConverter;
 import umc6.tom.alarm.dto.AlarmRequestDto;
 import umc6.tom.alarm.dto.AlarmResponseDto;
 import umc6.tom.alarm.model.Alarm;
-import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.alarm.model.enums.Category;
 import umc6.tom.alarm.model.enums.IsRead;
 import umc6.tom.alarm.repository.AlarmRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -29,7 +29,7 @@ public class AlarmServiceImpl implements AlaramService{
             throw new AlarmHandler(ErrorStatus.ALARM_READ_NOT_FOUND);
         }
         Page<Alarm> alarmPage = alarmRepository.findAllByUserIdAndIsReadAndCategoryOrderByCreatedAtDesc
-                (userId, isReadVal, Field.WrittenBoard, PageRequest.of(page,12));
+                (userId, isReadVal, Category.WrittenBoard, PageRequest.of(page,12));
 
         return AlarmConverter.toBoardListViewListDTO(alarmPage);
     }
@@ -43,7 +43,7 @@ public class AlarmServiceImpl implements AlaramService{
             throw new AlarmHandler(ErrorStatus.ALARM_READ_NOT_FOUND);
         }
         Page<Alarm> alarmPage = alarmRepository.findAllByUserIdAndIsReadAndCategoryOrderByCreatedAtDesc
-                (userId, isReadVal, Field.commented, PageRequest.of(page,12));
+                (userId, isReadVal, Category.commented, PageRequest.of(page,12));
         return AlarmConverter.toBoardListViewListDTO(alarmPage);
     }
 
@@ -56,7 +56,7 @@ public class AlarmServiceImpl implements AlaramService{
             throw new AlarmHandler(ErrorStatus.ALARM_READ_NOT_FOUND);
         }
         Page<Alarm> alarmPage = alarmRepository.findAllByUserIdAndIsReadAndCategoryOrderByCreatedAtDesc
-                (userId, isReadVal, Field.liked, PageRequest.of(page,12));
+                (userId, isReadVal, Category.liked, PageRequest.of(page,12));
         return AlarmConverter.toBoardListViewListDTO(alarmPage);
     }
 

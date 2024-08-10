@@ -108,7 +108,7 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardComplaintDto toBoardComplaintResultDto(BoardComplaint boardComplaint){
         return BoardResponseDto.BoardComplaintDto.builder()
-                .boardId(boardComplaint.getId())
+                .boardComplaintId(boardComplaint.getId())
                 .userId(boardComplaint.getUser().getId())
                 .build();
     }
@@ -294,5 +294,22 @@ public class BoardConverter {
                     pinAndCommentSize += 1;
         }
         return pinAndCommentSize;
+    }
+
+    public static BoardResponseDto.RootUserDetailDto titleBoardIdDto(BoardComplaint boardComplaint){
+        return BoardResponseDto.RootUserDetailDto.builder()
+                .boardId(boardComplaint.getBoard().getId())
+                .title(boardComplaint.getBoardTitle())
+                .build();
+    }
+
+    public static BoardResponseDto.RootUserReportBoardsDto rootUserReportBoardsDto(BoardComplaint boardComplaint){
+        return BoardResponseDto.RootUserReportBoardsDto.builder()
+                .boardId(boardComplaint.getBoard().getId())
+                .title(boardComplaint.getBoardTitle())
+                .content(boardComplaint.getBoardContent())
+                .createdAt(DateCalc.formatDate2(boardComplaint.getCreatedAt()))
+                .testCreatedAt(boardComplaint.getCreatedAt())
+                .build();
     }
 }

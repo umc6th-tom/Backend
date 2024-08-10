@@ -4,9 +4,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
-import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.alarm.model.enums.Category;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -49,7 +50,7 @@ public class PinService {
 
     //댓글 등록
     @Transactional
-    public ApiResponse pinRegister(PinReqDto.PinCommentAndPic pinReq, Long boardId, Long userId  ) {
+    public ApiResponse pinRegister(PinReqDto.PinCommentAndPic pinReq, Long boardId, Long userId, MultipartFile[] files) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //임시 에러코드 사용함
         //게시판 댓글 저장
@@ -77,7 +78,7 @@ public class PinService {
                 -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
         //댓글 알림 보내기
         if (alarmSet.getPinSet().equals(AlarmOnOff.ON) || !user.getId().equals(board.getUser().getId()))
-            pushMessage.commentNotification(board.getUser(), board, Field.WrittenBoard);
+            pushMessage.commentNotification(board.getUser(), board, board.getTitle(), Category.WrittenBoard);
 
 
         return ApiResponse.onSuccess(200);
@@ -87,7 +88,7 @@ public class PinService {
     @Transactional
     public ApiResponse getDetailPin(Long commentId) {
         Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
-        PinResDto pinResDto = PinConverter.toPinDto(pin);
+        PinResDto.DetailPin pinResDto = PinConverter.toPinDto(pin);
 
         return ApiResponse.onSuccess(pinResDto);
     }
@@ -137,6 +138,7 @@ public class PinService {
         }else {
             if (likeEntity == null) {
                 pinLikeRepository.save(PinLikeConverter.toEntity(user, pin));
+                pushMessage.commentLikeNotification(pin.getBoard(), pin.getUser(), pin.getComment(), user);
                 return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
             } else {
                 pinLikeRepository.delete(likeEntity);

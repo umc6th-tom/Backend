@@ -66,7 +66,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardComplaintDto{
-        Long boardId;
+        Long boardComplaintId;
         Long userId;
     }
 
@@ -222,6 +222,26 @@ public class BoardResponseDto {
         private String createdAt;
         private String title;
         private String comment;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class RootUserDetailDto {
+        private Long boardId;
+        private String title;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class RootUserReportBoardsDto {
+        private Long boardId;
+        private String title;
+        private String content;
+        private String createdAt;
+
+        private LocalDateTime testCreatedAt;
     }
 
 }

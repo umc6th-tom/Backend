@@ -1,5 +1,6 @@
 package umc6.tom.user.controller;
 
+import com.google.protobuf.Api;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -20,8 +21,6 @@ import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 import umc6.tom.user.service.UserService;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -393,7 +392,7 @@ public class UserController {
      */
     @PostMapping("/warn")
     public ApiResponse<UserDtoRes.warnDto> warn(@RequestParam(name = "targetUserId") Long targetUserId,
-                                                @RequestBody UserDtoReq.WarnsDto request) {
+                                                @RequestBody UserDtoReq.WarnDto request) {
 
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return ApiResponse.onSuccess(userService.warn(userId, targetUserId, request));
@@ -403,6 +402,11 @@ public class UserController {
      * 24.08.07 작성자 : 류기현
      * 관리자 - 회원 정지
      */
-//    @PostMapping("/suspension")
-//    public ApiResponse<UserDtoRes.>
+    @PostMapping("/suspension")
+    public ApiResponse<UserDtoRes.suspendDto> suspension(@RequestParam(name = "targetUserId") Long targetUserId,
+                                                          @RequestBody UserDtoReq.SuspendDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(userService.suspension(userId, targetUserId, request));
+    }
 }

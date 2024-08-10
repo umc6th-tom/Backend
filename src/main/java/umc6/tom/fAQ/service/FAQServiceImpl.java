@@ -39,17 +39,17 @@ public class FAQServiceImpl implements FAQService{
     public FAQResponseDto.FAQViewList fAQSearchViewList(Long userId, String category, String content, Integer page) {
         Page<FAQ> faqPage;
         if(category.equals("all"))
-            faqPage = faqRepository.findAllByTitleContainingOrderByUpdatedAtDesc
-                    (content,PageRequest.of(page, 12));
+            faqPage = faqRepository.findAllByTitleContainingOrContentContainingOrderByUpdatedAtDesc
+                    (content, content, PageRequest.of(page, 12));
         else if (category.equals("word"))
-            faqPage = faqRepository.findAllByCategoryAndTitleContainingOrderByUpdatedAtDesc
-                    (Category.검색어, content, PageRequest.of(page, 12));
+            faqPage = faqRepository.findAllByCategoryAndTitleContainingOrContentContainingOrderByUpdatedAtDesc
+                    (Category.검색어, content, content, PageRequest.of(page, 12));
         else if (category.equals("board"))
-            faqPage = faqRepository.findAllByCategoryAndTitleContainingOrderByUpdatedAtDesc
-                    (Category.커뮤니티, content, PageRequest.of(page, 12));
+            faqPage = faqRepository.findAllByCategoryAndTitleContainingOrContentContainingOrderByUpdatedAtDesc
+                    (Category.커뮤니티, content, content, PageRequest.of(page, 12));
         else if (category.equals("major"))
-            faqPage = faqRepository.findAllByCategoryAndTitleContainingOrderByUpdatedAtDesc
-                    (Category.문제, content, PageRequest.of(page, 12));
+            faqPage = faqRepository.findAllByCategoryAndTitleContainingOrContentContainingOrderByUpdatedAtDesc
+                    (Category.문제, content, content, PageRequest.of(page, 12));
         else
             throw new FAQHandler(ErrorStatus.FAQ_CATEGORY_NOT_FOUND);
 

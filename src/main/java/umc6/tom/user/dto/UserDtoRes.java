@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
-import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.dto.PinResDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -131,6 +131,48 @@ public class UserDtoRes {
     @Setter
     @Builder
     public static class warnDto {
+        private Long userId;
+        private String nickName;
+        private String message;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    public static class userFindAllDto {
+        private Long userId;
+        private String name;
+        private String nickName;
+        private String account;
+        private String createdAt;
+        private String pic;
+        private Long warn;
+        private Long report;
+        private Long stop;
+    }
+
+    @Setter
+    @Getter
+    @Builder
+    public static class userFindDetailDto {
+        private Long userId;
+        private String nickName;
+        private String name;
+        private String pic;
+        private Integer warn;
+        private Integer report;
+        private Integer stop;
+        private List<BoardResponseDto.RootUserDetailDto> boards;
+        private int boardReportCount;
+        private List<PinResDto.RootUserDetailPinsDto> pins;
+        private int pinsReportCount;
+    }
+
+
+    @Getter
+    @Setter
+    @Builder
+    public static class suspendDto {
         private Long userId;
         private String nickName;
         private String message;
