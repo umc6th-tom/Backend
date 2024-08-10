@@ -56,7 +56,7 @@ public class PushMessage {
     public void commentLikeNotification(Board board, User targetUser, String comment, User likedUser) { //type은 board 인지 댓글인지
         String alarmTitle = likedUser.getNickName() + "님이 댓글을 좋아합니다.";
         //좋아요 취소하고 다시 하면 알림 도배 됨 방지, DB에 중복값 방지
-        if(alarmRepository.existsByCategoryAndAlarmContainingAndBoardId(Category.liked, alarmTitle, board.getId()))
+        if(alarmRepository.existsByCategoryAndAlarmContainingAndBoardIdAndTargetAlarmContaining(Category.liked, alarmTitle, board.getId(), comment))
             return;
         Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(targetUser.getId()).getFCmTokens();
 
