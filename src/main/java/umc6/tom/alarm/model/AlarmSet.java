@@ -3,8 +3,6 @@ package umc6.tom.alarm.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
-import umc6.tom.alarm.model.enums.Field;
-import umc6.tom.gpt.model.Answer;
 import umc6.tom.user.model.User;
 
 @Entity
