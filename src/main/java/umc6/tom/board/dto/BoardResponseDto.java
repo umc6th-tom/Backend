@@ -232,4 +232,14 @@ public class BoardResponseDto {
         private String title;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    public static class RootUserReportBoardsDto {
+        private Long boardId;
+        private String title;
+        private String content;
+        private String createdAt;
+    }
+
 }

@@ -926,4 +926,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
     }
+
+    //유저의 신고당한 글 리스트 보기
+    public Page<BoardResponseDto.RootUserReportBoardsDto> findUserReportBoards(Long boardUserId, Pageable adjustPageable){
+        Page<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserIdOrderByCreatedAtDesc(boardUserId,adjustPageable);
+
+        List<BoardResponseDto.RootUserReportBoardsDto> reportBoards = boardComplaints.stream()
+                                        .map(BoardConverter::rootUserReportBoardsDto)
+                                        .toList();
+
+        return new PageImpl<>(reportBoards, adjustPageable, boardComplaints.getTotalElements());
+    }
 }
