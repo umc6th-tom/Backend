@@ -934,11 +934,19 @@ public class UserServiceImpl implements UserService {
         Page<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserIdOrderByCreatedAtDesc(boardUserId,adjustPageable);
 
         List<BoardResponseDto.RootUserReportBoardsDto> reportBoards = boardComplaints.stream()
+                                        .collect(Collectors.toMap(
+                                                BoardComplaint::getId, // 중복을 제거할 기준이 되는 키
+                                                Function.identity(),                           // 값을 그대로 사용
+                                                (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
+                                        ))
+                                        .values().stream() // 중복이 제거된 값들을 스트림으로 변환
                                         .map(BoardConverter::rootUserReportBoardsDto)
+                                        .sorted(Comparator.comparing(BoardResponseDto.RootUserReportBoardsDto::getTestCreatedAt).reversed()) // 시간순으로 정렬
                                         .toList();
 
         return new PageImpl<>(reportBoards, adjustPageable, boardComplaints.getTotalElements());
     }
+
     //유저의 신고당한 댓글 리스트 보기
     public Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long writeUserId, Pageable adjustedPageable){
         List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserIdOrderByCreatedAtDesc(writeUserId);

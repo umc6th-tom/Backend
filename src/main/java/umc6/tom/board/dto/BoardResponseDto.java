@@ -240,6 +240,8 @@ public class BoardResponseDto {
         private String title;
         private String content;
         private String createdAt;
+
+        private LocalDateTime testCreatedAt;
     }
 
 }

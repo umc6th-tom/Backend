@@ -309,6 +309,7 @@ public class BoardConverter {
                 .title(boardComplaint.getBoardTitle())
                 .content(boardComplaint.getBoardContent())
                 .createdAt(DateCalc.formatDate2(boardComplaint.getCreatedAt()))
+                .testCreatedAt(boardComplaint.getCreatedAt())
                 .build();
     }
 }
