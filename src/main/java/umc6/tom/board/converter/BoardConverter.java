@@ -108,7 +108,7 @@ public class BoardConverter {
 
     public static BoardResponseDto.BoardComplaintDto toBoardComplaintResultDto(BoardComplaint boardComplaint){
         return BoardResponseDto.BoardComplaintDto.builder()
-                .boardId(boardComplaint.getId())
+                .boardComplaintId(boardComplaint.getId())
                 .userId(boardComplaint.getUser().getId())
                 .build();
     }
