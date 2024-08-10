@@ -4,13 +4,19 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class PinPictureDto {
-    private Long id;
-    private Long pinId;
-    private List<String> pic;
+
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class PinPictureDto2 {
+        private Long id;
+        private Long pinId;
+        private List<String> pic;
+    }
+
+
 }

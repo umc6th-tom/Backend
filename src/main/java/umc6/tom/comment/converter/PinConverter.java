@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardPicture;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
 import umc6.tom.comment.model.PinComplaint;
 import umc6.tom.comment.model.PinPicture;
+import umc6.tom.common.model.Uuid;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
@@ -58,6 +60,13 @@ public class PinConverter {
                 .comment(content)
                 .createdAt(DateCalc.formatDate2(createdAt))
                 .pinOrComment(what)
+                .build();
+    }
+
+    public static PinPicture toPinPicture(Pin pin, String pic){
+        return PinPicture.builder()
+                .pin(pin)
+                .pic(pic)
                 .build();
     }
 }
