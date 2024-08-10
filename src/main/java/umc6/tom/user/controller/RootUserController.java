@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
+import umc6.tom.board.dto.BoardResponseDto;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.service.UserService;
 import org.springframework.data.domain.Page;
@@ -78,6 +80,29 @@ public class RootUserController {
         return ApiResponse.onSuccess(userService.findUserDetail(userId));
     }
 
+    /**
+     * 24.08.10 작성자 : 서정호
+     * 유저 신고된 글 리스트 조회 + 페이징
+     */
+    @GetMapping("/{userId}/boards")
+    public ApiResponse<Page<BoardResponseDto.RootUserReportBoardsDto>> findUserReportBoards(@PathVariable(name = "userId") Long boardUserId,
+                                                                                            @RequestParam(defaultValue = "1") int page,
+                                                                                            @PageableDefault(size = 12) Pageable pageable){
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findUserReportBoards(boardUserId,adjustedPageable));
+    }
+
+    /**
+     * 24.08.10 작성자 : 서정호
+     * 유저 신고된 댓글 리스트 조회 + 페이징
+     */
+    @GetMapping("/{userId}/pins")
+    public ApiResponse<Page<PinResDto.RootUserReportPinsOrCommentsPinsDto>> findUserReportPins(@PathVariable(name = "userId") Long pinUserId,
+                                                                                               @RequestParam(defaultValue = "1") int page,
+                                                                                               @PageableDefault(size = 6) Pageable pageable){
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(userService.findUserReportPins(pinUserId,adjustedPageable));
+    }
 
 
 
