@@ -79,8 +79,6 @@ public interface UserService {
 
     Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content);
 
-    UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnsDto request);
-
     Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable);
 
     Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable);
@@ -90,4 +88,12 @@ public interface UserService {
     Page<UserDtoRes.userFindAllDto> findAccountUser(String keyword, Pageable adjustedPageable);
 
     UserDtoRes.userFindDetailDto findUserDetail(Long userId);
+
+    UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnDto request);
+
+    UserDtoRes.suspendDto suspension(Long userId, Long targetUserId, UserDtoReq.SuspendDto request);
+
+    void managerAuth(Long userId);
+
+    User findUser(Long userId);
 }

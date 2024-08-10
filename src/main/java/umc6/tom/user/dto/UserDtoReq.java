@@ -122,12 +122,20 @@ public class UserDtoReq {
     }
 
     @Getter
-    public static class WarnsDto {
+    public static class WarnDto {
 
         private List<Long> boardIds;
         private String message;
         private String division;
     }
 
+    @Getter
+    public static class SuspendDto {
+
+        private List<Long> boardId;
+        private String message;
+        private String division;
+        private Integer suspensionDueInt;
+    }
 }
 
