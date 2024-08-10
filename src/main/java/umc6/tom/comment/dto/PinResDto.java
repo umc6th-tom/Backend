@@ -31,4 +31,14 @@ public class PinResDto {
         private LocalDateTime createdAt;
     }
 
+    @Getter
+    @Setter
+    @Builder
+    public static class RootUserReportPinsOrCommentsPinsDto {
+        private Long complaintId;
+        private String comment;
+        private String createdAt;
+        private String pinOrComment;
+    }
+
 }

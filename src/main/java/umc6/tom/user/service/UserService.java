@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.board.dto.BoardResponseDto;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
@@ -99,4 +100,6 @@ public interface UserService {
     User findUser(Long userId);
 
     Page<BoardResponseDto.RootUserReportBoardsDto> findUserReportBoards(Long boardUserId,Pageable adjustedPageable);
+
+    Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long pinUserId, Pageable adjustedPageable);
 }

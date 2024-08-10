@@ -25,6 +25,7 @@ import umc6.tom.board.repository.BoardComplaintRepository;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.CommentComplaintConverter;
+import umc6.tom.comment.converter.PinConverter;
 import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
@@ -66,6 +67,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -936,5 +938,47 @@ public class UserServiceImpl implements UserService {
                                         .toList();
 
         return new PageImpl<>(reportBoards, adjustPageable, boardComplaints.getTotalElements());
+    }
+    //유저의 신고당한 댓글 리스트 보기
+    public Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long writeUserId, Pageable adjustedPageable){
+        List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserIdOrderByCreatedAtDesc(writeUserId);
+        List<CommentComplaint> commentComplaints = commentComplaintRepository.findAllByCommentUserIdOrderByCreatedAtDesc(writeUserId);
+
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> pinComplaintDtos = pinComplaints.stream()
+                .collect(Collectors.toMap(
+                        pinComplaint -> pinComplaint.getPin().getId(), // 중복을 제거할 기준이 되는 키
+                        Function.identity(),                           // 값을 그대로 사용
+                        (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
+                ))
+                .values().stream() // 중복이 제거된 값들을 스트림으로 변환
+                .map(pinComplaint -> PinConverter.rootUserReportPinsOrCommentsPinsDto(pinComplaint.getPin().getId(),pinComplaint.getPinComment(),pinComplaint.getCreatedAt(),"pin"))
+                .toList();
+
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> commentComplaintDtos = commentComplaints.stream()
+                .collect(Collectors.toMap(
+                        commentComplaint -> commentComplaint.getComment().getId(), // 중복을 제거할 기준이 되는 키
+                        Function.identity(),                           // 값을 그대로 사용
+                        (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
+                ))
+                .values().stream() // 중복이 제거된 값들을 스트림으로 변환
+                .map(commentComplaint -> PinConverter.rootUserReportPinsOrCommentsPinsDto(commentComplaint.getComment().getId(),commentComplaint.getCommentComment(),commentComplaint.getCreatedAt(),"comment"))
+                .toList();
+
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> complaintPinCommentList = Stream.concat(pinComplaintDtos.stream(), commentComplaintDtos.stream())
+                .sorted(Comparator.comparing(PinResDto.RootUserReportPinsOrCommentsPinsDto::getCreatedAt).reversed())
+                .toList();
+
+        // 총 데이터 개수
+        int totalElements = complaintPinCommentList.size();
+
+        // 현재 페이지에 대한 시작 인덱스 계산
+        int startIndex = (int) adjustedPageable.getOffset();
+        int endIndex = Math.min((startIndex + adjustedPageable.getPageSize()), totalElements);
+
+        // 부분 리스트 생성
+        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> pageContent = complaintPinCommentList.subList(startIndex, endIndex);
+
+        // PageImpl 생성
+        return new PageImpl<>(pageContent, adjustedPageable, totalElements);
     }
 }
