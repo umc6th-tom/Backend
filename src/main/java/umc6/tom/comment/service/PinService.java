@@ -6,7 +6,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
-import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.alarm.model.enums.Category;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -77,7 +77,7 @@ public class PinService {
                 -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
         //댓글 알림 보내기
         if (alarmSet.getPinSet().equals(AlarmOnOff.ON) || !user.getId().equals(board.getUser().getId()))
-            pushMessage.commentNotification(board.getUser(), board, Field.WrittenBoard);
+            pushMessage.commentNotification(board.getUser(), board, board.getTitle(), Category.WrittenBoard);
 
 
         return ApiResponse.onSuccess(200);
@@ -137,6 +137,7 @@ public class PinService {
         }else {
             if (likeEntity == null) {
                 pinLikeRepository.save(PinLikeConverter.toEntity(user, pin));
+                pushMessage.commentLikeNotification(pin.getBoard(), pin.getUser(), pin.getComment(), user);
                 return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
             } else {
                 pinLikeRepository.delete(likeEntity);

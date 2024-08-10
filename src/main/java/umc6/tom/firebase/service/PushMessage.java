@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import umc6.tom.alarm.converter.AlarmConverter;
 import umc6.tom.alarm.model.Alarm;
-import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.alarm.model.enums.Category;
 import umc6.tom.alarm.repository.AlarmRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.CommentHandler;
@@ -28,49 +28,60 @@ public class PushMessage {
 
 
     @Async
-    public void commentNotification(User alarmUser, Board board, Field field) {
-        log.info("userID:"+alarmUser.getId()+"에게 알림");
-        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(alarmUser.getId()).getFCmTokens();
+    public void commentNotification(User targetUser, Board board, String comment, Category category) {
         String alarmTitle = "새로운 댓글이 달렸어요";
-        for (String targetFcmToken : targetFcmTokens)
-            Optional.ofNullable(targetFcmToken).ifPresent(token -> {
-                        try {
-                            log.info("sendMessage token:"+token);
-                            firebaseService.sendMessageTo(
-                                    token,
-                                    alarmTitle,
-                                    board.getTitle());
+        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(targetUser.getId()).getFCmTokens();
 
-                        } catch (IOException e) {
-                            throw new CommentHandler(ErrorStatus.PIN_NOT_NOTIFICATION);
-                        }
-                    }
-            );
-        Alarm alarm = AlarmConverter.toAlarm(board, field, alarmTitle);
+        pushNotification(targetFcmTokens, alarmTitle, comment);
+
+        Alarm alarm = AlarmConverter.toAlarm(board, targetUser, category, alarmTitle, comment);
         alarmRepository.save(alarm);
     }
 
     @Async
     public void boardLikeNotification(Board board, User likedUser) {
-        log.info("userID:"+board.getUser().getId()+"에게 알림");
-        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(board.getUser().getId()).getFCmTokens();
         String alarmTitle = likedUser.getNickName() + "님이 게시물을 좋아합니다.";
+        //좋아요 취소하고 다시 하면 알림 도배 됨 방지, DB에 중복값 방지
+        if(alarmRepository.existsByCategoryAndAlarmContainingAndBoardId(Category.liked, alarmTitle, board.getId()))
+            return;
+        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(board.getUser().getId()).getFCmTokens();
+
+        pushNotification(targetFcmTokens, alarmTitle, board.title);
+
+        Alarm alarm = AlarmConverter.toAlarm(board, board.getUser(), Category.liked, alarmTitle, board.title);
+        alarmRepository.save(alarm);
+    }
+
+    @Async
+    public void commentLikeNotification(Board board, User targetUser, String comment, User likedUser) { //type은 board 인지 댓글인지
+        String alarmTitle = likedUser.getNickName() + "님이 댓글을 좋아합니다.";
+        //좋아요 취소하고 다시 하면 알림 도배 됨 방지, DB에 중복값 방지
+        if(alarmRepository.existsByCategoryAndAlarmContainingAndBoardId(Category.liked, alarmTitle, board.getId()))
+            return;
+        Set<String> targetFcmTokens = fcmTokenService.getAllFcmToken(targetUser.getId()).getFCmTokens();
+
+        pushNotification(targetFcmTokens, alarmTitle, comment);
+
+        Alarm alarm = AlarmConverter.toAlarm(board, board.getUser(), Category.liked, alarmTitle, comment);
+        alarmRepository.save(alarm);
+    }
+
+    private void pushNotification(Set<String> targetFcmTokens, String title, String body) {
         for (String targetFcmToken : targetFcmTokens)
             Optional.ofNullable(targetFcmToken).ifPresent(token -> {
                         try {
                             log.info("sendMessage token:" + token);
                             firebaseService.sendMessageTo(
                                     token,
-                                    alarmTitle,
-                                    board.getTitle());
+                                    title,
+                                    body);
 
                         } catch (IOException e) {
                             throw new CommentHandler(ErrorStatus.PIN_NOT_NOTIFICATION);
                         }
                     }
             );
-        Alarm alarm = AlarmConverter.toAlarm(board, Field.liked, alarmTitle);
-        alarmRepository.save(alarm);
     }
+
 
 }

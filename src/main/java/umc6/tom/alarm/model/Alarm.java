@@ -2,8 +2,11 @@ package umc6.tom.alarm.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
-import umc6.tom.alarm.model.enums.Field;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import umc6.tom.alarm.model.enums.Category;
 import umc6.tom.alarm.model.enums.IsRead;
 import umc6.tom.board.model.Board;
 import umc6.tom.user.model.User;
@@ -16,6 +19,9 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
+@EntityListeners(AuditingEntityListener.class)
 public class Alarm {
 
     @Id
@@ -23,10 +29,14 @@ public class Alarm {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Field category;
+    private Category category;
 
     @Column(nullable = false, length = 50)
     private String alarm;
+    
+    //어떤 내용에 알림을 받았는지
+    @Column(nullable = false ,length = 500)
+    private String targetAlarm;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(3) DEFAULT 'NO'")
