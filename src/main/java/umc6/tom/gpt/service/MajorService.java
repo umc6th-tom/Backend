@@ -21,6 +21,7 @@ import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.user.service.UserServiceImpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import static umc6.tom.gpt.function.Function.extractContent;
@@ -65,9 +66,9 @@ public class MajorService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
-//        GPT 기본 설정
+////        GPT 기본 설정
         GptReq request = new GptReq(
-                model, searchDto.getQuestion(), 1.75,2048,0.7,0,0, user);
+                model, searchDto.getQuestion(), 1.5,2048,0.7,0,0, user);
         GptRes gptResponse = restTemplate.postForObject(
                 apiUrl
                 , request
@@ -77,8 +78,9 @@ public class MajorService {
         //GPT 답변 파싱  이후에 활성화하기 -> gptResponse.getChoices().get(0).getMessage().getContent();
         String responseText = gptResponse.getChoices().get(0).getMessage().getContent();
         log.info(responseText);
+        List<String> exampleKeywords = List.of("예시문제:", "예시 문제:", "예시 질문:", "예시질문:" , "예시문제 :", "예시 문제 :", "예시 질문 :", "예시질문 :");
         String answer = extractContent(responseText, "답변:");
-        String exampleQuestion = extractContent(responseText, "예시 질문:");
+        String exampleQuestion = extractContent(responseText, "예시문제:");
         String correctAnswer = extractContent(responseText, "정답:");
 
 //      이후에 활성화하기  answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
