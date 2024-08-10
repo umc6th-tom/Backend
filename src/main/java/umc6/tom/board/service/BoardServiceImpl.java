@@ -249,7 +249,6 @@ public class BoardServiceImpl implements BoardService {
                 try {
                     String uuid = UUID.randomUUID().toString();
                     Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
-
                     fileName = amazonS3Util.upload(file, amazonConfig.getBoardPath(), savedUuid);
                 } catch (IOException e) {
                     throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
@@ -260,12 +259,16 @@ public class BoardServiceImpl implements BoardService {
         }
             if (!ObjectUtils.isEmpty(board.getBoardPictureList())) {
                 //수정으로 삭제된 사진만 남음(중복안된 값)
-                List<String> PicUrl = BoardConverter.toPicStringIdList(boardPictureList).stream().
-                        filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
-                        .toList();
-                for (String pic : PicUrl) {
+                List<String> picUrl;
+                if(ObjectUtils.isEmpty(request.getPic())) // request에 pic이 null 일때 null 예외 처리
+                    picUrl = BoardConverter.toPicStringIdList(boardPictureList);
+                else
+                    picUrl = BoardConverter.toPicStringIdList(boardPictureList).stream().
+                            filter(o -> request.getPic().stream().noneMatch(Predicate.isEqual(o)))
+                            .toList();
+                for (String pic : picUrl) {
                     //신고된적 없을시 실제 버킷 사진 데이터 삭제
-                    if (board.getStatus().equals(BoardStatus.ACTIVE))
+                    if (board.getStatus().equals(BoardStatus.ACTIVE) && board.getReport() == 0)
                         amazonS3Util.deleteFile(pic);
 
                     boardPictureRepository.deleteByPicUrl(pic);
