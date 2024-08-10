@@ -66,7 +66,7 @@ public class BoardResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardComplaintDto{
-        Long boardId;
+        Long boardComplaintId;
         Long userId;
     }
 
