@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
+import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
 
 import java.time.LocalDateTime;

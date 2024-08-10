@@ -58,7 +58,7 @@ public class RootNoticeController {
         if(noticeService.update(noticeId,req,userId)){
             return ApiResponse.onSuccess(200);
         }else {
-            return ApiResponse.onFailure("502","삭제에 실패했습니다.", req);
+            return ApiResponse.onFailure("502","수정에 실패했습니다.", req);
         }
     }
 }

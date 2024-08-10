@@ -302,4 +302,14 @@ public class BoardConverter {
                 .title(boardComplaint.getBoardTitle())
                 .build();
     }
+
+    public static BoardResponseDto.RootUserReportBoardsDto rootUserReportBoardsDto(BoardComplaint boardComplaint){
+        return BoardResponseDto.RootUserReportBoardsDto.builder()
+                .boardId(boardComplaint.getBoard().getId())
+                .title(boardComplaint.getBoardTitle())
+                .content(boardComplaint.getBoardContent())
+                .createdAt(DateCalc.formatDate2(boardComplaint.getCreatedAt()))
+                .testCreatedAt(boardComplaint.getCreatedAt())
+                .build();
+    }
 }

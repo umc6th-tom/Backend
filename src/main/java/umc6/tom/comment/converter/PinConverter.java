@@ -3,13 +3,16 @@ package umc6.tom.comment.converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinComplaint;
 import umc6.tom.comment.model.PinPicture;
 import umc6.tom.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -43,6 +46,18 @@ public class PinConverter {
                 .userId(pin.getUser().getId())
                 .comment(pin.getComment())
                 .pic(pictureUrls)
+                .build();
+    }
+
+    public static PinResDto.RootUserReportPinsOrCommentsPinsDto rootUserReportPinsOrCommentsPinsDto(Long complaintId , String content, LocalDateTime createdAt, String what){
+
+
+
+        return PinResDto.RootUserReportPinsOrCommentsPinsDto.builder()
+                .complaintId(complaintId)
+                .comment(content)
+                .createdAt(DateCalc.formatDate2(createdAt))
+                .pinOrComment(what)
                 .build();
     }
 }
