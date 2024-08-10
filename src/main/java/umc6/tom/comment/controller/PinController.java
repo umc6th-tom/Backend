@@ -2,7 +2,9 @@ package umc6.tom.comment.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
@@ -20,10 +22,12 @@ public class PinController {
 
     //댓글 등록
     //댓글과 이미지를 받아오면 됨 + 토큰으로 유저 ID
-    @PostMapping("/{boardId}/register")
-    public ApiResponse register(@PathVariable("boardId") Long boardId,@RequestBody PinReqDto.PinCommentAndPic pinReqDto ) {
+    @PostMapping(value = "/{boardId}/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse register(@PathVariable("boardId") Long boardId,
+                                @RequestBody PinReqDto.PinCommentAndPic pinReqDto,
+                                @RequestPart(required = false) MultipartFile[] files ) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
-        return pinService.pinRegister(pinReqDto,boardId,userId);
+        return pinService.pinRegister(pinReqDto,boardId,userId,files);
     }
 
     //댓글 조회
