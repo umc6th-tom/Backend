@@ -95,6 +95,7 @@ public class UserServiceImpl implements UserService {
     private final BoardLikeRepository boardLikeRepository;
     private final CommentRepository commentRepository;
     private final ProhibitRepository prohibitRepository;
+    private final ProhibitBoardRepository prohibitBoardRepository;
     private final BoardComplaintRepository boardComplaintRepository;
     private final PinComplaintRepository pinComplaintRepository;
     private final CommentComplaintRepository commentComplaintRepository;
@@ -128,7 +129,6 @@ public class UserServiceImpl implements UserService {
         User user = UserConverter.toUser(request, major, DEFAULT_PROFILE_PATH);
 
         userRepository.save(user);
-        prohibitRepository.save(Prohibit.builder().user(user).build());
         alarmSetRepository.save(AlarmSetConverter.convertAlarmSetToAlarmSet(user));
 
         return user;
@@ -782,6 +782,30 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         return new PageImpl<>(likeBoardsDto, adjustedPageable, likeBoardsDto.size());
+    }
+
+    // 경고 부여
+    @Override
+    public UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnDto request) {
+
+        managerAuth(userId);
+
+        User user = findUser(targetUserId);
+
+        Prohibit prohibit = prohibitRepository.findById(targetUserId)
+                .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
+
+        prohibit.setDivision(request.getDivision());
+
+        List<Board> boards = boardRepository.findByIdIn(request.getBoardIds());
+        boards.forEach(board -> prohibitBoardRepository.save(ProhibitBoard.builder()
+                .board(board)
+                .prohibit(prohibit)
+                .build()));
+
+        user.setWarn(user.getWarn() + 1);
+
+        return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
     }
 
     public Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable){
