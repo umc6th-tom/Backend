@@ -7,7 +7,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
-import umc6.tom.alarm.model.enums.Field;
+import umc6.tom.alarm.model.enums.Category;
 import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
@@ -93,7 +93,7 @@ public class CommentService {
             alarmSet = alarmSetRepository.findByUserId(commentUserId).orElseThrow(()
                     -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
             if (alarmSet.getCommentSet().equals(AlarmOnOff.ON))
-                pushMessage.commentNotification(alarmSet.getUser(), pin.getBoard(), Field.commented);
+                pushMessage.commentNotification(alarmSet.getUser(), pin.getBoard(), pin.getComment(), Category.commented);
         }
         return ApiResponse.onSuccess(200);
     }
@@ -146,12 +146,12 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
         CommentLike likeEntity = commentLikeRepository.findByUser(user);
-
         if(Objects.equals(user.getId(), comment.getUser().getId())){
             return ApiResponse.onFailure("COMMENT_LIKE_4010","자기 댓글에 좋아요를 누를 수 없습니다.", null);
         }else{
             if(likeEntity == null){
                 commentLikeRepository.save(CommentLikeConverter.toEntity(user,comment));
+                pushMessage.commentLikeNotification(comment.getPin().getBoard(), comment.getUser(), comment.getComment(), user);
                 return ApiResponse.onSuccessWithoutResult(SuccessStatus.PIN_LIKE);
             }else{
                 commentLikeRepository.delete(likeEntity);

@@ -8,11 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
-import umc6.tom.alarm.model.AlarmSet;
 import umc6.tom.alarm.model.enums.AlarmOnOff;
-import umc6.tom.alarm.repository.AlarmSetRepository;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
-import umc6.tom.apiPayload.exception.handler.AlarmSetHandler;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.converter.BoardConverter;
@@ -54,7 +51,6 @@ public class BoardServiceImpl implements BoardService {
     private final UuidRepository uuidRepository;
     private final AmazonS3Util amazonS3Util;
     private final AmazonConfig amazonConfig;
-    private final AlarmSetRepository alarmSetRepository;
     private final PushMessage pushMessage;
     private final PinRepository pinRepository;
 
@@ -157,11 +153,9 @@ public class BoardServiceImpl implements BoardService {
             boardRepository.save(board);
         }
         BoardLike boardLike = BoardConverter.toBoardLike(user, board);
-        // 좋아요 알림 유무
-        AlarmSet alarmSet = alarmSetRepository.findByUserId(board.getUser().getId()).orElseThrow(()
-                -> new AlarmSetHandler(ErrorStatus.ALARM_SET_NOT_FOUND));
+
         //좋아요 알림 보내기
-        if (alarmSet.getLikeSet().equals(AlarmOnOff.ON))
+        if (board.getUser().getAlarmSet().getLikeSet().equals(AlarmOnOff.ON))
             pushMessage.boardLikeNotification(board, user);
 
         return boardLikeRepository.save(boardLike);
