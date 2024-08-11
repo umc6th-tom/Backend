@@ -84,7 +84,7 @@ public class PinService {
                 try {
                     String uuid = UUID.randomUUID().toString();
                     Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
-                    fileName = amazonS3Util.upload(file, amazonConfig.getBoardPath(), savedUuid);
+                    fileName = amazonS3Util.upload(file, amazonConfig.getPinPath(), savedUuid);
                 } catch (IOException e) {
                     throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
                 }

@@ -17,7 +17,6 @@ public class PinReqDto {
     @NoArgsConstructor
     public static class PinCommentAndPic{
         private String comment;
-        private List<String> pic;
     }
 
     @Getter
