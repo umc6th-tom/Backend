@@ -91,9 +91,9 @@ public interface UserService {
 
     UserDtoRes.userFindDetailDto findUserDetail(Long userId);
 
-    UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnDto request);
+    UserDtoRes.warnDto warn(Long userId, UserDtoReq.WarnDto request);
 
-    UserDtoRes.suspendDto suspension(Long userId, Long targetUserId, UserDtoReq.SuspendDto request);
+    UserDtoRes.suspendDto suspension(Long userId, UserDtoReq.SuspendDto request);
 
     void managerAuth(Long userId);
 
