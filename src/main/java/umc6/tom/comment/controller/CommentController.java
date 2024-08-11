@@ -66,7 +66,7 @@ public class CommentController {
     public ApiResponse report(@PathVariable("commentId") Long commentId, @RequestBody PinReportReqDto.PinReportDto reportDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return commentService.pinReport(commentId,reportDto,userId);
+        return commentService.commentReport(commentId,reportDto,userId);
     }
 
 

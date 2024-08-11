@@ -18,7 +18,6 @@ import umc6.tom.apiPayload.exception.handler.PinHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.model.Board;
-import umc6.tom.board.model.BoardPicture;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.PinComplaintConverter;
 import umc6.tom.comment.converter.PinConverter;
@@ -28,6 +27,7 @@ import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.*;
+import umc6.tom.comment.model.enums.PinBoardStatus;
 import umc6.tom.comment.repository.*;
 import umc6.tom.common.model.Uuid;
 import umc6.tom.common.repository.UuidRepository;
@@ -37,7 +37,6 @@ import umc6.tom.user.model.User;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.AmazonS3Util;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -190,18 +189,26 @@ public class PinService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
 
-        pin.setReport(pin.getReport() + 1);
-        pinRepository.save(pin);
-
         if (Objects.equals(user.getId(), pin.getUser().getId())) {
             return ApiResponse.onFailure("PIN_REPORT_4011", "자기 댓글은 신고를 할 수 없습니다.", null);
         }else{
+            pin.setReport(pin.getReport() + 1);
+
+            if(pin.getReport() == 10) {
+                pin.setPinBoardStatus(PinBoardStatus.OVERCOMPLAINT);
+            }
+            pinRepository.save(pin);
+
             PinComplaint pinComplaintEntity = PinComplaintConverter.toPinComplaintEntity(reportDto, user, pin);
             PinComplaint pinComplaintSaved = pinComplaintRepository.save(pinComplaintEntity);
 
             for (String pic : reportDto.getPic()) {
                 pinComplaintPictureRepository.save(PinComplaintPicture.builder().pinComplaint(pinComplaintSaved).pic(pic).build());
             }
+
+            User pinUser = userRepository.findById(pin.getUser().getId()).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+            pinUser.setReport(pinUser.getReport() + 1);
+            userRepository.save(pinUser);
 
             return ApiResponse.onSuccess(200);
         }

@@ -22,6 +22,7 @@ import umc6.tom.comment.dto.CommentResDto;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.model.*;
+import umc6.tom.comment.model.enums.PinBoardStatus;
 import umc6.tom.comment.repository.*;
 import umc6.tom.common.model.Uuid;
 import umc6.tom.common.repository.UuidRepository;
@@ -195,23 +196,30 @@ public class CommentService {
     }
 
     //대댓글 신고하기
-    public ApiResponse pinReport(Long commentId, PinReportReqDto.PinReportDto reportDto, Long userId) {
+    public ApiResponse commentReport(Long commentId, PinReportReqDto.PinReportDto reportDto, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
-
-        comment.setReport(comment.getReport() + 1);
-        commentRepository.save(comment);
-
-        CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
 
         if(Objects.equals(user.getId(), comment.getUser().getId())){
             return ApiResponse.onFailure("COMMENT_REPORT_4011","자기 댓글을 신고할 수 없습니다.", null);
         }else {
+            comment.setReport(comment.getReport() + 1);
+
+            if(comment.getReport() == 10) {
+                comment.setPinBoardStatus(PinBoardStatus.OVERCOMPLAINT);
+            }
+            commentRepository.save(comment);
+
+            CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
             CommentComplaint commentComplaintSaved = commentComplaintRepository.save(commentComplaintEntity);
 
             for (String pic : reportDto.getPic()) {
                 commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
             }
+
+            User pinUser = userRepository.findById(comment.getUser().getId()).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+            pinUser.setReport(pinUser.getReport() + 1);
+            userRepository.save(pinUser);
 
             return ApiResponse.onSuccess(200);
         }

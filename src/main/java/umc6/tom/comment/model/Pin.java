@@ -3,7 +3,7 @@ package umc6.tom.comment.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.model.Board;
-import umc6.tom.board.model.enums.BoardStatus;
+import umc6.tom.comment.model.enums.PinBoardStatus;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
 
@@ -27,7 +27,7 @@ public class Pin extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
-    private BoardStatus status;
+    private PinBoardStatus pinBoardStatus;
 
     @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     public Integer report;
