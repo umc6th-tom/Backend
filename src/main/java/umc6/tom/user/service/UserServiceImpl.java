@@ -54,7 +54,6 @@ import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
 import umc6.tom.user.model.enums.Role;
 import umc6.tom.user.model.enums.UserStatus;
-import umc6.tom.user.model.mapping.ProhibitBoard;
 import umc6.tom.user.repository.*;
 import umc6.tom.util.AmazonS3Util;
 import umc6.tom.util.CookieUtil;
@@ -96,7 +95,6 @@ public class UserServiceImpl implements UserService {
     private final BoardLikeRepository boardLikeRepository;
     private final CommentRepository commentRepository;
     private final ProhibitRepository prohibitRepository;
-    private final ProhibitBoardRepository prohibitBoardRepository;
     private final BoardComplaintRepository boardComplaintRepository;
     private final PinComplaintRepository pinComplaintRepository;
     private final CommentComplaintRepository commentComplaintRepository;
@@ -785,29 +783,6 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(likeBoardsDto, adjustedPageable, likeBoardsDto.size());
     }
 
-    // 경고 부여
-    @Override
-    public UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnDto request) {
-
-        managerAuth(userId);
-
-        User user = findUser(targetUserId);
-
-        Prohibit prohibit = prohibitRepository.findById(targetUserId)
-                .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
-
-        prohibit.setDivision(request.getDivision());
-
-        List<Board> boards = boardRepository.findByIdIn(request.getBoardIds());
-        boards.forEach(board -> prohibitBoardRepository.save(ProhibitBoard.builder()
-                .board(board)
-                .prohibit(prohibit)
-                .build()));
-
-        user.setWarn(user.getWarn() + 1);
-
-        return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
-    }
 
     public Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable){
         Page<User> userPageEntity = userRepository.findAllByNameContainingOrAccountContainingOrNickNameContainingOrderByCreatedAtDesc(keyword,keyword,keyword,adjustedPageable);
@@ -884,31 +859,55 @@ public class UserServiceImpl implements UserService {
 
         return UserConverter.userFindDetailDto(user,boardComplaintList,top3ComplaintPinCommentList,boardComplaints.size(),pinComplaints.size() + commentComplaints.size());
     }
-    // 회원 정지
+
+    // 경고 부여
     @Override
-    public UserDtoRes.suspendDto suspension(Long userId, Long targetUserId, UserDtoReq.SuspendDto request) {
+    public UserDtoRes.warnDto warn(Long userId, UserDtoReq.WarnDto request) {
 
         managerAuth(userId);
 
-        User user = findUser(targetUserId);
+        User user = findUser(request.getTargetUserId());
 
-        Prohibit prohibit = prohibitRepository.findById(targetUserId)
+        Prohibit prohibit = prohibitRepository.findById(request.getTargetUserId())
                 .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
 
-        prohibit.setDivision(request.getDivision());
+        Board board = boardRepository.findById(request.getBoardId())
+                        .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
-        List<Board> boards = boardRepository.findByIdIn(request.getBoardId());
-        boards.forEach(board -> prohibitBoardRepository.save(ProhibitBoard.builder()
-                .prohibit(prohibit)
-                .board(board)
-                .build()));
+
+        prohibit.setDivision(request.getDivision());
+        prohibit.setBoard(board);
+
+        user.setWarn(user.getWarn() + 1);
+
+        return UserConverter.toWarnDto(request.getTargetUserId(), user.getNickName(), "귀하는 " +request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 1회 경고를 부여합니다.");
+    }
+
+    // 회원 정지
+    @Override
+    public UserDtoRes.suspendDto suspension(Long userId, UserDtoReq.SuspendDto request) {
+
+        managerAuth(userId);
+
+        User user = findUser(request.getTargetUserId());
+
+        Prohibit prohibit = prohibitRepository.findById(request.getTargetUserId())
+                .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
+
+        Board board = boardRepository.findById(request.getBoardId())
+                .orElseThrow(() ->new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        prohibit.setDivision(request.getDivision());
+        prohibit.setBoard(board);
 
         prohibit.setSuspensionDue(LocalDateTime.now().plusDays(request.getSuspensionDueInt()));
+
+        user.setSuspension(user.getSuspension() + 1);
 
         return UserDtoRes.suspendDto.builder()
                 .message("귀하는 " + request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 " + request.getSuspensionDueInt() + "일 정지에 해당하는 조취를 취하는 바이다.")
                 .nickName(user.getNickName())
-                .userId(targetUserId)
+                .userId(request.getTargetUserId())
                 .build();
     }
 
