@@ -26,7 +26,7 @@ public class Comment extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
-    private PinBoardStatus pinBoardStatus;
+    private PinBoardStatus status;
 
     @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
     public Integer report;

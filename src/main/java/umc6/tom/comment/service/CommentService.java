@@ -39,6 +39,7 @@ import java.util.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CommentService {
 
     private final UserRepository userRepository;
@@ -206,16 +207,16 @@ public class CommentService {
             comment.setReport(comment.getReport() + 1);
 
             if(comment.getReport() == 10) {
-                comment.setPinBoardStatus(PinBoardStatus.OVERCOMPLAINT);
+                comment.setStatus(PinBoardStatus.OVERCOMPLAINT);
             }
             commentRepository.save(comment);
 
             CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
-            CommentComplaint commentComplaintSaved = commentComplaintRepository.save(commentComplaintEntity);
+            commentComplaintRepository.save(commentComplaintEntity);
 
-            for (String pic : reportDto.getPic()) {
-                commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
-            }
+//            for (String pic : reportDto.getPic()) {
+//                commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
+//            }
 
             User pinUser = userRepository.findById(comment.getUser().getId()).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
             pinUser.setReport(pinUser.getReport() + 1);

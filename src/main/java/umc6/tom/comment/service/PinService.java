@@ -2,6 +2,7 @@ package umc6.tom.comment.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,8 +44,10 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PinService {
 
     private final UserRepository userRepository;
@@ -195,16 +198,16 @@ public class PinService {
             pin.setReport(pin.getReport() + 1);
 
             if(pin.getReport() == 10) {
-                pin.setPinBoardStatus(PinBoardStatus.OVERCOMPLAINT);
+                pin.setStatus(PinBoardStatus.OVERCOMPLAINT);
             }
             pinRepository.save(pin);
 
             PinComplaint pinComplaintEntity = PinComplaintConverter.toPinComplaintEntity(reportDto, user, pin);
-            PinComplaint pinComplaintSaved = pinComplaintRepository.save(pinComplaintEntity);
+            pinComplaintRepository.save(pinComplaintEntity);
 
-            for (String pic : reportDto.getPic()) {
-                pinComplaintPictureRepository.save(PinComplaintPicture.builder().pinComplaint(pinComplaintSaved).pic(pic).build());
-            }
+//            for (String pic : reportDto.getPic()) {
+//                pinComplaintPictureRepository.save(PinComplaintPicture.builder().pinComplaint(pinComplaintSaved).pic(pic).build());
+//            }
 
             User pinUser = userRepository.findById(pin.getUser().getId()).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
             pinUser.setReport(pinUser.getReport() + 1);
