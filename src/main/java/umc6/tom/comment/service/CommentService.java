@@ -199,6 +199,9 @@ public class CommentService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
+        comment.setReport(comment.getReport() + 1);
+        commentRepository.save(comment);
+
         CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
 
         if(Objects.equals(user.getId(), comment.getUser().getId())){

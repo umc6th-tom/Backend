@@ -2,6 +2,7 @@ package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import umc6.tom.board.model.enums.BoardComplaintStatus;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
 
@@ -26,6 +27,10 @@ public class PinComplaint extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'WAITING'")
+    private BoardComplaintStatus status;
 
     @Column(nullable = false, length = 200)
     public String content;
