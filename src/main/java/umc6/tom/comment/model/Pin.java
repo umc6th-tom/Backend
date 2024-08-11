@@ -29,6 +29,9 @@ public class Pin extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
     private BoardStatus status;
 
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    public Integer report;
+
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)
     public List<PinPicture> pinPictureList = new ArrayList<>();
 

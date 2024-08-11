@@ -132,7 +132,7 @@ public class PinService {
     }
 
     @Transactional
-    public ApiResponse pinModify(PinReqDto.PinAndPic pinDto) {
+    public ApiResponse pinModify(PinReqDto.PinAndPic pinDto, MultipartFile[] files) {
         try {
             Pin existingPin = pinRepository.findById(pinDto.getId())
                     .orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
@@ -189,6 +189,7 @@ public class PinService {
     public ApiResponse pinReport(Long commentId, PinReportReqDto.PinReportDto reportDto, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+
 
         if (Objects.equals(user.getId(), pin.getUser().getId())) {
             return ApiResponse.onFailure("PIN_REPORT_4011", "자기 댓글은 신고를 할 수 없습니다.", null);

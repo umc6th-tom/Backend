@@ -140,7 +140,7 @@ public class CommentService {
     }
 
     @Transactional
-    public ApiResponse commentModify(PinReqDto.PinAndPic commentDto) {
+    public ApiResponse commentModify(PinReqDto.PinAndPic commentDto, MultipartFile[] files) {
         try {
             Comment existingComment = commentRepository.findById(commentDto.getId())
                     .orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));

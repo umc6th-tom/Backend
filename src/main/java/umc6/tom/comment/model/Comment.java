@@ -28,6 +28,8 @@ public class Comment extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
     private BoardStatus status;
 
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    public Integer report;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<CommentLike> commentLikeList = new ArrayList<>();
