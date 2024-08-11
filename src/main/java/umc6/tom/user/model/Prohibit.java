@@ -2,7 +2,7 @@ package umc6.tom.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import umc6.tom.user.model.mapping.ProhibitBoard;
+import umc6.tom.board.model.Board;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,11 +24,12 @@ public class Prohibit {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false)
+    @Column
     private String division;
 
-    @OneToMany(mappedBy = "prohibit", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProhibitBoard> prohibitBoards = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "board_id")
+    private Board board;
 
     @Column
     private LocalDateTime suspensionDue;

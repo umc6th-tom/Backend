@@ -125,6 +125,7 @@ public class UserDtoReq {
     public static class WarnDto {
 
         private Long boardId;
+        private Long targetUserId;
         private String message;
         private String division;
     }
@@ -133,6 +134,7 @@ public class UserDtoReq {
     public static class SuspendDto {
 
         private Long boardId;
+        private Long targetUserId;
         private String message;
         private String division;
         private Integer suspensionDueInt;
