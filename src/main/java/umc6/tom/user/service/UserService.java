@@ -81,25 +81,5 @@ public interface UserService {
 
     Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content);
 
-    Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable);
-
-    Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable);
-
-    Page<UserDtoRes.userFindAllDto> findNameUser(String keyword, Pageable adjustedPageable);
-
-    Page<UserDtoRes.userFindAllDto> findAccountUser(String keyword, Pageable adjustedPageable);
-
-    UserDtoRes.userFindDetailDto findUserDetail(Long userId);
-
-    UserDtoRes.warnDto warn(Long userId, UserDtoReq.WarnDto request);
-
-    UserDtoRes.suspendDto suspension(Long userId, UserDtoReq.SuspendDto request);
-
-    void managerAuth(Long userId);
-
     User findUser(Long userId);
-
-    Page<BoardResponseDto.RootUserReportBoardsDto> findUserReportBoards(Long boardUserId,Pageable adjustedPageable);
-
-    Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long pinUserId, Pageable adjustedPageable);
 }

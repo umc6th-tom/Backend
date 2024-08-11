@@ -384,26 +384,4 @@ public class UserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findTextHistoryLikes(userId,adjustedPageable,content));
     }
-
-    /**
-     * 24.08.07 작성자 : 류기현
-     * 관리자 - 경고 부여
-     */
-    @PostMapping("/warn")
-    public ApiResponse<UserDtoRes.warnDto> warn(@RequestBody UserDtoReq.WarnDto request) {
-
-        Long userId = jwtTokenProvider.getUserIdFromToken();
-        return ApiResponse.onSuccess(userService.warn(userId, request));
-    }
-
-    /**
-     * 24.08.07 작성자 : 류기현
-     * 관리자 - 회원 정지
-     */
-    @PostMapping("/suspension")
-    public ApiResponse<UserDtoRes.suspendDto> suspension(@RequestBody UserDtoReq.SuspendDto request) {
-
-        Long userId = jwtTokenProvider.getUserIdFromToken();
-        return ApiResponse.onSuccess(userService.suspension(userId, request));
-    }
 }
