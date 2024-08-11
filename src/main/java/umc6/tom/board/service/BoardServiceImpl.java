@@ -26,6 +26,7 @@ import umc6.tom.common.repository.UuidRepository;
 import umc6.tom.config.AmazonConfig;
 import umc6.tom.firebase.service.PushMessage;
 import umc6.tom.user.model.User;
+import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.util.AmazonS3Util;
 
@@ -57,6 +58,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public Board registerBoard(BoardRequestDto.RegisterDto request, Long userId, MultipartFile[] files) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        if(user.getStatus().equals(UserStatus.SUSPENSION))
+            throw new UserHandler(ErrorStatus.USER_IS_SUSPENSION);
+
         Majors majors = majorRepositoryBoard.findById(request.getMajorId()).orElseThrow(()
                 -> new BoardHandler(ErrorStatus.MAJORS_NOR_FOUND));
         Board newBoard = BoardConverter.toBoard(request, user, majors);
@@ -180,11 +185,17 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public Board deleteBoard(Long userId, Long boardId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        if(user.getStatus().equals(UserStatus.SUSPENSION))
+            throw new UserHandler(ErrorStatus.USER_IS_SUSPENSION);
+
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
         List<String> boardPicList = BoardConverter.toPicStringList(board.getBoardPictureList());
+
         //타인 게시글 삭제 못하게
         if (!board.getUser().getId().equals(userId))
             throw new BoardHandler(ErrorStatus.BOARD_USER_NOT_MATCH);
+
 
         //댓글 작성 됐거나, 핫한 게시글, 신고 상태에선 삭제 못함.
         //댓글 없고 대댓글만 있을 때 조건 추가야함*
@@ -207,6 +218,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     @Transactional
     public Board updateBoard(BoardRequestDto.UpdateBoardDto request, Long userId, Long boardId, MultipartFile[] files) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        if(user.getStatus().equals(UserStatus.SUSPENSION))
+            throw new UserHandler(ErrorStatus.USER_IS_SUSPENSION);
+
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
         //타인 게시글 수정 못하게
