@@ -1,5 +1,6 @@
 package umc6.tom.user.controller;
 
+import com.google.auth.oauth2.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -8,8 +9,12 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.board.dto.BoardResponseDto;
+import umc6.tom.board.service.BoardService;
 import umc6.tom.comment.dto.PinResDto;
+import umc6.tom.security.JwtTokenProvider;
+import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
+import umc6.tom.user.service.RootUserService;
 import umc6.tom.user.service.UserService;
 import org.springframework.data.domain.Page;
 
@@ -22,6 +27,8 @@ import java.util.List;
 public class RootUserController {
 
     private final UserService userService;
+    private final RootUserService rootUserService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 24.08.07 작성자 : 서정호
@@ -32,7 +39,7 @@ public class RootUserController {
                                                                     @RequestParam(defaultValue = "1") int page,
                                                                     @PageableDefault(size = 12) Pageable pageable) {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
-        return ApiResponse.onSuccess(userService.findAllUser(keyword,adjustedPageable));
+        return ApiResponse.onSuccess(rootUserService.findAllUser(keyword,adjustedPageable));
     }
 
     /**
@@ -44,7 +51,7 @@ public class RootUserController {
                                                                     @RequestParam(defaultValue = "1") int page,
                                                                     @PageableDefault(size = 12) Pageable pageable) {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
-        return ApiResponse.onSuccess(userService.findNicknameUser(keyword,adjustedPageable));
+        return ApiResponse.onSuccess(rootUserService.findNicknameUser(keyword,adjustedPageable));
     }
 
     /**
@@ -56,7 +63,7 @@ public class RootUserController {
                                                                          @RequestParam(defaultValue = "1") int page,
                                                                          @PageableDefault(size = 12) Pageable pageable) {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
-        return ApiResponse.onSuccess(userService.findNameUser(keyword,adjustedPageable));
+        return ApiResponse.onSuccess(rootUserService.findNameUser(keyword,adjustedPageable));
     }
 
     /**
@@ -68,7 +75,7 @@ public class RootUserController {
                                                                      @RequestParam(defaultValue = "1") int page,
                                                                      @PageableDefault(size = 12) Pageable pageable) {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
-        return ApiResponse.onSuccess(userService.findAccountUser(keyword,adjustedPageable));
+        return ApiResponse.onSuccess(rootUserService.findAccountUser(keyword,adjustedPageable));
     }
 
     /**
@@ -77,7 +84,7 @@ public class RootUserController {
      */
     @GetMapping("/{userId}")
     public ApiResponse<UserDtoRes.userFindDetailDto> findUserDetail(@PathVariable(name = "userId") Long userId){
-        return ApiResponse.onSuccess(userService.findUserDetail(userId));
+        return ApiResponse.onSuccess(rootUserService.findUserDetail(userId));
     }
 
     /**
@@ -89,7 +96,7 @@ public class RootUserController {
                                                                                             @RequestParam(defaultValue = "1") int page,
                                                                                             @PageableDefault(size = 12) Pageable pageable){
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
-        return ApiResponse.onSuccess(userService.findUserReportBoards(boardUserId,adjustedPageable));
+        return ApiResponse.onSuccess(rootUserService.findUserReportBoards(boardUserId,adjustedPageable));
     }
 
     /**
@@ -101,9 +108,29 @@ public class RootUserController {
                                                                                                @RequestParam(defaultValue = "1") int page,
                                                                                                @PageableDefault(size = 6) Pageable pageable){
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
-        return ApiResponse.onSuccess(userService.findUserReportPins(pinUserId,adjustedPageable));
+        return ApiResponse.onSuccess(rootUserService.findUserReportPins(pinUserId,adjustedPageable));
     }
 
 
+    /**
+     * 24.08.07 작성자 : 류기현
+     * 관리자 - 경고 부여
+     */
+    @PostMapping("/warn")
+    public ApiResponse<UserDtoRes.warnDto> warn(@RequestBody UserDtoReq.WarnDto request) {
 
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(rootUserService.warn(userId, request));
+    }
+
+    /**
+     * 24.08.07 작성자 : 류기현
+     * 관리자 - 회원 정지
+     */
+    @PostMapping("/suspension")
+    public ApiResponse<UserDtoRes.suspendDto> suspension(@RequestBody UserDtoReq.SuspendDto request) {
+
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(rootUserService.suspension(userId, request));
+    }
 }

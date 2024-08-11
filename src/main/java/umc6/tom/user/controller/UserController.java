@@ -1,6 +1,5 @@
 package umc6.tom.user.controller;
 
-import com.google.protobuf.Api;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -384,29 +383,5 @@ public class UserController {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findTextHistoryLikes(userId,adjustedPageable,content));
-    }
-
-    /**
-     * 24.08.07 작성자 : 류기현
-     * 관리자 - 경고 부여
-     */
-    @PostMapping("/warn")
-    public ApiResponse<UserDtoRes.warnDto> warn(@RequestParam(name = "targetUserId") Long targetUserId,
-                                                @RequestBody UserDtoReq.WarnDto request) {
-
-        Long userId = jwtTokenProvider.getUserIdFromToken();
-        return ApiResponse.onSuccess(userService.warn(userId, targetUserId, request));
-    }
-
-    /**
-     * 24.08.07 작성자 : 류기현
-     * 관리자 - 회원 정지
-     */
-    @PostMapping("/suspension")
-    public ApiResponse<UserDtoRes.suspendDto> suspension(@RequestParam(name = "targetUserId") Long targetUserId,
-                                                          @RequestBody UserDtoReq.SuspendDto request) {
-
-        Long userId = jwtTokenProvider.getUserIdFromToken();
-        return ApiResponse.onSuccess(userService.suspension(userId, targetUserId, request));
     }
 }

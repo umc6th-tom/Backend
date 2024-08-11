@@ -15,4 +15,5 @@ public interface AlarmRepository extends JpaRepository<Alarm, Long> {
     Page<Alarm> findAllByUserIdAndIsReadAndCategoryOrderByCreatedAtDesc(Long userId, IsRead isRead, Category category, PageRequest pageRequest);
 
     boolean existsByCategoryAndAlarmContainingAndBoardId(Category category, String alarm, Long boardId);
+    boolean existsByCategoryAndAlarmContainingAndBoardIdAndTargetAlarmContaining(Category category, String alarm, Long boardId, String targetAlarm);
 }

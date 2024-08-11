@@ -19,21 +19,15 @@ import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
-import umc6.tom.board.model.BoardComplaint;
 import umc6.tom.board.model.BoardLike;
 import umc6.tom.board.repository.BoardComplaintRepository;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
-import umc6.tom.comment.converter.CommentComplaintConverter;
-import umc6.tom.comment.converter.PinConverter;
 import umc6.tom.comment.dto.CommentBoardDto;
 import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
-import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.comment.model.Comment;
-import umc6.tom.comment.model.CommentComplaint;
 import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.model.PinComplaint;
 import umc6.tom.comment.repository.CommentComplaintRepository;
 import umc6.tom.comment.repository.CommentRepository;
 import umc6.tom.comment.repository.PinComplaintRepository;
@@ -48,13 +42,10 @@ import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
-import umc6.tom.user.model.Prohibit;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
-import umc6.tom.user.model.enums.Role;
 import umc6.tom.user.model.enums.UserStatus;
-import umc6.tom.user.model.mapping.ProhibitBoard;
 import umc6.tom.user.repository.*;
 import umc6.tom.util.AmazonS3Util;
 import umc6.tom.util.CookieUtil;
@@ -96,7 +87,6 @@ public class UserServiceImpl implements UserService {
     private final BoardLikeRepository boardLikeRepository;
     private final CommentRepository commentRepository;
     private final ProhibitRepository prohibitRepository;
-    private final ProhibitBoardRepository prohibitBoardRepository;
     private final BoardComplaintRepository boardComplaintRepository;
     private final PinComplaintRepository pinComplaintRepository;
     private final CommentComplaintRepository commentComplaintRepository;
@@ -785,208 +775,10 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(likeBoardsDto, adjustedPageable, likeBoardsDto.size());
     }
 
-    // 경고 부여
-    @Override
-    public UserDtoRes.warnDto warn(Long userId, Long targetUserId, UserDtoReq.WarnDto request) {
-
-        managerAuth(userId);
-
-        User user = findUser(targetUserId);
-
-        Prohibit prohibit = prohibitRepository.findById(targetUserId)
-                .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
-
-        prohibit.setDivision(request.getDivision());
-
-        List<Board> boards = boardRepository.findByIdIn(request.getBoardIds());
-        boards.forEach(board -> prohibitBoardRepository.save(ProhibitBoard.builder()
-                .board(board)
-                .prohibit(prohibit)
-                .build()));
-
-        user.setWarn(user.getWarn() + 1);
-
-        return UserConverter.toWarnDto(targetUserId, user.getNickName(), request.getMessage());
-    }
-
-    public Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable){
-        Page<User> userPageEntity = userRepository.findAllByNameContainingOrAccountContainingOrNickNameContainingOrderByCreatedAtDesc(keyword,keyword,keyword,adjustedPageable);
-
-        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
-                                .map(UserConverter::toUsersFindDto)
-                                .toList();
-
-        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
-    }
-
-    public Page<UserDtoRes.userFindAllDto> findNicknameUser(String keyword, Pageable adjustedPageable){
-        Page<User> userPageEntity = userRepository.findAllByNickNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
-
-        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
-                .map(UserConverter::toUsersFindDto)
-                .toList();
-
-        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
-    }
-
-    public Page<UserDtoRes.userFindAllDto> findNameUser(String keyword, Pageable adjustedPageable){
-        Page<User> userPageEntity = userRepository.findAllByNameContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
-
-        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
-                .map(UserConverter::toUsersFindDto)
-                .toList();
-
-        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
-    }
-
-    public Page<UserDtoRes.userFindAllDto> findAccountUser(String keyword, Pageable adjustedPageable){
-        Page<User> userPageEntity = userRepository.findAllByAccountContainingOrderByCreatedAtDesc(keyword,adjustedPageable);
-
-        List<UserDtoRes.userFindAllDto> userDtoList = userPageEntity.stream()
-                .map(UserConverter::toUsersFindDto)
-                .toList();
-
-        return new PageImpl<>(userDtoList, adjustedPageable, userDtoList.size());
-    }
-
-    //root 유저 프로필 조회
-    public UserDtoRes.userFindDetailDto findUserDetail(Long userId){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-
-        List<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserId(user.getId());
-        List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserId(user.getId());
-        List<CommentComplaint> commentComplaints = commentComplaintRepository.findAllByCommentUserId(user.getId());
-
-        //게시판 3개
-        List<BoardComplaint> boardComplaintList = boardComplaints.stream()
-                                        .sorted(Comparator.comparing(BoardComplaint::getCreatedAt).reversed())
-                                        .limit(3)
-                                        .toList();
-
-        List<PinResDto.RootUserDetailPinsDto> complaintPin = pinComplaints.stream()
-                                .sorted(Comparator.comparing(PinComplaint::getCreatedAt).reversed())
-                                .limit(3)
-                                .map(pinComplaint -> CommentComplaintConverter.rootUserFindDetail(pinComplaint.getId(), pinComplaint.getPin().getBoard().getId(), pinComplaint.getPinComment(),pinComplaint.getCreatedAt()))
-                                .toList();
-
-        List<PinResDto.RootUserDetailPinsDto> complaintComment = commentComplaints.stream()
-                .sorted(Comparator.comparing(CommentComplaint::getCreatedAt).reversed())
-                .limit(3)
-                .map(CommentComplaint -> CommentComplaintConverter.rootUserFindDetail(CommentComplaint.getId(), CommentComplaint.getComment().getPin().getBoard().getId(), CommentComplaint.getCommentComment(),CommentComplaint.getCreatedAt()))
-                .toList();
-
-        List<PinResDto.RootUserDetailPinsDto> top3ComplaintPinCommentList = Stream.concat(complaintPin.stream(), complaintComment.stream())
-                .sorted(Comparator.comparing(PinResDto.RootUserDetailPinsDto::getCreatedAt).reversed())
-                .limit(3)
-                .toList();
-
-
-        return UserConverter.userFindDetailDto(user,boardComplaintList,top3ComplaintPinCommentList,boardComplaints.size(),pinComplaints.size() + commentComplaints.size());
-    }
-    // 회원 정지
-    @Override
-    public UserDtoRes.suspendDto suspension(Long userId, Long targetUserId, UserDtoReq.SuspendDto request) {
-
-        managerAuth(userId);
-
-        User user = findUser(targetUserId);
-
-        Prohibit prohibit = prohibitRepository.findById(targetUserId)
-                .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
-
-        prohibit.setDivision(request.getDivision());
-
-        List<Board> boards = boardRepository.findByIdIn(request.getBoardId());
-        boards.forEach(board -> prohibitBoardRepository.save(ProhibitBoard.builder()
-                .prohibit(prohibit)
-                .board(board)
-                .build()));
-
-        prohibit.setSuspensionDue(LocalDateTime.now().plusDays(request.getSuspensionDueInt()));
-
-        return UserDtoRes.suspendDto.builder()
-                .message("귀하는 " + request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 " + request.getSuspensionDueInt() + "일 정지에 해당하는 조취를 취하는 바이다.")
-                .nickName(user.getNickName())
-                .userId(targetUserId)
-                .build();
-    }
-
-    // 관리자의 권한을 갖는지 검증하는 메서드
-    @Override
-    public void managerAuth(Long userId) {
-        if (!Role.ADMIN.equals(userRepository.findById(userId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND))
-                .getRole())) {
-            throw new UserHandler(ErrorStatus.NOT_ADMIN);
-        }
-    }
-
     // 사용자 찾기
     @Override
     public User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-    }
-
-    //유저의 신고당한 글 리스트 보기
-    public Page<BoardResponseDto.RootUserReportBoardsDto> findUserReportBoards(Long boardUserId, Pageable adjustPageable){
-        Page<BoardComplaint> boardComplaints = boardComplaintRepository.findAllByBoardUserIdOrderByCreatedAtDesc(boardUserId,adjustPageable);
-
-        List<BoardResponseDto.RootUserReportBoardsDto> reportBoards = boardComplaints.stream()
-                                        .collect(Collectors.toMap(
-                                                BoardComplaint::getId, // 중복을 제거할 기준이 되는 키
-                                                Function.identity(),                           // 값을 그대로 사용
-                                                (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
-                                        ))
-                                        .values().stream() // 중복이 제거된 값들을 스트림으로 변환
-                                        .map(BoardConverter::rootUserReportBoardsDto)
-                                        .sorted(Comparator.comparing(BoardResponseDto.RootUserReportBoardsDto::getTestCreatedAt).reversed()) // 시간순으로 정렬
-                                        .toList();
-
-        return new PageImpl<>(reportBoards, adjustPageable, boardComplaints.getTotalElements());
-    }
-
-    //유저의 신고당한 댓글 리스트 보기
-    public Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long writeUserId, Pageable adjustedPageable){
-        List<PinComplaint> pinComplaints = pinComplaintRepository.findAllByPinUserIdOrderByCreatedAtDesc(writeUserId);
-        List<CommentComplaint> commentComplaints = commentComplaintRepository.findAllByCommentUserIdOrderByCreatedAtDesc(writeUserId);
-
-        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> pinComplaintDtos = pinComplaints.stream()
-                .collect(Collectors.toMap(
-                        pinComplaint -> pinComplaint.getPin().getId(), // 중복을 제거할 기준이 되는 키
-                        Function.identity(),                           // 값을 그대로 사용
-                        (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
-                ))
-                .values().stream() // 중복이 제거된 값들을 스트림으로 변환
-                .map(pinComplaint -> PinConverter.rootUserReportPinsOrCommentsPinsDto(pinComplaint.getPin().getId(),pinComplaint.getPinComment(),pinComplaint.getCreatedAt(),"pin"))
-                .toList();
-
-        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> commentComplaintDtos = commentComplaints.stream()
-                .collect(Collectors.toMap(
-                        commentComplaint -> commentComplaint.getComment().getId(), // 중복을 제거할 기준이 되는 키
-                        Function.identity(),                           // 값을 그대로 사용
-                        (existing, replacement) -> existing            // 중복 키가 있을 경우 기존 값을 유지
-                ))
-                .values().stream() // 중복이 제거된 값들을 스트림으로 변환
-                .map(commentComplaint -> PinConverter.rootUserReportPinsOrCommentsPinsDto(commentComplaint.getComment().getId(),commentComplaint.getCommentComment(),commentComplaint.getCreatedAt(),"comment"))
-                .toList();
-
-        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> complaintPinCommentList = Stream.concat(pinComplaintDtos.stream(), commentComplaintDtos.stream())
-                .sorted(Comparator.comparing(PinResDto.RootUserReportPinsOrCommentsPinsDto::getCreatedAt).reversed())
-                .toList();
-
-        // 총 데이터 개수
-        int totalElements = complaintPinCommentList.size();
-
-        // 현재 페이지에 대한 시작 인덱스 계산
-        int startIndex = (int) adjustedPageable.getOffset();
-        int endIndex = Math.min((startIndex + adjustedPageable.getPageSize()), totalElements);
-
-        // 부분 리스트 생성
-        List<PinResDto.RootUserReportPinsOrCommentsPinsDto> pageContent = complaintPinCommentList.subList(startIndex, endIndex);
-
-        // PageImpl 생성
-        return new PageImpl<>(pageContent, adjustedPageable, totalElements);
     }
 }

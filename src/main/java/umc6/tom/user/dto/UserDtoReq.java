@@ -124,7 +124,8 @@ public class UserDtoReq {
     @Getter
     public static class WarnDto {
 
-        private List<Long> boardIds;
+        private Long boardId;
+        private Long targetUserId;
         private String message;
         private String division;
     }
@@ -132,7 +133,8 @@ public class UserDtoReq {
     @Getter
     public static class SuspendDto {
 
-        private List<Long> boardId;
+        private Long boardId;
+        private Long targetUserId;
         private String message;
         private String division;
         private Integer suspensionDueInt;
