@@ -16,6 +16,8 @@ import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardComplaintPicture;
+import umc6.tom.board.model.BoardPicture;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.*;
 import umc6.tom.comment.dto.CommentResDto;
@@ -155,7 +157,7 @@ public class CommentService {
 
 //            //삭제
             commentDto.getPic()
-                    .forEach(pic -> amazonS3Util.deleteFile(pic));
+                    .forEach(amazonS3Util::deleteFile);
             commentPictureRepository.deleteAllByComment(comment);
 
             Comment commentSaved = commentRepository.save(comment);
@@ -217,13 +219,24 @@ public class CommentService {
         }
     }
 
+    //댓글 수정하기위해 데이터 주는거!!
+    @Transactional
     public ApiResponse commentDelete(Long commentId) {
-        try {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
+
+        //3. 신고 없을경우 삭제 하기
+        if(comment.getReport() == 0){
+            for(CommentPicture cp : comment.getCommentPictureList()){
+                amazonS3Util.deleteFile(cp.getPic());
+            }
             commentRepository.deleteById(commentId);
-        } catch (Exception e) {
-            throw new CommentHandler(ErrorStatus.COMMENT_NOT_DELETE);
+
+            return ApiResponse.onSuccess("삭제에 성공하였습니다.");
+        }else{
+            comment.setStatus(PinBoardStatus.COMPLAINTDELETE);
+            commentRepository.save(comment);
+            return ApiResponse.onSuccess( "신고가 있음으로 상태 변경에 성공하였습니다.");
         }
-        return ApiResponse.onSuccess(200);
     }
 
     //댓글 좋아요 추가/제거
@@ -265,6 +278,12 @@ public class CommentService {
 
             CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
             commentComplaintRepository.save(commentComplaintEntity);
+
+            CommentComplaintPicture commentComplaintPicture;
+            for (CommentPicture pic : comment.getCommentPictureList()) {
+                commentComplaintPicture = CommentComplaintConverter.toCommentComplaintPictureEntity(pic.getPic(),commentComplaintEntity);
+                commentComplaintPictureRepository.save(commentComplaintPicture);
+            }
 
 //            for (String pic : reportDto.getPic()) {
 //                commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());
