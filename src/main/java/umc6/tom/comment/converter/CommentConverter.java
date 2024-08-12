@@ -8,14 +8,24 @@ import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.model.Comment;
 import umc6.tom.comment.model.CommentPicture;
 import umc6.tom.comment.model.Pin;
+import umc6.tom.comment.model.PinPicture;
 import umc6.tom.user.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class CommentConverter {
+
+    public static List<String> toPicStringIdList(List<CommentPicture> commentPictureList){
+        List<String> picList = new ArrayList<>();
+        for(CommentPicture commentPicture : commentPictureList){
+            picList.add(commentPicture.getPic());
+        }
+        return picList;
+    }
 
     public static Pin toPinUpdateEntity(PinReqDto.PinAndPic pinReqDto) {
         return Pin.builder()

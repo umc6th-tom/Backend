@@ -38,10 +38,11 @@ public class PinController {
     }
 
     //댓글 수정
-    @PatchMapping("/update")
-    public ApiResponse modify(@RequestBody PinReqDto.PinAndPic pinDto) {
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse modify(@RequestPart @Valid PinReqDto.PinAndPic request,
+                              @RequestPart(required = false) MultipartFile[] files) {
 
-        return pinService.pinModify(pinDto);
+        return pinService.pinModify(request,files);
     }
 
     //댓글 삭제

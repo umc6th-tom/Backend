@@ -1,5 +1,6 @@
 package umc6.tom.comment.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -38,10 +39,11 @@ public class CommentController {
     }
 
     //대댓글 수정
-    @PatchMapping("/update")
-    public ApiResponse modify(@RequestBody PinReqDto.PinAndPic pinDto) {
+    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse modify(@RequestPart @Valid PinReqDto.PinAndPic request,
+                              @RequestPart(required = false) MultipartFile[] files) {
 
-        return commentService.commentModify(pinDto);
+        return commentService.commentModify(request,files);
     }
 
     //대댓글 삭제
@@ -64,7 +66,7 @@ public class CommentController {
     public ApiResponse report(@PathVariable("commentId") Long commentId, @RequestBody PinReportReqDto.PinReportDto reportDto) {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
-        return commentService.pinReport(commentId,reportDto,userId);
+        return commentService.commentReport(commentId,reportDto,userId);
     }
 
 

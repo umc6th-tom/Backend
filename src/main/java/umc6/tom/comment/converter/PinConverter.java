@@ -13,12 +13,21 @@ import umc6.tom.common.model.Uuid;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class PinConverter {
+
+    public static List<String> toPicStringIdList(List<PinPicture> pinPictureList){
+        List<String> picList = new ArrayList<>();
+        for(PinPicture pinPicture : pinPictureList){
+            picList.add(pinPicture.getPic());
+        }
+        return picList;
+    }
 
     public static Pin toPinUpdateEntity(PinReqDto.PinAndPic pinReqDto) {
         return Pin.builder()
