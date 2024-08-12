@@ -126,7 +126,12 @@ public enum ErrorStatus implements BaseErrorCode {
     QNA_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "QNA4001", "문의 사진 업로드 실패입니다."),
     QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4002", "문의사항을 찾을 수 없습니다"),
     QNA_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4003", "문의사항 상태가 잘 못 되었습니다."),
-    QNA_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "BOARD4013", "사진 개수를 초과하였습니다.")
+    QNA_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "BOARD4013", "사진 개수를 초과하였습니다."),
+
+    //게시물 신고 에러
+    BOARDCOMPLAINT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPLAINT4001", "신고내역을 찾지 못했습니다."),
+    COMMENTCOMPLAINT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4001", "신고내역을 찾지 못했습니다."),
+    PINCOMPLAINT_NOT_FOUND(HttpStatus.NOT_FOUND, "PIN4001", "신고내역을 찾지 못했습니다."),
     ;
 
 

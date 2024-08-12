@@ -9,6 +9,7 @@ import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardComplaint;
+import umc6.tom.board.model.BoardComplaintPicture;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
@@ -225,6 +226,36 @@ public class UserConverter {
                 .pins(top3PinComments)
                 .pinsReportCount(pinCommentSize)
                 .stop(user.getSuspension())
+                .build();
+    }
+
+    public static UserDtoRes.complaintBoardReasonDto boardReportReasonDto(User user, BoardComplaint boardcomplaint, Board board, List<UserDtoRes.complaintReasonDto> dto){
+
+        List<String> bcPic = boardcomplaint.getBoardComplaintPictureList().stream()
+                .map(BoardComplaintPicture::getPic)
+                .toList();
+
+        return UserDtoRes.complaintBoardReasonDto.builder()
+                .userId(user.getId())
+                .boardId(board.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.boardListDate(board.getCreatedAt()))
+                .report(board.getReport())
+                .boardTitle(boardcomplaint.getBoardTitle())
+                .boardContent(boardcomplaint.getBoardContent())
+                .boardPic(bcPic)
+                .complaint(dto)
+                .build();
+    }
+
+    public static UserDtoRes.complaintReasonDto boardReportContentDto(User user, BoardComplaint boardcomplaint){
+        return UserDtoRes.complaintReasonDto.builder()
+                .userId(user.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.formatDate2(boardcomplaint.getCreatedAt()))
+                .complaintContent(boardcomplaint.getBoardContent())
                 .build();
     }
 

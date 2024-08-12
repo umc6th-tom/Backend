@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.exception.handler.BoardComplaintHandler;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.ProhibitHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
@@ -256,5 +257,27 @@ public class RootUserServiceImpl implements RootUserService {
 
         // PageImpl 생성
         return new PageImpl<>(pageContent, adjustedPageable, totalElements);
+    }
+
+    // 1. 상단에 노출될 신고자 정보랑 게시판 먼저 만들기
+    public UserDtoRes.complaintBoardReasonDto boardReportReason(Long complaintId){
+
+        //신고 게시물 가져오기
+        BoardComplaint targetComplaint = boardComplaintRepository.findById(complaintId).orElseThrow
+                (() -> new BoardComplaintHandler(ErrorStatus.BOARDCOMPLAINT_NOT_FOUND));
+        User targetUser = userRepository.findById(targetComplaint.getBoardUserId()).orElseThrow(
+                () -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        Board targetBoard = boardRepository.findById(targetComplaint.getBoard().getId()).orElseThrow(
+                () -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        //신고자들 받아오기
+        List<BoardComplaint> boardComplaintList = boardComplaintRepository.findAllByBoardOrderByCreatedAtDesc(targetComplaint.getBoard());
+        List<UserDtoRes.complaintReasonDto> complaintReasonDtos = boardComplaintList.stream()
+                                                .map(boardComplaint -> UserConverter.boardReportContentDto(userRepository.findById(boardComplaint.getUser().getId()).orElseThrow(
+                                                        ()-> new UserHandler(ErrorStatus.USER_NOT_FOUND)),boardComplaint))
+                                                .toList();
+
+        return UserConverter.boardReportReasonDto(targetUser,targetComplaint,targetBoard,complaintReasonDtos);
+
     }
 }

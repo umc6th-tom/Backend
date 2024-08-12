@@ -307,6 +307,7 @@ public class BoardConverter {
 
     public static BoardResponseDto.RootUserReportBoardsDto rootUserReportBoardsDto(BoardComplaint boardComplaint){
         return BoardResponseDto.RootUserReportBoardsDto.builder()
+                .complaintId(boardComplaint.getId())
                 .boardId(boardComplaint.getBoard().getId())
                 .title(boardComplaint.getBoardTitle())
                 .content(boardComplaint.getBoardContent())
