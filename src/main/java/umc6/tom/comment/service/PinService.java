@@ -201,13 +201,44 @@ public class PinService {
         return ApiResponse.onSuccess(200);
     }
 
-    public ApiResponse pinDelete(Long commentId) {
-        try {
-            pinRepository.deleteById(commentId);
-        } catch (Exception e) {
-            throw new PinHandler(ErrorStatus.PIN_NOT_DELETE);
+    //삭제 로직
+    //1. 삭제할 때 신고되었으면 삭제 X 상태를 변경하기
+    //2. 삭제할 경우 대댓글이 달려있으면 상태를 변경하기
+    //3. 대댓글과 신고가 되지 않았을경우 삭제 하기
+    //4. cascade임으로 image쪽은 삭제할 필요 없을 뜻?
+    public ApiResponse pinDelete(Long pinId) {
+
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+
+        //3. 신고 및 대댓글이 없을경우 삭제 하기
+        if(pin.getCommentList().isEmpty() && pin.getReport() == 0){
+            for(PinPicture pp : pin.pinPictureList){
+                amazonS3Util.deleteFile(pp.getPic());
+            }
+            pinRepository.deleteById(pinId);
+
+            return ApiResponse.onSuccess("삭제에 성공하였습니다.");
         }
-        return ApiResponse.onSuccess(200);
+
+        //2. 대댓글이 달려있으면 상태를 변경하기
+        String comment = "";
+        if(pin.commentList != null && !pin.commentList.isEmpty()){
+            pin.setStatus(PinBoardStatus.INACTIVE);
+            //서버 용량 줄이기
+            for(PinPicture pp : pin.pinPictureList){
+                amazonS3Util.deleteFile(pp.getPic());
+            }
+            comment = "대댓글이 있음으로";
+        }
+        //1. 삭제할 때 신고되었으면 삭제 X 상태를 변경하기
+        if(pin.getReport() > 0){
+            pin.setStatus(PinBoardStatus.COMPLAINTDELETE);
+            comment = "신고가 있음으로";
+        }
+
+        pinRepository.save(pin);
+        return ApiResponse.onSuccess( comment + "상태 변경에 성공하였습니다.");
+
     }
 
     //댓글 좋아요 추가/제거

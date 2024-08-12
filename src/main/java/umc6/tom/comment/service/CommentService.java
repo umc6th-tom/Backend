@@ -219,16 +219,24 @@ public class CommentService {
         }
     }
 
-    //대댓글 삭제
-    //로직 1. 상태 변경
-    //
+    //댓글 수정하기위해 데이터 주는거!!
+    @Transactional
     public ApiResponse commentDelete(Long commentId) {
-        try {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
+
+        //3. 신고 없을경우 삭제 하기
+        if(comment.getReport() == 0){
+            for(CommentPicture cp : comment.getCommentPictureList()){
+                amazonS3Util.deleteFile(cp.getPic());
+            }
             commentRepository.deleteById(commentId);
-        } catch (Exception e) {
-            throw new CommentHandler(ErrorStatus.COMMENT_NOT_DELETE);
+
+            return ApiResponse.onSuccess("삭제에 성공하였습니다.");
+        }else{
+            comment.setStatus(PinBoardStatus.COMPLAINTDELETE);
+            commentRepository.save(comment);
+            return ApiResponse.onSuccess( "신고가 있음으로 상태 변경에 성공하였습니다.");
         }
-        return ApiResponse.onSuccess(200);
     }
 
     //댓글 좋아요 추가/제거
