@@ -133,4 +133,14 @@ public class RootUserController {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return ApiResponse.onSuccess(rootUserService.suspension(userId, request));
     }
+
+    /**
+     * 24.08.13 작성자 : 서정호
+     * 관리자 - 유저 신고된 글 조회
+     */
+    @GetMapping("/board/{complaintId}")
+    public ApiResponse<UserDtoRes.complaintBoardReasonDto> BoardReportReason(@PathVariable("complaintId") Long complaintId) {
+//        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(rootUserService.boardReportReason(complaintId));
+    }
 }

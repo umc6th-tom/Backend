@@ -238,6 +238,7 @@ public class BoardResponseDto {
     @Setter
     @Builder
     public static class RootUserReportBoardsDto {
+        private Long complaintId;
         private Long boardId;
         private String title;
         private String content;

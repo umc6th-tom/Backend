@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateCalc {
 
-    public String boardListDate(LocalDateTime pastDateTime) {
+    public static String boardListDate(LocalDateTime pastDateTime) {
         if(ObjectUtils.isEmpty(pastDateTime))
             return "알 수 없음";
 
@@ -48,7 +48,7 @@ public class DateCalc {
         return "방금 전";
     }
 
-    public String formatDate(LocalDateTime pastDateTime) {
+    public static String formatDate(LocalDateTime pastDateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return pastDateTime.format(formatter);
 

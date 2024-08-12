@@ -31,4 +31,6 @@ public interface RootUserService {
     Page<BoardResponseDto.RootUserReportBoardsDto> findUserReportBoards(Long boardUserId, Pageable adjustedPageable);
 
     Page<PinResDto.RootUserReportPinsOrCommentsPinsDto> findUserReportPins(Long pinUserId, Pageable adjustedPageable);
+
+    UserDtoRes.complaintBoardReasonDto boardReportReason(Long userId);
 }
