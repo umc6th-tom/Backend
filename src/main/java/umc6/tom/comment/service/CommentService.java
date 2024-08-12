@@ -35,6 +35,7 @@ import umc6.tom.util.AmazonS3Util;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Slf4j
 @Service
@@ -141,22 +142,73 @@ public class CommentService {
         return ApiResponse.onSuccess(CommentResDto);
     }
 
+
     @Transactional
     public ApiResponse commentModify(PinReqDto.PinAndPic commentDto, MultipartFile[] files) {
         try {
-            Comment existingComment = commentRepository.findById(commentDto.getId())
+            Comment comment = commentRepository.findById(commentDto.getId())
                     .orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
             if (commentDto.getComment() != null) {
-                existingComment.setComment(commentDto.getComment());
+                comment.setComment(commentDto.getComment());
             }
-            Comment commentSaved = commentRepository.save(existingComment);
-            commentPictureRepository.deleteAllByComment(commentSaved);
 
-            for (String picUrl : commentDto.getPic()) {
-                CommentPicture commentPictureEntity = CommentPictureConverter.toCommentPictureEntity(picUrl, commentSaved);
-                commentPictureRepository.save(commentPictureEntity);
+//            //삭제
+            commentDto.getPic()
+                    .forEach(pic -> amazonS3Util.deleteFile(pic));
+            commentPictureRepository.deleteAllByComment(comment);
+
+            Comment commentSaved = commentRepository.save(comment);
+
+            files = (files != null && files.length > 0) ?
+                    Arrays.stream(files)
+                            .filter(file -> !file.isEmpty())
+                            .toArray(MultipartFile[]::new) :
+                    new MultipartFile[0];
+
+//            commentPictureRepository.findAllByCommentId(commentDto.getId());
+
+            if (!org.springframework.util.ObjectUtils.isEmpty(files)) {
+                if(files.length+commentSaved.getCommentPictureList().size()>3)
+                    throw new CommentHandler(ErrorStatus.COMMENT_PICTURE_OVERED);
+
+                CommentPicture newPinPicture = null;
+                String fileName = null;
+
+                for (MultipartFile file : files) {
+                    try {
+                        String uuid = UUID.randomUUID().toString();
+                        Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+                        fileName = amazonS3Util.upload(file, amazonConfig.getCommentPath(), savedUuid);
+                    } catch (IOException e) {
+                        throw new BoardHandler(ErrorStatus.BOARD_FILE_UPLOAD_FAILED);
+                    }
+                    newPinPicture = CommentPictureConverter.toCommentPictureEntity(fileName,comment);
+                    commentPictureRepository.save(newPinPicture);
+                }
             }
+
+//            if (!org.springframework.util.ObjectUtils.isEmpty(comment.getCommentPictureList())) {
+//                log.info("조건충족 : " + comment.getCommentPictureList());
+//                //수정으로 삭제된 사진만 남음(중복안된 값)
+//                List<String> picUrl;
+//                if(org.springframework.util.ObjectUtils.isEmpty(commentDto.getPic())) // request에 pic이 null 일때 null 예외 처리
+//                    picUrl = CommentConverter.toPicStringIdList(commentPictures);
+//                else
+//                    picUrl = CommentConverter.toPicStringIdList(commentPictures).stream().
+//                            filter(o -> commentDto.getPic().stream()
+//                                    .noneMatch(Predicate.isEqual(o)))
+//                            .toList();
+//                log.info("picUrl 값 : " + picUrl);
+//                for (String pic : picUrl) {
+//                    //신고된적 없을시 실제 버킷 사진 데이터 삭제
+//                    if (comment.getStatus().equals(PinBoardStatus.ACTIVE) && comment.getReport() == 0)
+//                        amazonS3Util.deleteFile(pic);
+//
+//                    commentPictureRepository.deleteByPic(pic);
+//                    log.info("횟수 값 : gd");
+//                }
+//            }
 
             return ApiResponse.onSuccess(200);
         }
