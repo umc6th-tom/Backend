@@ -141,6 +141,7 @@ public class BoardResponseDto {
         String userNickname;
         String comment;
         String pinDate;
+        String pinProfilePic;
         Integer pinLikeCount;
         Integer pinCommentCount;
         Boolean isLiked;
@@ -165,6 +166,7 @@ public class BoardResponseDto {
         Long id;
         Long userId;
         String userNickname;
+        String commentProfilePic;
         String comment;
         String pinCommentDate;
         Integer pinLikeCount;
