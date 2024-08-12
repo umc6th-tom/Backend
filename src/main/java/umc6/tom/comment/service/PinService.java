@@ -22,10 +22,7 @@ import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardPicture;
 import umc6.tom.board.model.enums.BoardStatus;
 import umc6.tom.board.repository.BoardRepository;
-import umc6.tom.comment.converter.PinComplaintConverter;
-import umc6.tom.comment.converter.PinConverter;
-import umc6.tom.comment.converter.PinLikeConverter;
-import umc6.tom.comment.converter.PinPictureConverter;
+import umc6.tom.comment.converter.*;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinReqDto;
 import umc6.tom.comment.dto.PinResDto;
@@ -252,9 +249,11 @@ public class PinService {
             PinComplaint pinComplaintEntity = PinComplaintConverter.toPinComplaintEntity(reportDto, user, pin);
             pinComplaintRepository.save(pinComplaintEntity);
 
-//            for (String pic : reportDto.getPic()) {
-//                pinComplaintPictureRepository.save(PinComplaintPicture.builder().pinComplaint(pinComplaintSaved).pic(pic).build());
-//            }
+            PinComplaintPicture pinComplaintPicture;
+            for (PinPicture pic : pin.getPinPictureList()) {
+                pinComplaintPicture = PinComplaintConverter.toPinComplaintPictureEntity(pic.getPic(),pinComplaintEntity);
+                pinComplaintPictureRepository.save(pinComplaintPicture);
+            }
 
             User pinUser = userRepository.findById(pin.getUser().getId()).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
             pinUser.setReport(pinUser.getReport() + 1);

@@ -16,6 +16,8 @@ import umc6.tom.apiPayload.code.status.SuccessStatus;
 import umc6.tom.apiPayload.exception.handler.*;
 import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardComplaintPicture;
+import umc6.tom.board.model.BoardPicture;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.converter.*;
 import umc6.tom.comment.dto.CommentResDto;
@@ -155,7 +157,7 @@ public class CommentService {
 
 //            //삭제
             commentDto.getPic()
-                    .forEach(pic -> amazonS3Util.deleteFile(pic));
+                    .forEach(amazonS3Util::deleteFile);
             commentPictureRepository.deleteAllByComment(comment);
 
             Comment commentSaved = commentRepository.save(comment);
@@ -217,6 +219,9 @@ public class CommentService {
         }
     }
 
+    //대댓글 삭제
+    //로직 1. 상태 변경
+    //
     public ApiResponse commentDelete(Long commentId) {
         try {
             commentRepository.deleteById(commentId);
@@ -265,6 +270,12 @@ public class CommentService {
 
             CommentComplaint commentComplaintEntity = CommentComplaintConverter.toCommentComplaintEntity(reportDto,user,comment);
             commentComplaintRepository.save(commentComplaintEntity);
+
+            CommentComplaintPicture commentComplaintPicture;
+            for (CommentPicture pic : comment.getCommentPictureList()) {
+                commentComplaintPicture = CommentComplaintConverter.toCommentComplaintPictureEntity(pic.getPic(),commentComplaintEntity);
+                commentComplaintPictureRepository.save(commentComplaintPicture);
+            }
 
 //            for (String pic : reportDto.getPic()) {
 //                commentComplaintPictureRepository.save(CommentComplaintPicture.builder().commentComplaint(commentComplaintSaved).pic(pic).build());

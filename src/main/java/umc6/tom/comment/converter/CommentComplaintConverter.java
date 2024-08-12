@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.comment.dto.PinResDto;
-import umc6.tom.comment.model.Comment;
-import umc6.tom.comment.model.CommentComplaint;
-import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.model.PinComplaint;
+import umc6.tom.comment.model.*;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDate;
@@ -41,5 +38,11 @@ public class CommentComplaintConverter {
                 .build();
     }
 
+    public static CommentComplaintPicture toCommentComplaintPictureEntity(String picUrl, CommentComplaint commentComplaint) {
+        return CommentComplaintPicture.builder()
+                .pic(picUrl)
+                .commentComplaint(commentComplaint)
+                .build();
 
+    }
 }
