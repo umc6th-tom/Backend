@@ -120,13 +120,13 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardResponseDto.BoardViewDto getBoardView(Long boardId, Integer page) {
+    public BoardResponseDto.BoardViewDto getBoardView(Long boardId, Integer page, Long userId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
         //신고로 안보이게 된 게시글 조회 방지
         if (!board.getStatus().equals(BoardStatus.ACTIVE))
             throw new BoardHandler(ErrorStatus.BOARD_NOT_FOUND);
         Page<Pin> pinPage= pinRepository.findAllByBoardIdOrderByCreatedAtAsc(boardId, PageRequest.of(page, 10));
-        return BoardConverter.toBoardViewDto(board, pinPage);
+        return BoardConverter.toBoardViewDto(board, pinPage, userId);
     }
 
     @Override
