@@ -186,8 +186,8 @@ public class BoardRestController {
     @GetMapping("/{board_id}")
     public ApiResponse<BoardResponseDto.BoardViewDto> boardView(@PathVariable(name = "board_id") Long boardId,
                                                                 @RequestParam(name = "page") Integer page) {
-
-        return ApiResponse.onSuccess(boardService.getBoardView(boardId, page));
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(boardService.getBoardView(boardId, page, userId));
     }
 
 }
