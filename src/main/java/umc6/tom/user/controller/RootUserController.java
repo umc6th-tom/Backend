@@ -143,4 +143,24 @@ public class RootUserController {
 //        Long userId = jwtTokenProvider.getUserIdFromToken();
         return ApiResponse.onSuccess(rootUserService.boardReportReason(complaintId));
     }
+
+    /**
+     * 24.08.14 작성자 : 서정호
+     * 관리자 - 유저 신고된 댓글 조회
+     */
+    @GetMapping("/pincomplaint/{pinComplaintId}")
+    public ApiResponse<UserDtoRes.complaintCommentReasonDto> pinReportReason(@PathVariable("pinComplaintId") Long complaintId) {
+//        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(rootUserService.pinReportReason(complaintId));
+    }
+
+    /**
+     * 24.08.14 작성자 : 서정호
+     * 관리자 - 유저 신고된 대댓글 조회
+     */
+    @GetMapping("/commentcomplaint/{commentComplaintId}")
+    public ApiResponse<UserDtoRes.complaintCommentReasonDto> commentReportReason(@PathVariable("commentComplaintId") Long complaintId) {
+//        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(rootUserService.commentReportReason(complaintId));
+    }
 }
