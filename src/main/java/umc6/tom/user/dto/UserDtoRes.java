@@ -177,4 +177,48 @@ public class UserDtoRes {
         private String nickName;
         private String message;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class complaintBoardReasonDto {
+        private Long userId;
+        private Long boardId;
+        private String nickname;
+        private String userPic;
+        private String createdAt;
+        private int report;
+        private String boardTitle;
+        private String boardContent;
+        private List<String> boardPic;
+
+        private List<complaintReasonDto> complaint;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class complaintReasonDto {
+        private Long userId;
+        private String nickname;
+        private String userPic;
+        private String createdAt;
+        private String complaintContent;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class complaintCommentReasonDto {
+        private Long userId;
+        private Long boardId;
+        private String nickname;
+        private String userPic;
+        private String createdAt;
+        private int report;
+        private String commentContent;
+        private List<String> commentPic;
+
+        private List<complaintReasonDto> complaint;
+    }
 }

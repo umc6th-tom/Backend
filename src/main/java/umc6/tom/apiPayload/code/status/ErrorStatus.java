@@ -87,6 +87,8 @@ public enum ErrorStatus implements BaseErrorCode {
     PIN_NOT_LIKE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4007", "댓글 좋아요 등록에 실패하였습니다."),
     PIN_NOT_UNLIKE(HttpStatus.INTERNAL_SERVER_ERROR, "PIN4008", "댓글 좋아요 취소하기를 실패하였습니다."),
     PIN_NOT_NOTIFICATION(HttpStatus.BAD_REQUEST, "PIN4009", "댓글 알림 전송 실패하였습니다."),
+    PIN_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "PIN4013", "사진 개수를 초과하였습니다."),
+
 
     // 대댓글 관련 에러
     COMMENT_NOT_REGISTER(HttpStatus.INTERNAL_SERVER_ERROR, "COMMENT4001", "대댓글 등록에 실패했습니다."),
@@ -96,6 +98,8 @@ public enum ErrorStatus implements BaseErrorCode {
     COMMENT_NOT_REPORT(HttpStatus.INTERNAL_SERVER_ERROR, "COMMENT4006", "대댓글을 신고하는데 실패하였습니다."),
     COMMENT_NOT_LIKE(HttpStatus.INTERNAL_SERVER_ERROR, "COMMENT4007", "대댓글 좋아요 등록에 실패하였습니다."),
     COMMENT_NOT_UNLIKE(HttpStatus.INTERNAL_SERVER_ERROR, "COMMENT4008", "대댓글 좋아요 취소하기를 실패하였습니다."),
+    COMMENT_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "COMMENT4013", "사진 개수를 초과하였습니다."),
+
 
     // 예제 관련 에러
     FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, "FAVORITE4001", "즐겨찾기 예제를 찾는것에 실패하였습니다."),
@@ -122,7 +126,12 @@ public enum ErrorStatus implements BaseErrorCode {
     QNA_FILE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "QNA4001", "문의 사진 업로드 실패입니다."),
     QNA_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4002", "문의사항을 찾을 수 없습니다"),
     QNA_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "QNA4003", "문의사항 상태가 잘 못 되었습니다."),
-    QNA_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "BOARD4013", "사진 개수를 초과하였습니다.")
+    QNA_PICTURE_OVERED(HttpStatus.BAD_REQUEST, "BOARD4013", "사진 개수를 초과하였습니다."),
+
+    //게시물 신고 에러
+    BOARDCOMPLAINT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMPLAINT4001", "신고내역을 찾지 못했습니다."),
+    COMMENTCOMPLAINT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4001", "신고내역을 찾지 못했습니다."),
+    PINCOMPLAINT_NOT_FOUND(HttpStatus.NOT_FOUND, "PIN4001", "신고내역을 찾지 못했습니다."),
     ;
 
 

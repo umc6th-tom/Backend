@@ -39,7 +39,7 @@ public class Board extends BaseEntity {
     public LocalDateTime popularAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "VARCHAR(10) DEFAULT 'ACTIVE'")
+    @Column(columnDefinition = "VARCHAR(25) DEFAULT 'ACTIVE'")
     private BoardStatus status;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)

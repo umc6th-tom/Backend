@@ -139,5 +139,11 @@ public class UserDtoReq {
         private String division;
         private Integer suspensionDueInt;
     }
+
+    @Getter
+    public static class BoardReportReasonDto{
+        private Long boardId;
+    }
+
 }
 

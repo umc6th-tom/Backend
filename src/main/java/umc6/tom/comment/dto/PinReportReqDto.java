@@ -15,7 +15,6 @@ public class PinReportReqDto {
     @NoArgsConstructor
     public static class PinReportDto{
         private String content;
-        private List<String> pic;
     }
 
 }

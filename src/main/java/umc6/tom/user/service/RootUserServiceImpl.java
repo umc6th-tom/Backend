@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.exception.handler.BoardComplaintHandler;
 import umc6.tom.apiPayload.exception.handler.BoardHandler;
 import umc6.tom.apiPayload.exception.handler.ProhibitHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
@@ -256,5 +257,65 @@ public class RootUserServiceImpl implements RootUserService {
 
         // PageImpl 생성
         return new PageImpl<>(pageContent, adjustedPageable, totalElements);
+    }
+
+    // 신고된 글 조회 + 신고 사유
+    public UserDtoRes.complaintBoardReasonDto boardReportReason(Long complaintId){
+
+        //신고 게시물 가져오기
+        BoardComplaint targetComplaint = boardComplaintRepository.findById(complaintId).orElseThrow
+                (() -> new BoardComplaintHandler(ErrorStatus.BOARDCOMPLAINT_NOT_FOUND));
+        User targetUser = userRepository.findById(targetComplaint.getBoardUserId()).orElseThrow(
+                () -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        Board targetBoard = boardRepository.findById(targetComplaint.getBoard().getId()).orElseThrow(
+                () -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        //신고자들 받아오기
+        List<BoardComplaint> boardComplaintList = boardComplaintRepository.findAllByBoardOrderByCreatedAtDesc(targetComplaint.getBoard());
+        List<UserDtoRes.complaintReasonDto> complaintReasonDtos = boardComplaintList.stream()
+                                                .map(boardComplaint -> UserConverter.boardReportContentDto(userRepository.findById(boardComplaint.getUser().getId()).orElseThrow(
+                                                        ()-> new UserHandler(ErrorStatus.USER_NOT_FOUND)),boardComplaint))
+                                                .toList();
+
+        return UserConverter.boardReportReasonDto(targetUser,targetComplaint,targetBoard,complaintReasonDtos);
+
+    }
+
+    //신고된 댓글 조회 + 신고 사유
+    public UserDtoRes.complaintCommentReasonDto pinReportReason(Long complaintId){
+        PinComplaint pinComplaint = pinComplaintRepository.findById(complaintId).orElseThrow(
+                () -> new BoardComplaintHandler(ErrorStatus.PINCOMPLAINT_NOT_FOUND));
+        User targetUser = userRepository.findById(pinComplaint.getPinUserId()).orElseThrow(
+                () -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        Board targetBoard = boardRepository.findById(pinComplaint.getPin().getBoard().getId()).orElseThrow(
+                () -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        List<PinComplaint> pinComplaintList = pinComplaintRepository.findAllByPinIdOrderByCreatedAtDesc(pinComplaint.getPin().getId());
+        List<UserDtoRes.complaintReasonDto> pinReasonDtos = pinComplaintList.stream()
+                .map(pinComplaints -> UserConverter.pinReportContentDto(userRepository.findById(pinComplaints.getUser().getId()).orElseThrow(
+                        ()-> new UserHandler(ErrorStatus.USER_NOT_FOUND)),pinComplaints))
+                .toList();
+
+        return UserConverter.pinReportReasonDto(targetUser,pinComplaint,targetBoard,pinReasonDtos);
+
+    }
+
+    //신고된 대댓글 조회 + 신고 사유
+    public UserDtoRes.complaintCommentReasonDto commentReportReason(Long complaintId){
+        CommentComplaint commentComplaint = commentComplaintRepository.findById(complaintId).orElseThrow(
+                () -> new BoardComplaintHandler(ErrorStatus.COMMENTCOMPLAINT_NOT_FOUND));
+        User targetUser = userRepository.findById(commentComplaint.getCommentUserId()).orElseThrow(
+                () -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+        Board targetBoard = boardRepository.findById(commentComplaint.getComment().getPin().getBoard().getId()).orElseThrow(
+                () -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
+
+        List<CommentComplaint> commentComplaintList = commentComplaintRepository.findAllByCommentIdOrderByCreatedAtDesc(commentComplaint.getComment().getId());
+        List<UserDtoRes.complaintReasonDto> commentReasonDtos = commentComplaintList.stream()
+                .map(commentComplaints -> UserConverter.commentReportContentDto(userRepository.findById(commentComplaints.getUser().getId()).orElseThrow(
+                        ()-> new UserHandler(ErrorStatus.USER_NOT_FOUND)),commentComplaints))
+                .toList();
+
+        return UserConverter.commentReportReasonDto(targetUser,commentComplaint,targetBoard,commentReasonDtos);
+
     }
 }

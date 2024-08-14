@@ -2,6 +2,8 @@ package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
+import umc6.tom.board.model.enums.BoardComplaintStatus;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
 
@@ -13,6 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@DynamicInsert
 public class CommentComplaint extends BaseEntity {
 
     @Id
@@ -26,6 +29,10 @@ public class CommentComplaint extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     public User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'WAITING'")
+    private BoardComplaintStatus status;
 
     @Column(nullable = false, length = 200)
     public String content;

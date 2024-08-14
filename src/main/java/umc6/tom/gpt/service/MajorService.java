@@ -87,7 +87,7 @@ public class MajorService {
             answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
 
 //      이후에 활성화하기  return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer);
-        return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer);
+        return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer,responseText);
     }
 
     public ExampleDto exampleRegister(MajorReq.exampleRegisterDto exampleDto) {

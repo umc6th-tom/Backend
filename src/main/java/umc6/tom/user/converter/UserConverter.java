@@ -9,7 +9,12 @@ import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardComplaint;
+import umc6.tom.board.model.BoardComplaintPicture;
 import umc6.tom.comment.dto.PinResDto;
+import umc6.tom.comment.model.CommentComplaint;
+import umc6.tom.comment.model.CommentComplaintPicture;
+import umc6.tom.comment.model.PinComplaint;
+import umc6.tom.comment.model.PinComplaintPicture;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
@@ -225,6 +230,94 @@ public class UserConverter {
                 .pins(top3PinComments)
                 .pinsReportCount(pinCommentSize)
                 .stop(user.getSuspension())
+                .build();
+    }
+
+    public static UserDtoRes.complaintBoardReasonDto boardReportReasonDto(User user, BoardComplaint boardcomplaint, Board board, List<UserDtoRes.complaintReasonDto> dto){
+
+        List<String> bcPic = boardcomplaint.getBoardComplaintPictureList().stream()
+                .map(BoardComplaintPicture::getPic)
+                .toList();
+
+        return UserDtoRes.complaintBoardReasonDto.builder()
+                .userId(user.getId())
+                .boardId(board.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.boardListDate(board.getCreatedAt()))
+                .report(board.getReport())
+                .boardTitle(boardcomplaint.getBoardTitle())
+                .boardContent(boardcomplaint.getBoardContent())
+                .boardPic(bcPic)
+                .complaint(dto)
+                .build();
+    }
+
+    public static UserDtoRes.complaintReasonDto boardReportContentDto(User user, BoardComplaint boardcomplaint){
+        return UserDtoRes.complaintReasonDto.builder()
+                .userId(user.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.formatDate2(boardcomplaint.getCreatedAt()))
+                .complaintContent(boardcomplaint.getBoardContent())
+                .build();
+    }
+
+    public static UserDtoRes.complaintCommentReasonDto pinReportReasonDto(User user, PinComplaint pinComplaint, Board board, List<UserDtoRes.complaintReasonDto> dto){
+
+        List<String> bcPic = pinComplaint.getPinComplaintPictureList().stream()
+                .map(PinComplaintPicture::getPic)
+                .toList();
+
+        return UserDtoRes.complaintCommentReasonDto.builder()
+                .userId(user.getId())
+                .boardId(board.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.boardListDate(board.getCreatedAt()))
+                .report(board.getReport())
+                .commentContent(pinComplaint.getPinComment())
+                .commentPic(bcPic)
+                .complaint(dto)
+                .build();
+    }
+
+    public static UserDtoRes.complaintCommentReasonDto commentReportReasonDto(User user, CommentComplaint commentComplaint, Board board, List<UserDtoRes.complaintReasonDto> dto){
+
+        List<String> bcPic = commentComplaint.getCommentComplaintPictureList().stream()
+                .map(CommentComplaintPicture::getPic)
+                .toList();
+
+        return UserDtoRes.complaintCommentReasonDto.builder()
+                .userId(user.getId())
+                .boardId(board.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.boardListDate(board.getCreatedAt()))
+                .report(board.getReport())
+                .commentContent(commentComplaint.getCommentComment())
+                .commentPic(bcPic)
+                .complaint(dto)
+                .build();
+    }
+
+    public static UserDtoRes.complaintReasonDto pinReportContentDto(User user, PinComplaint pinComplaint){
+        return UserDtoRes.complaintReasonDto.builder()
+                .userId(user.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.formatDate2(pinComplaint.getCreatedAt()))
+                .complaintContent(pinComplaint.getContent())
+                .build();
+    }
+
+    public static UserDtoRes.complaintReasonDto commentReportContentDto(User user, CommentComplaint commentComplaint){
+        return UserDtoRes.complaintReasonDto.builder()
+                .userId(user.getId())
+                .nickname(user.getNickName())
+                .userPic(user.getPic())
+                .createdAt(DateCalc.formatDate2(commentComplaint.getCreatedAt()))
+                .complaintContent(commentComplaint.getContent())
                 .build();
     }
 

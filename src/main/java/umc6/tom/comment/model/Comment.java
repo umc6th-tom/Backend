@@ -2,6 +2,7 @@ package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import umc6.tom.comment.model.enums.PinBoardStatus;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
 
@@ -22,6 +23,13 @@ public class Comment extends BaseEntity {
 
     @Column(nullable = false, length = 50)
     private String comment;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "VARCHAR(25) DEFAULT 'ACTIVE'")
+    private PinBoardStatus status;
+
+    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    public Integer report;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<CommentLike> commentLikeList = new ArrayList<>();

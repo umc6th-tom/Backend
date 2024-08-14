@@ -2,14 +2,12 @@ package umc6.tom.board.converter;
 
 import org.springframework.data.domain.Page;
 import org.springframework.util.ObjectUtils;
-import umc6.tom.board.model.*;
-import umc6.tom.comment.model.Pin;
 import umc6.tom.board.dto.BoardRequestDto;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.functionClass.DateCalc;
-import umc6.tom.comment.model.Comment;
-import umc6.tom.comment.model.CommentPicture;
-import umc6.tom.comment.model.PinPicture;
+import umc6.tom.board.model.*;
+import umc6.tom.comment.model.*;
+import umc6.tom.comment.model.enums.PinBoardStatus;
 import umc6.tom.common.model.Majors;
 import umc6.tom.user.model.User;
 
@@ -20,6 +18,8 @@ import java.util.stream.Collectors;
 
 
 public class BoardConverter {
+
+    private static final String DEFAULT_PROFILE_PATH = "https://yesol.s3.ap-northeast-2.amazonaws.com/profile/defaultProfile.png";
 
 
     public static Board toBoard(BoardRequestDto.RegisterDto request, User user, Majors majors){
@@ -176,17 +176,22 @@ public class BoardConverter {
                 .build();
     }
 
-    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board, Page<Pin> pinPage){
+    public static BoardResponseDto.BoardViewDto toBoardViewDto(Board board, Page<Pin> pinPage, Long userId){
         int pinCommentSize = 0; //대댓글 개수
         for (Pin pin : board.getPinList())
             pinCommentSize += pin.getCommentList().size();
 
         List<BoardResponseDto.BoardViewPinListDto> toBoardViewPinListDtoList = pinPage.stream()
-                .map(BoardConverter::toBoardViewPinListDto).collect(Collectors.toList());
+                .map(pin -> BoardConverter.toBoardViewPinListDto(pin, userId)).collect(Collectors.toList());
 
         List<String> newBoardPicList = new ArrayList<>();
         for (BoardPicture picture : board.getBoardPictureList())
             newBoardPicList.add(picture.getPic());
+
+        //게시글 보는 유저가 좋아요 눌렀는지 확인
+        List<BoardLike> userLiked = board.getBoardLikeList().stream()
+                .filter(user -> user.getUser().getId().equals(userId))
+                .collect(Collectors.toList());
 
         return BoardResponseDto.BoardViewDto.builder()
                 .id(board.getId())
@@ -198,33 +203,51 @@ public class BoardConverter {
                 .pinCount(board.getPinList().size() + pinCommentSize)
                 .likeCount(board.getBoardLikeList().size())
                 .boardDate(new DateCalc().boardListDate(board.getCreatedAt()))
-                .isLiked(!ObjectUtils.isEmpty(board.getBoardLikeList()))
+                .isLiked(!ObjectUtils.isEmpty(userLiked))
                 .boardPic(newBoardPicList)
                 .pinList(toBoardViewPinListDtoList)
                 .build();
     }
 
-    public static BoardResponseDto.BoardViewPinListDto toBoardViewPinListDto(Pin pin){
+    public static BoardResponseDto.BoardViewPinListDto toBoardViewPinListDto(Pin pin, Long userId){
         int pinCommentSize = 0; //대댓글 개수
         for (Comment pinComment : pin.getCommentList())
             pinCommentSize += 1;
 
         List<BoardResponseDto.BoardViewPinCommentListDto> toBoardViewPinCommentListDtoList = pin.getCommentList().stream()
-                .map(BoardConverter::toBoardPinCommentListDto).collect(Collectors.toList());
+                .map(comment -> BoardConverter.toBoardPinCommentListDto(comment, userId)).collect(Collectors.toList());
 
         List<String> newPinPicList = new ArrayList<>();
         for (PinPicture picture : pin.getPinPictureList())
                 newPinPicList.add(picture.getPic());
 
+        String nickname = pin.getUser().getNickName();
+        String comment = pin.getComment();
+        String userPic = pin.getUser().getPic();
+        int pinLike = pin.getPinLikeList().size();
+        if(pin.getStatus().equals(PinBoardStatus.INACTIVE)){
+            nickname = "알 수 없음";
+            comment = "삭제된 댓글 입니다.";
+            userPic = DEFAULT_PROFILE_PATH;
+            pinLike = 0;
+            pinCommentSize = 0;
+        }
+
+        //댓글 보는 유저가 좋아요 눌렀는지 확인
+        List<PinLike> pinLiked = pin.getPinLikeList().stream()
+                .filter(user -> user.getUser().getId().equals(userId))
+                .toList();
+
         return BoardResponseDto.BoardViewPinListDto.builder()
                 .id(pin.getId())
                 .userId(pin.getUser().getId())
-                .userNickname(pin.getUser().getNickName())
-                .comment(pin.getComment())
+                .userNickname(nickname)
+                .pinProfilePic(userPic)
+                .comment(comment)
                 .pinDate(new DateCalc().boardListDate(pin.getCreatedAt()))
-                .pinLikeCount(pin.getPinLikeList().size())
+                .pinLikeCount(pinLike)
                 .pinCommentCount(pinCommentSize)
-                .isLiked(!ObjectUtils.isEmpty(pin.getPinLikeList()))
+                .isLiked(!ObjectUtils.isEmpty(pinLiked))
                 .pinCommentList(toBoardViewPinCommentListDtoList)
                 .pinPictureList(newPinPicList)
                 .build();
@@ -238,20 +261,26 @@ public class BoardConverter {
                 .build();
     }
 
-    public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(Comment comment){
+    public static BoardResponseDto.BoardViewPinCommentListDto toBoardPinCommentListDto(Comment comment, Long userId){
         List<String> newPinCommentPicList = new ArrayList<>();
 
         for (CommentPicture picture : comment.getCommentPictureList())
                 newPinCommentPicList.add(picture.getPic());
+
+        //대댓글 보는 유저가 좋아요 눌렀는지 확인
+        List<CommentLike> commentLiked = comment.getCommentLikeList().stream()
+                .filter(user -> user.getUser().getId().equals(userId))
+                .toList();
 
         return BoardResponseDto.BoardViewPinCommentListDto.builder()
                 .id(comment.getId())
                 .userId(comment.getUser().getId())
                 .userNickname(comment.getUser().getNickName())
                 .comment(comment.getComment())
+                .commentProfilePic(comment.getUser().getPic())
                 .pinCommentDate(new DateCalc().boardListDate(comment.getCreatedAt()))
                 .pinLikeCount(comment.getCommentLikeList().size())
-                .isLiked(!ObjectUtils.isEmpty(comment.getCommentLikeList()))
+                .isLiked(!ObjectUtils.isEmpty(commentLiked))
                 .pinCommentPicList(newPinCommentPicList)
                 .build();
     }
@@ -305,6 +334,7 @@ public class BoardConverter {
 
     public static BoardResponseDto.RootUserReportBoardsDto rootUserReportBoardsDto(BoardComplaint boardComplaint){
         return BoardResponseDto.RootUserReportBoardsDto.builder()
+                .complaintId(boardComplaint.getId())
                 .boardId(boardComplaint.getBoard().getId())
                 .title(boardComplaint.getBoardTitle())
                 .content(boardComplaint.getBoardContent())
