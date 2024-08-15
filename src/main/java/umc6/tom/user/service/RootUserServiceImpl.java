@@ -333,24 +333,36 @@ public class RootUserServiceImpl implements RootUserService {
         List<CommentComplaint> commentComplaintPage = commentComplaintRepository.findAllByOrderByCreatedAtDesc();
 
         List<UserDtoRes.complaintAllResDto2> boardComDtos = boardComplaintPage.stream()
-                            .map(bc -> new UserDtoRes.complaintAllResDto2(
-                                    "게시글", bc.getId(), bc.getBoardTitle(),
-                                    boardComplaintRepository.findAllByBoard(bc.getBoard()).size(), bc.getCreatedAt(), bc.getStatus())
-                            )
-                            .toList();
+                .collect(Collectors.toMap(
+                        BoardComplaint::getBoard,  // boardId를 키로 사용
+                        bc -> new UserDtoRes.complaintAllResDto2(
+                                "게시글", bc.getId(), bc.getBoardTitle(),
+                                boardComplaintRepository.findAllByBoard(bc.getBoard()).size(), bc.getCreatedAt(), bc.getStatus()),
+                        (existing, replacement) -> existing))  // 중복된 키가 있을 때 기존 값 유지
+                    .values()  // Map의 값만 추출
+                    .stream()
+                    .toList();
 
         List<UserDtoRes.complaintAllResDto2> pinComDtos = pinComplaintPage.stream()
-                .map(pc -> new UserDtoRes.complaintAllResDto2(
+                .collect(Collectors.toMap(
+                        PinComplaint::getPin,
+                        pc -> new UserDtoRes.complaintAllResDto2(
                         "댓글", pc.getId(), pc.getPinComment(),
-                        pinComplaintRepository.findAllByPin(pc.getPin()).size(), pc.getCreatedAt(), pc.getStatus())
-                )
+                        pinComplaintRepository.findAllByPin(pc.getPin()).size(), pc.getCreatedAt(), pc.getStatus()),
+                        (existing, replacement) -> existing))
+                .values()  // Map의 값만 추출
+                .stream()
                 .toList();
 
         List<UserDtoRes.complaintAllResDto2> commentComDtos = commentComplaintPage.stream()
-                .map(cc -> new UserDtoRes.complaintAllResDto2(
-                        "댓글", cc.getId(), cc.getCommentComment(),
-                        commentComplaintRepository.findAllByComment(cc.getComment()).size(), cc.getCreatedAt(), cc.getStatus())
-                )
+                .collect(Collectors.toMap(
+                        CommentComplaint::getComment,
+                        cc -> new UserDtoRes.complaintAllResDto2(
+                                        "대댓글", cc.getId(), cc.getCommentComment(),
+                                        commentComplaintRepository.findAllByComment(cc.getComment()).size(), cc.getCreatedAt(), cc.getStatus()),
+                                (existing, replacement) -> existing))
+                .values()  // Map의 값만 추출
+                .stream()
                 .toList();
 
         List<UserDtoRes.complaintAllResDto2> allComplaints = new ArrayList<>();
@@ -372,10 +384,14 @@ public class RootUserServiceImpl implements RootUserService {
         List<BoardComplaint> boardComplaintPage = boardComplaintRepository.findAllByOrderByCreatedAtDesc();
 
         List<UserDtoRes.complaintAllResDto2> boardComDtos = boardComplaintPage.stream()
-                .map(bc -> new UserDtoRes.complaintAllResDto2(
-                        "게시글", bc.getId(), bc.getBoardTitle(),
-                        boardComplaintRepository.findAllByBoard(bc.getBoard()).size(), bc.getCreatedAt(), bc.getStatus())
-                )
+                .collect(Collectors.toMap(
+                        BoardComplaint::getBoard,  // boardId를 키로 사용
+                        bc -> new UserDtoRes.complaintAllResDto2(
+                                "게시글", bc.getId(), bc.getBoardTitle(),
+                                boardComplaintRepository.findAllByBoard(bc.getBoard()).size(), bc.getCreatedAt(), bc.getStatus()),
+                        (existing, replacement) -> existing))  // 중복된 키가 있을 때 기존 값 유지
+                .values()  // Map의 값만 추출
+                .stream()
                 .sorted(Comparator.comparing((UserDtoRes.complaintAllResDto2 dto) -> !dto.getStatus().equals("WAITING"))
                         .thenComparing(UserDtoRes.complaintAllResDto2::getCreatedAt, Comparator.reverseOrder()))
                 .toList();
@@ -385,5 +401,45 @@ public class RootUserServiceImpl implements RootUserService {
                 .toList();
 
         return new PageImpl<>(dtos, adjustedPageable, dtos.size());
+    }
+
+    public Page<UserDtoRes.complaintAllResDto> complaintsComment(Pageable adjustedPageable){
+        List<PinComplaint> pinComplaintPage = pinComplaintRepository.findAllByOrderByCreatedAtDesc();
+        List<CommentComplaint> commentComplaintPage = commentComplaintRepository.findAllByOrderByCreatedAtDesc();
+
+        List<UserDtoRes.complaintAllResDto2> pinComDtos = pinComplaintPage.stream()
+                .collect(Collectors.toMap(
+                        PinComplaint::getPin,
+                        pc -> new UserDtoRes.complaintAllResDto2(
+                                "댓글", pc.getId(), pc.getPinComment(),
+                                pinComplaintRepository.findAllByPin(pc.getPin()).size(), pc.getCreatedAt(), pc.getStatus()),
+                        (existing, replacement) -> existing))
+                .values()  // Map의 값만 추출
+                .stream()
+                .toList();
+
+        List<UserDtoRes.complaintAllResDto2> commentComDtos = commentComplaintPage.stream()
+                .collect(Collectors.toMap(
+                        CommentComplaint::getComment,
+                        cc -> new UserDtoRes.complaintAllResDto2(
+                                "대댓글", cc.getId(), cc.getCommentComment(),
+                                commentComplaintRepository.findAllByComment(cc.getComment()).size(), cc.getCreatedAt(), cc.getStatus()),
+                        (existing, replacement) -> existing))
+                .values()  // Map의 값만 추출
+                .stream()
+                .toList();
+
+        List<UserDtoRes.complaintAllResDto2> allComplaints = new ArrayList<>();
+        allComplaints.addAll(pinComDtos);
+        allComplaints.addAll(commentComDtos);
+
+        allComplaints.sort(Comparator.comparing((UserDtoRes.complaintAllResDto2 dto) -> !dto.getStatus().equals("WAITING"))
+                .thenComparing(UserDtoRes.complaintAllResDto2::getCreatedAt, Comparator.reverseOrder()));
+
+        List<UserDtoRes.complaintAllResDto> dtos = allComplaints.stream()
+                .map(UserConverter::complaintAllResDtoDto)
+                .toList();
+
+        return new PageImpl<>(dtos, adjustedPageable, allComplaints.size());
     }
 }

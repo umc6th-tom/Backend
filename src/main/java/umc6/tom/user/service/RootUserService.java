@@ -41,4 +41,6 @@ public interface RootUserService {
     Page<UserDtoRes.complaintAllResDto> complaintsAll(Pageable adjustedPageable);
 
     Page<UserDtoRes.complaintAllResDto> complaintsBoard(Pageable adjustedPageable);
+
+    Page<UserDtoRes.complaintAllResDto> complaintsComment(Pageable adjustedPageable);
 }
