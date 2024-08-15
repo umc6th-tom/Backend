@@ -282,4 +282,14 @@ public class UserDtoRes {
         }
     }
 
+    @Getter
+    @Setter
+    public static class getMajor {
+        private String major;
+
+        public getMajor(String major) {
+            this.major = major;
+        }
+    }
+
 }
