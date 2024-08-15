@@ -37,4 +37,6 @@ public interface RootUserService {
     UserDtoRes.complaintCommentReasonDto pinReportReason(Long complaintId);
 
     UserDtoRes.complaintCommentReasonDto commentReportReason(Long complaintId);
+
+    Page<UserDtoRes.complaintAllResDto> complaintsAll(Pageable adjustedPageable);
 }
