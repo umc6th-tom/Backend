@@ -5,10 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 public class UserDtoReq {
-
 
     @Getter
     @ToString
@@ -131,7 +128,7 @@ public class UserDtoReq {
     }
 
     @Getter
-    public static class SuspendDto {
+    public static class SuspensionDto {
 
         private Long boardId;
         private Long targetUserId;

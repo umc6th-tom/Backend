@@ -1,6 +1,5 @@
 package umc6.tom.user.controller;
 
-import com.google.auth.oauth2.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -9,7 +8,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.board.dto.BoardResponseDto;
-import umc6.tom.board.service.BoardService;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.dto.UserDtoReq;
@@ -17,8 +15,6 @@ import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.service.RootUserService;
 import umc6.tom.user.service.UserService;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -128,7 +124,7 @@ public class RootUserController {
      * 관리자 - 회원 정지
      */
     @PostMapping("/suspension")
-    public ApiResponse<UserDtoRes.suspendDto> suspension(@RequestBody UserDtoReq.SuspendDto request) {
+    public ApiResponse<UserDtoRes.suspensionDto> suspension(@RequestBody UserDtoReq.SuspensionDto request) {
 
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return ApiResponse.onSuccess(rootUserService.suspension(userId, request));

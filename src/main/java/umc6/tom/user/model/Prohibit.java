@@ -25,6 +25,9 @@ public class Prohibit {
     private User user;
 
     @Column
+    private String message;
+
+    @Column
     private String division;
 
     @ManyToOne

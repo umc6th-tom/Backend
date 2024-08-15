@@ -79,3 +79,19 @@ gpt:
   api:
     key: ${GPT_KEY}
     url: ${GPT_URL}
+
+security:
+  oauth2:
+    client:
+      registration:
+        kakao:
+          client_id: ${KAKAO_REST_API_KEY}
+          redirect_uri: ${KAKAO_REDIRECT_URI}
+
+management:
+  endpoints:
+    web:
+      base-path: /
+  endpoint:
+    health:
+      show-details: always

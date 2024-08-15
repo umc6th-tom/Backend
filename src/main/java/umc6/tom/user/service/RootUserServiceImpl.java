@@ -30,6 +30,7 @@ import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.Prohibit;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Role;
+import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.ProhibitRepository;
 import umc6.tom.user.repository.UserRepository;
 
@@ -84,18 +85,20 @@ public class RootUserServiceImpl implements RootUserService {
         Board board = boardRepository.findById(request.getBoardId())
                 .orElseThrow(() -> new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
-
+        prohibit.setMessage("귀하는 " +request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 1회 경고를 부여합니다.");
         prohibit.setDivision(request.getDivision());
         prohibit.setBoard(board);
 
         user.setWarn(user.getWarn() + 1);
 
-        return UserConverter.toWarnDto(request.getTargetUserId(), user.getNickName(), "귀하는 " +request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 1회 경고를 부여합니다.");
+        return UserConverter.toWarnDto(request.getTargetUserId(),
+                user.getNickName(), prohibit.getMessage());
     }
 
     // 회원 정지
+    // 알람 구현 해야함
     @Override
-    public UserDtoRes.suspendDto suspension(Long userId, UserDtoReq.SuspendDto request) {
+    public UserDtoRes.suspensionDto suspension(Long userId, UserDtoReq.SuspensionDto request) {
 
         managerAuth(userId);
 
@@ -107,17 +110,18 @@ public class RootUserServiceImpl implements RootUserService {
         Board board = boardRepository.findById(request.getBoardId())
                 .orElseThrow(() ->new BoardHandler(ErrorStatus.BOARD_NOT_FOUND));
 
+        prohibit.setMessage("귀하는 " + request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 " + request.getSuspensionDueInt() + "일 정지에 해당하는 조취를 취하는 바이다.");
         prohibit.setDivision(request.getDivision());
         prohibit.setBoard(board);
 
         prohibit.setSuspensionDue(LocalDateTime.now().plusDays(request.getSuspensionDueInt()));
 
         user.setSuspension(user.getSuspension() + 1);
+        user.setStatus(UserStatus.SUSPENSION);
 
-        return UserDtoRes.suspendDto.builder()
-                .message("귀하는 " + request.getMessage() + "의 이유로 커뮤니티 가이드라인을 위반 하였고, 이에 " + request.getSuspensionDueInt() + "일 정지에 해당하는 조취를 취하는 바이다.")
+        return UserDtoRes.suspensionDto.builder()
+                .message(prohibit.getMessage())
                 .nickName(user.getNickName())
-                .userId(request.getTargetUserId())
                 .build();
     }
 
