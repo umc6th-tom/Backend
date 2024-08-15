@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.processing.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,6 @@ import umc6.tom.board.converter.BoardConverter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
 import umc6.tom.board.model.BoardLike;
-import umc6.tom.board.repository.BoardComplaintRepository;
 import umc6.tom.board.repository.BoardLikeRepository;
 import umc6.tom.board.repository.BoardRepository;
 import umc6.tom.comment.dto.CommentBoardDto;
@@ -28,9 +28,7 @@ import umc6.tom.comment.dto.LikeBoardDto;
 import umc6.tom.comment.dto.PinBoardDto;
 import umc6.tom.comment.model.Comment;
 import umc6.tom.comment.model.Pin;
-import umc6.tom.comment.repository.CommentComplaintRepository;
 import umc6.tom.comment.repository.CommentRepository;
-import umc6.tom.comment.repository.PinComplaintRepository;
 import umc6.tom.comment.repository.PinRepository;
 import umc6.tom.common.model.Majors;
 import umc6.tom.common.model.Uuid;
@@ -42,9 +40,11 @@ import umc6.tom.user.converter.UserConverter;
 import umc6.tom.user.dto.ResignDtoReq;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
+import umc6.tom.user.model.Prohibit;
 import umc6.tom.user.model.Resign;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
+import umc6.tom.user.model.enums.SocialType;
 import umc6.tom.user.model.enums.UserStatus;
 import umc6.tom.user.repository.*;
 import umc6.tom.util.AmazonS3Util;
@@ -58,7 +58,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -87,9 +86,6 @@ public class UserServiceImpl implements UserService {
     private final BoardLikeRepository boardLikeRepository;
     private final CommentRepository commentRepository;
     private final ProhibitRepository prohibitRepository;
-    private final BoardComplaintRepository boardComplaintRepository;
-    private final PinComplaintRepository pinComplaintRepository;
-    private final CommentComplaintRepository commentComplaintRepository;
 
 
     // 회원 가입
@@ -107,20 +103,74 @@ public class UserServiceImpl implements UserService {
         }
         if (userRepository.findByPhone(request.getPhone()).isPresent()) {
             log.info("이미 사용중인 휴대폰 번호 등록 관리자 확인 필요!");
+            if (userRepository.findByPhone(request.getPhone()).get().getSocialType().equals(SocialType.KAKAO)) {
+                throw new UserHandler(ErrorStatus.USER_IS_ALREADY_REGISTERED_KAKAO);
+            }
         }
 
         Majors major = majorsRepository.findById(request.getMajor())
                 .orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
 
-        // 비밀번호 암호화 후 저장
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-
-        // 휴대폰 번호 "-" 제거
-        request.setPhone(request.getPhone().replaceAll("-", ""));
-        User user = UserConverter.toUser(request, major, DEFAULT_PROFILE_PATH);
+        User user = UserConverter.toUser(request.getName(), request.getNickName(), request.getAccount(),
+                // 비밀번호 암호화
+                passwordEncoder.encode(request.getPassword()),
+                // 휴대폰 번호 "-" 제거
+                request.getPhone().replaceAll("-", ""),
+                SocialType.NON,
+                major,
+                DEFAULT_PROFILE_PATH);
 
         userRepository.save(user);
+        prohibitRepository.save(Prohibit.builder().user(user).build());
         alarmSetRepository.save(AlarmSetConverter.convertAlarmSetToAlarmSet(user));
+
+        return user;
+    }
+
+    // 카카오 회원가입
+    @Override
+    @Transactional
+    public User joinKakao(UserDtoRes.kakaoJoinDto kakaoRequest, UserDtoReq.JoinDto request) {
+
+        // 이름, 번호는 필수
+        String phone = kakaoRequest.getPhone();
+        String name = kakaoRequest.getName();
+        String nickName = null;
+        String account = request.getAccount();
+        User user;
+
+        // 이미 가입된 회원
+        if (userRepository.findByPhone(phone).isPresent()) {
+            // 카카오로 통합 계정 사용 - 휴대폰 번호는 유일하다. 카카오는 신뢰성 있다.
+            user = userRepository.findByPhone(kakaoRequest.getPhone())
+                    .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+            user.setSocialType(SocialType.KAKAO);
+        }
+        // 가입되어있지 않은 회원 - 가입
+        else {
+            // 닉네임
+            if (!kakaoRequest.getNickName().isEmpty()) {
+                nickName = kakaoRequest.getNickName();
+                duplicatedNickName(nickName);
+            }
+            else {
+                nickName = request.getNickName();
+            }
+
+            Majors major = majorsRepository.findById(request.getMajor())
+                    .orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
+
+            user = UserConverter.toUser(name, nickName, account,
+                    // 비밀번호 암호화 - 초기 비밀번호는 password
+                    passwordEncoder.encode("password"),
+                    phone,
+                    SocialType.KAKAO,
+                    major,
+                    kakaoRequest.getProfilePic());
+
+            userRepository.save(user);
+        }
 
         return user;
     }
@@ -149,6 +199,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDtoRes.LoginDto login(HttpServletRequest request, HttpServletResponse response, UserDtoReq.LoginDto req) {
 
+        UserDtoRes.suspensionDto suspension = null;
+
         String account = req.getAccount();
         String password = req.getPassword();
 
@@ -157,11 +209,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByAccountAndStatusIn(account, statuses)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         log.info("로그인 유저 : {} {}", user.getUsername(), user.getStatus());
-
-        if (user.getStatus().equals(UserStatus.SUSPENSION)) {
-
-            throw new UserHandler(ErrorStatus.USER_IS_SUSPENSION);
-        }
 
         // 비밀번호 불일치
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -180,6 +227,29 @@ public class UserServiceImpl implements UserService {
             log.info("탈퇴한 유저 {} 재가입", user.getId());
         }
 
+        // 선 응답
+        if (user.getStatus() == UserStatus.SUSPENSION) {
+            Prohibit prohibit = prohibitRepository.findById(user.getId())
+                    .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
+
+            suspension = UserDtoRes.suspensionDto.builder()
+                    .nickName(user.getNickName())
+                    .message(prohibit.getMessage())
+                    .boardId(prohibit.getBoard().getId())
+                    .title(prohibit.getBoard().getTitle())
+                    .content(prohibit.getBoard().getContent().substring(0, 20))
+                    .build();
+        }
+
+        // 정지 시기가 지났을 시 Status 값 변경
+        if (user.getStatus().equals(UserStatus.SUSPENSION)) {
+            Prohibit prohibit = prohibitRepository.findById(user.getId())
+                    .orElseThrow(() -> new ProhibitHandler(ErrorStatus.PROHIBIT_NOT_FOUND));
+            if (prohibit.getSuspensionDue().isBefore(LocalDateTime.now())) {
+                user.setStatus(UserStatus.ACTIVE);
+            }
+        }
+
         String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
@@ -192,7 +262,7 @@ public class UserServiceImpl implements UserService {
 
         redisUtil.setDataAndExpire("RT:" + user.getId(), refreshToken, JwtTokenProvider.REFRESH_TOKEN_VALID_TIME_IN_REDIS);
 
-        return UserConverter.signInRes(user, accessToken, refreshToken);
+        return UserConverter.signInRes(user, accessToken, suspension);
     }
 
     // 쿠키의 RefreshToken 으로 AccessToken 재발행 / Redis 의 refreshToken 과 비교
@@ -780,5 +850,11 @@ public class UserServiceImpl implements UserService {
     public User findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+    }
+
+    // 사용자 존재 유무
+    @Override
+    public boolean existUser(Long userId) {
+        return userRepository.existsById(userId);
     }
 }

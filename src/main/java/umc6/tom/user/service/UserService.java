@@ -5,19 +5,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
-import umc6.tom.apiPayload.ApiResponse;
 import umc6.tom.board.dto.BoardResponseDto;
-import umc6.tom.comment.dto.PinResDto;
+import umc6.tom.kakao.dto.KakaoUserInfoResponseDto;
 import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface UserService {
 
     User join(UserDtoReq.JoinDto request);
+
+    User joinKakao(UserDtoRes.kakaoJoinDto kakaoRequest, UserDtoReq.JoinDto request);
 
     UserDtoRes.PhoneAuthDto phoneAuth(UserDtoReq.PhoneDto request);
 
@@ -82,4 +82,6 @@ public interface UserService {
     Page<BoardResponseDto.HistoryDto> findTextHistoryLikes(Long userId, Pageable adjustedPageable, String content);
 
     User findUser(Long userId);
+
+    boolean existUser(Long userId);
 }

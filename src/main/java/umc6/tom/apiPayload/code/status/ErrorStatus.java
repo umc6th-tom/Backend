@@ -33,6 +33,8 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_PHONE_IS_YOURS(HttpStatus.BAD_REQUEST, "USER4013", "본인이 사용중인 휴대폰번호입니다."),
     USER_PHONE_IS_USED(HttpStatus.BAD_REQUEST, "USER4014", "이미 사용중인 휴대폰번호입니다. 관리자에게 문의하세요"),
     USER_IS_SUSPENSION(HttpStatus.BAD_REQUEST, "USER4015", "정지된 계정입니다."),
+    USER_IS_ALREADY_REGISTERED_KAKAO(HttpStatus.IM_USED, "USER4016", "이미 카카오계쩡으로 가입된 전화번호입니다. 카카오로 로그인해주세요."),
+    USER_IS_INTEGRATED_KAKAO(HttpStatus.ACCEPTED, "USER4017", "사용자의 계정이 카카오계정과 통합되었습니다. YESOL 계정 혹은 카카오로 로그인해주세요."),
 
 
     // 관리자 관련 에러

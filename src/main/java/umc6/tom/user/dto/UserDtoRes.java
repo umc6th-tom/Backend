@@ -1,11 +1,15 @@
 package umc6.tom.user.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import umc6.tom.board.dto.BoardResponseDto;
 import umc6.tom.board.model.Board;
 import umc6.tom.comment.dto.PinResDto;
+import umc6.tom.user.model.enums.Role;
+import umc6.tom.user.model.enums.SocialType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +23,7 @@ public class UserDtoRes {
 
         private Long id;
         private String nickName;
+        private String socialType;
     }
 
     @Setter
@@ -38,8 +43,9 @@ public class UserDtoRes {
         private Long userId;
         private String nickName;
         private Long majorId;
+        private Role role;
         private String accessToken;
-        private String refreshToken;
+        private UserDtoRes.suspensionDto suspension;
         private LocalDateTime createdAt;
     }
 
@@ -172,10 +178,28 @@ public class UserDtoRes {
     @Getter
     @Setter
     @Builder
-    public static class suspendDto {
-        private Long userId;
+    public static class suspensionDto {
         private String nickName;
         private String message;
+        private Long boardId;
+        private String title;
+        @Size(max = 20)
+        private String content;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class kakaoJoinDto {
+        @NotBlank(message = "이름은 필수 입력 항목입니다.")
+        private String name;
+        @Size(message = "닉네임은 2글자 이상, 10글자 이하입니다.", min = 2, max = 10)
+        private String nickName;
+        @NotBlank(message = "아이디는 필수! 6글자 이상, 15글자 이하입니다.")
+        @Size(min = 6, max = 15)
+        @NotBlank(message = "휴대폰 번호는 필수 입력 항목입니다.")
+        private String phone;
+        private String profilePic;
     }
 
     @Getter

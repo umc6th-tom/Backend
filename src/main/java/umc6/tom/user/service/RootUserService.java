@@ -16,7 +16,7 @@ public interface RootUserService {
 
     UserDtoRes.warnDto warn(Long userId, UserDtoReq.WarnDto request);
 
-    UserDtoRes.suspendDto suspension(Long userId, UserDtoReq.SuspendDto request);
+    UserDtoRes.suspensionDto suspension(Long userId, UserDtoReq.SuspensionDto request);
 
     Page<UserDtoRes.userFindAllDto> findAllUser(String keyword, Pageable adjustedPageable);
 
