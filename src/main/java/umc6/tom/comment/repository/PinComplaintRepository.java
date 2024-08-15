@@ -1,5 +1,6 @@
 package umc6.tom.comment.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,4 +17,8 @@ public interface PinComplaintRepository extends JpaRepository<PinComplaint, Long
     List<PinComplaint> findAllByPinUserIdOrderByCreatedAtDesc(Long writeUserId);
 
     List<PinComplaint> findAllByPinIdOrderByCreatedAtDesc(Long id);
+
+    List<PinComplaint> findAllByOrderByCreatedAtDesc();
+
+    List<PinComplaint> findAllByPin(Pin pin);
 }
