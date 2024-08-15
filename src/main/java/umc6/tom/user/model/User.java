@@ -76,9 +76,6 @@ public class User extends BaseEntity implements UserDetails {
     @Column(length = 5, columnDefinition = "INTEGER DEFAULT 0")
     private Integer suspension;
 
-    @Column
-    private LocalDateTime suspensionDue;
-
     @Enumerated(EnumType.STRING)
     @Column(length = 10, columnDefinition = "VARCHAR(10) DEFAULT 'INACTIVE'")
     private UserStatus status;

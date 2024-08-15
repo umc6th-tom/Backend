@@ -20,6 +20,7 @@ import umc6.tom.user.dto.UserDtoReq;
 import umc6.tom.user.dto.UserDtoRes;
 import umc6.tom.user.model.User;
 import umc6.tom.user.model.enums.Agreement;
+import umc6.tom.user.model.enums.SocialType;
 import umc6.tom.user.model.enums.UserStatus;
 
 import java.time.LocalDateTime;
@@ -33,16 +34,17 @@ import java.util.Objects;
 public class UserConverter {
 
     // 회원 객체 생성
-    public static User toUser(UserDtoReq.JoinDto request, Majors major, String defaultProfilePAth) {
+    public static User toUser(String name, String nickName, String account, String password, String phone, SocialType socialType, Majors major, String defaultProfilePAth) {
 
         return User.builder()
-                .name(request.getName())
-                .nickName(request.getNickName())
-                .account(request.getAccount())
-                .password(request.getPassword())
-                .phone(request.getPhone())
+                .name(name)
+                .nickName(nickName)
+                .account(account)
+                .password(password)
+                .phone(phone)
                 .agreement(Agreement.AGREE)
                 .pic(defaultProfilePAth)
+                .socialType(socialType)
                 .majors(major)
                 .status(UserStatus.ACTIVE)
                 .build();
@@ -62,20 +64,22 @@ public class UserConverter {
 
         return UserDtoRes.JoinDto.builder()
                 .id(user.getId())
-                .nickName(user.getUsername())
+                .nickName(user.getNickName())
+                .socialType(user.getSocialType().toString())
                 .build();
     }
 
     // 로그인 응답
-    public static UserDtoRes.LoginDto signInRes(User user, String accessToken, String refreshToken) {
+    public static UserDtoRes.LoginDto signInRes(User user, String accessToken, UserDtoRes.suspensionDto suspension) {
 
         return UserDtoRes.LoginDto.builder()
                 .userId(user.getId())
                 .nickName(user.getNickName())
                 .majorId(user.getMajors().getId())
+                .role(user.getRole())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
                 .createdAt(user.getCreatedAt())
+                .suspension(suspension)
                 .build();
     }
 
