@@ -170,4 +170,18 @@ public class RootUserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(rootUserService.complaintsAll(adjustedPageable));
     }
+    /**
+     * 24.08.16 작성자 : 서정호
+     * 관리자 - 유저 신고된 전체 게시 글 조회
+     */
+    @GetMapping("/complaints/board")
+    public ApiResponse<Page<UserDtoRes.complaintAllResDto>> complaintsBoard(@RequestParam(defaultValue = "1") int page,
+                                                                          @PageableDefault(size = 12) Pageable pageable) {
+//        Long userId = jwtTokenProvider.getUserIdFromToken();
+        Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
+        return ApiResponse.onSuccess(rootUserService.complaintsBoard(adjustedPageable));
+    }
+
+
+
 }

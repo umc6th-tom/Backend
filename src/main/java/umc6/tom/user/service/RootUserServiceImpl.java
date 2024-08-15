@@ -367,4 +367,23 @@ public class RootUserServiceImpl implements RootUserService {
 
         return new PageImpl<>(dtos, adjustedPageable, allComplaints.size());
     }
+
+    public Page<UserDtoRes.complaintAllResDto> complaintsBoard(Pageable adjustedPageable){
+        List<BoardComplaint> boardComplaintPage = boardComplaintRepository.findAllByOrderByCreatedAtDesc();
+
+        List<UserDtoRes.complaintAllResDto2> boardComDtos = boardComplaintPage.stream()
+                .map(bc -> new UserDtoRes.complaintAllResDto2(
+                        "게시글", bc.getId(), bc.getBoardTitle(),
+                        boardComplaintRepository.findAllByBoard(bc.getBoard()).size(), bc.getCreatedAt(), bc.getStatus())
+                )
+                .sorted(Comparator.comparing((UserDtoRes.complaintAllResDto2 dto) -> !dto.getStatus().equals("WAITING"))
+                        .thenComparing(UserDtoRes.complaintAllResDto2::getCreatedAt, Comparator.reverseOrder()))
+                .toList();
+
+        List<UserDtoRes.complaintAllResDto> dtos = boardComDtos.stream()
+                .map(UserConverter::complaintAllResDtoDto)
+                .toList();
+
+        return new PageImpl<>(dtos, adjustedPageable, dtos.size());
+    }
 }
