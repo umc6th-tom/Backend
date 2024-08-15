@@ -857,4 +857,11 @@ public class UserServiceImpl implements UserService {
     public boolean existUser(Long userId) {
         return userRepository.existsById(userId);
     }
+
+    //본인 전공 검색
+    public UserDtoRes.getMajor getMajor(Long userId){
+        User user = findUser(userId);
+
+        return new UserDtoRes.getMajor(user.getMajors().getMajor());
+    }
 }

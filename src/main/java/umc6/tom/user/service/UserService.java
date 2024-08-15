@@ -84,4 +84,6 @@ public interface UserService {
     User findUser(Long userId);
 
     boolean existUser(Long userId);
+
+    UserDtoRes.getMajor getMajor(Long userId);
 }

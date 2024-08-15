@@ -384,4 +384,14 @@ public class UserController {
         Pageable adjustedPageable = PageRequest.of(page - 1, pageable.getPageSize(), pageable.getSort());
         return ApiResponse.onSuccess(userService.findTextHistoryLikes(userId,adjustedPageable,content));
     }
+
+    /**
+     * 24.08.16 작성자 : 서정호
+     * 나의 전공 조회
+     */
+    @GetMapping("/find/major")
+    public ApiResponse<UserDtoRes.getMajor> getMajor() {
+        Long userId = jwtTokenProvider.getUserIdFromToken();
+        return ApiResponse.onSuccess(userService.getMajor(userId));
+    }
 }
