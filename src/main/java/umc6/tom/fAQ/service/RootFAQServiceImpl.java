@@ -56,10 +56,10 @@ public class RootFAQServiceImpl implements RootFAQService{
 
     @Override
     @Transactional
-    public FAQResponseDto.RootFAQDeleteDto deleteRootFAQ(Long fqaId, Long userId) {
+    public FAQResponseDto.RootFAQDeleteDto deleteRootFAQ(Long userId, Long fqaId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //관리자 검증
-        if(!user.getRole().equals(Role.ADMIN))
+        if (!user.getRole().equals(Role.ADMIN))
             throw new UserHandler(ErrorStatus._FORBIDDEN);
         fAQRepository.deleteById(fqaId);
 
