@@ -68,12 +68,14 @@ public class MajorService {
 
 ////        GPT 기본 설정
         GptReq request = new GptReq(
-                model, searchDto.getQuestion(), 1.5,2048,0.7,0,0, user);
+                model, searchDto, 1.5,2048,0.7,0,0, user);
         GptRes gptResponse = restTemplate.postForObject(
                 apiUrl
                 , request
                 , GptRes.class
         );
+
+        log.info(request.getMessages().toString());
 
         //GPT 답변 파싱  이후에 활성화하기 -> gptResponse.getChoices().get(0).getMessage().getContent();
         String responseText = gptResponse.getChoices().get(0).getMessage().getContent();
