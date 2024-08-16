@@ -156,6 +156,7 @@ public class UserDtoRes {
         private String account;
         private String createdAt;
         private String pic;
+        private String status;
         private Long warn;
         private Long report;
         private Long stop;

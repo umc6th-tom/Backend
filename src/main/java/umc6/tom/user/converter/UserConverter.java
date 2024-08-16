@@ -216,6 +216,7 @@ public class UserConverter {
                 .createdAt(date)
                 .warn(Long.valueOf(user.getWarn()))
                 .report(Long.valueOf(user.getReport()))
+                .status(String.valueOf(user.getStatus()))
                 .stop(Long.valueOf(user.getSuspension()))
                 .build();
     }
