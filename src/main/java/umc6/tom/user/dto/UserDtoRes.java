@@ -5,8 +5,12 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.cglib.core.Local;
 import umc6.tom.board.dto.BoardResponseDto;
+import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.board.model.Board;
+import umc6.tom.board.model.BoardComplaint;
+import umc6.tom.board.model.enums.BoardComplaintStatus;
 import umc6.tom.comment.dto.PinResDto;
 import umc6.tom.user.model.enums.Role;
 import umc6.tom.user.model.enums.SocialType;
@@ -245,4 +249,47 @@ public class UserDtoRes {
 
         private List<complaintReasonDto> complaint;
     }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class complaintAllResDto {
+        private String type;
+        private Long id;
+        private String title;
+        private int report;
+        private String createdAt;  // LocalDateTime으로 수정
+        private String status;
+    }
+
+    @Getter
+    @Setter
+    public static class complaintAllResDto2 {
+        private String type;
+        private Long id;
+        private String title;
+        private LocalDateTime createdAt;  // LocalDateTime으로 수정
+        private int report;
+        private String status;
+
+        public complaintAllResDto2(String type, Long id, String content, int report, LocalDateTime createdAt, BoardComplaintStatus status) {
+            this.type = type;
+            this.id = id;
+            this.title = content;
+            this.report = report;
+            this.createdAt = createdAt;
+            this.status = String.valueOf(status);
+        }
+    }
+
+    @Getter
+    @Setter
+    public static class getMajor {
+        private String major;
+
+        public getMajor(String major) {
+            this.major = major;
+        }
+    }
+
 }

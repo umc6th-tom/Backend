@@ -20,13 +20,16 @@ public class GptReq {
     private int frequencyPenalty;
     private int presencePenalty;
 //user.getMajors().getMajor()
-    public GptReq(String model, String prompt, double temperature, int maxTokens, double topP, int frequencyPenalty, int presencePenalty, User user) {
+    public GptReq(String model, MajorReq.SearchDto searchDto, double temperature, int maxTokens, double topP, int frequencyPenalty, int presencePenalty, User user) {
+
+        String result = searchDto.getMajor() != null ? searchDto.getMajor() : user.getMajors().getMajor();
+
         this.model = model;
         this.messages = new ArrayList<>();
         this.messages.add(new Message("system", "Now, your role is that of a tutor. \n" +
                 "Here's what you need to do. First, the user will tell you their major in words and ask you a question in words or sentences. Then you'll have to answer that user ask you to the user. at this time, you must to answer detailed. Then you need to generate example question and correct answer for the user's input, related to the user's major. And the most important thing is to answer in Korean in three parts: \"답변:\", \"예시문제:\", \"정답:\". The example question and correct answer should be difficult, and require deep thinking! \n" +
                 "Every time you generate an answer, I want you to give a different answer."));
-        this.messages.add(new Message("user","나의 전공은 " + user.getMajors().getMajor() + "이야. " + prompt + "에 대해 알려줘 그리고 예시 문제와 정답을 생성해줘."));
+        this.messages.add(new Message("user","나의 전공은 " + result + "이야. " + searchDto.getQuestion() + "에 대해 알려줘 그리고 예시 문제와 정답을 생성해줘."));
         this.temperature = temperature;
         this.maxTokens = maxTokens;
         this.topP=topP;

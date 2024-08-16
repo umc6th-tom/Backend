@@ -325,4 +325,15 @@ public class UserConverter {
                 .build();
     }
 
+    public static UserDtoRes.complaintAllResDto complaintAllResDtoDto(UserDtoRes.complaintAllResDto2 dto){
+        return UserDtoRes.complaintAllResDto.builder()
+                .type(dto.getType())
+                .id(dto.getId())
+                .title(dto.getTitle())
+                .createdAt(DateCalc.formatDate2(dto.getCreatedAt()))
+                .status(dto.getStatus())
+                .report(dto.getReport())
+                .build();
+    }
+
 }
