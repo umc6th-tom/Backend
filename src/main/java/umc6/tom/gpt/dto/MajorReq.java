@@ -9,7 +9,7 @@ public class MajorReq {
     @ToString
     @NoArgsConstructor
     public static class SearchDto {
-        private String major;
+        private Long majorId;
         private String question;
     }
 

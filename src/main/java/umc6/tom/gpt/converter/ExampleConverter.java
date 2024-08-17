@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import umc6.tom.board.functionClass.DateCalc;
+import umc6.tom.common.model.Majors;
 import umc6.tom.gpt.dto.ExampleDto;
 import umc6.tom.gpt.dto.MajorReq;
 import umc6.tom.gpt.dto.MajorRes;
@@ -53,8 +54,9 @@ public class ExampleConverter {
                 .build();
     }
 
-    public static Answer toAnswerEntity(String question, String content, User user){
+    public static Answer toAnswerEntity(String question, String content, User user, Majors major){
         return Answer.builder()
+                .majors(major)
                 .question(question)
                 .content(content)
                 .user(user)

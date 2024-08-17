@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
+import umc6.tom.common.model.Majors;
 import umc6.tom.gpt.converter.ExampleConverter;
 import umc6.tom.gpt.dto.*;
 import umc6.tom.gpt.model.Answer;
@@ -66,6 +67,9 @@ public class MajorService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        Majors major = majorsRepository.findById(searchDto.getMajorId()).orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
+
+
 ////        GPT 기본 설정
         GptReq request = new GptReq(
                 model, searchDto, 1.5,2048,0.7,0,0, user);
@@ -80,13 +84,13 @@ public class MajorService {
         //GPT 답변 파싱  이후에 활성화하기 -> gptResponse.getChoices().get(0).getMessage().getContent();
         String responseText = gptResponse.getChoices().get(0).getMessage().getContent();
         log.info(responseText);
-        List<String> exampleKeywords = List.of("예시문제:", "예시 문제:", "예시 질문:", "예시질문:" , "예시문제 :", "예시 문제 :", "예시 질문 :", "예시질문 :");
+//        List<String> exampleKeywords = List.of("예시문제:", "예시 문제:", "예시 질문:", "예시질문:" , "예시문제 :", "예시 문제 :", "예시 질문 :", "예시질문 :");
         String answer = extractContent(responseText, "답변:");
         String exampleQuestion = extractContent(responseText, "예시문제:");
         String correctAnswer = extractContent(responseText, "정답:");
 
 //      이후에 활성화하기  answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
-            answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
+            answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user,major));
 
 //      이후에 활성화하기  return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer);
         return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer,responseText);
