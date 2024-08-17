@@ -3,6 +3,7 @@ package umc6.tom.common.model;
 import jakarta.persistence.*;
 import lombok.*;
 import umc6.tom.board.model.Board;
+import umc6.tom.gpt.model.Answer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,9 @@ public class Majors {
 
     @OneToMany(mappedBy = "majors", cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "majors", cascade = CascadeType.ALL)
+    private List<Answer> answerList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "college_id")

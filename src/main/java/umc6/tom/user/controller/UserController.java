@@ -394,4 +394,6 @@ public class UserController {
         Long userId = jwtTokenProvider.getUserIdFromToken();
         return ApiResponse.onSuccess(userService.getMajor(userId));
     }
+
+
 }

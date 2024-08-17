@@ -8,9 +8,11 @@ import umc6.tom.comment.dto.PinReportReqDto;
 import umc6.tom.gpt.dto.ExampleDto;
 import umc6.tom.gpt.dto.GptRes;
 import umc6.tom.gpt.dto.MajorReq;
+import umc6.tom.gpt.dto.MajorRes;
 import umc6.tom.gpt.service.FavoriteService;
 import umc6.tom.gpt.service.MajorService;
 import umc6.tom.security.JwtTokenProvider;
+import umc6.tom.user.dto.UserDtoRes;
 
 import java.util.List;
 
@@ -86,4 +88,12 @@ public class MajorController {
         return ApiResponse.onSuccess(majorService.exampleFindId(id));
     }
 
+    /**
+     * 24.08.16 작성자 : 서정호
+     *  홈화면
+     */
+    @GetMapping("/main")
+    public ApiResponse<List<MajorRes.getHome>> getHome(){
+        return ApiResponse.onSuccess(majorService.getHome());
+    }
 }

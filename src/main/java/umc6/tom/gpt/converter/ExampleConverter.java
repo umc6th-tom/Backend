@@ -3,8 +3,10 @@ package umc6.tom.gpt.converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import umc6.tom.board.functionClass.DateCalc;
 import umc6.tom.gpt.dto.ExampleDto;
 import umc6.tom.gpt.dto.MajorReq;
+import umc6.tom.gpt.dto.MajorRes;
 import umc6.tom.gpt.model.Answer;
 import umc6.tom.gpt.model.Example;
 import umc6.tom.user.model.User;
@@ -56,6 +58,19 @@ public class ExampleConverter {
                 .question(question)
                 .content(content)
                 .user(user)
+                .build();
+    }
+
+    public static MajorRes.getHome getHome(Answer answer){
+        return MajorRes.getHome.builder()
+                .userId(answer.getUser().getId())
+                .answerId(answer.getId())
+                .question(answer.getQuestion())
+                .content(answer.getContent())
+                .createdAt(DateCalc.formatDate2(answer.getCreatedAt()))
+                .nickname(answer.getUser().getNickName())
+                .major(answer.getMajors().getMajor())
+                .majorId(answer.getMajors().getId())
                 .build();
     }
 }
