@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
@@ -28,6 +29,7 @@ import static umc6.tom.gpt.function.Function.extractContent;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MajorService {
 
     private final ExampleRepository exampleRepository;
@@ -102,10 +104,9 @@ public class MajorService {
     }
 
     public List<MajorRes.getHome> getHome() {
-        List<Answer> answers = answerRepository.findAllByOrderByCreatedAtDesc();
+        List<Answer> answers = answerRepository.findTop2ByOrderByCreatedAtDesc();
 
         return answers.stream()
-                .limit(2)
                 .map(ExampleConverter::getHome)
                 .toList();
     }

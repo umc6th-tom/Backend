@@ -13,5 +13,5 @@ public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
     Answer findAllBy();
 
-    List<Answer> findAllByOrderByCreatedAtDesc();
+    List<Answer> findTop2ByOrderByCreatedAtDesc();
 }

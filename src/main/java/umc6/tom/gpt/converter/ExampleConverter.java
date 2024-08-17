@@ -67,12 +67,12 @@ public class ExampleConverter {
         return MajorRes.getHome.builder()
                 .userId(answer.getUser().getId())
                 .answerId(answer.getId())
+                .majorId(answer.getMajors().getId())
                 .question(answer.getQuestion())
                 .content(answer.getContent())
-                .createdAt(DateCalc.formatDate2(answer.getCreatedAt()))
                 .nickname(answer.getUser().getNickName())
                 .major(answer.getMajors().getMajor())
-                .majorId(answer.getMajors().getId())
+                .createdAt(DateCalc.formatDate2(answer.getCreatedAt()))
                 .build();
     }
 }

@@ -25,9 +25,9 @@ public class MajorRes {
         private Long majorId;
         private String question;
         private String content;
+        private String nickname;
         private String major;
         private String createdAt;
-        private String nickname;
 
     }
 }
