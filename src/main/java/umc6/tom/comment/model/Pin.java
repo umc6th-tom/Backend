@@ -2,6 +2,8 @@ package umc6.tom.comment.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import umc6.tom.board.model.Board;
 import umc6.tom.comment.model.enums.PinBoardStatus;
 import umc6.tom.common.BaseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
+@DynamicInsert
 public class Pin extends BaseEntity {
 
     @Id
@@ -29,7 +32,7 @@ public class Pin extends BaseEntity {
     @Column(columnDefinition = "VARCHAR(25) DEFAULT 'ACTIVE'")
     private PinBoardStatus status;
 
-    @Column(nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     public Integer report;
 
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL)

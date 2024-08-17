@@ -2,8 +2,10 @@ package umc6.tom.gpt.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicInsert;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.common.model.College;
+import umc6.tom.common.model.Majors;
 import umc6.tom.user.model.User;
 
 import java.util.ArrayList;
@@ -17,7 +19,8 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Answer {
+@DynamicInsert
+public class Answer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +38,10 @@ public class Answer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "majors_id")
+    private Majors majors;
 
     @PrePersist
     protected void onCreate() {

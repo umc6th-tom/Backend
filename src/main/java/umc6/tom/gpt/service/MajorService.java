@@ -9,15 +9,15 @@ import org.springframework.web.client.RestTemplate;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
+import umc6.tom.common.model.Majors;
 import umc6.tom.gpt.converter.ExampleConverter;
-import umc6.tom.gpt.dto.ExampleDto;
-import umc6.tom.gpt.dto.GptReq;
-import umc6.tom.gpt.dto.GptRes;
-import umc6.tom.gpt.dto.MajorReq;
+import umc6.tom.gpt.dto.*;
+import umc6.tom.gpt.model.Answer;
 import umc6.tom.gpt.model.Example;
 import umc6.tom.gpt.repository.AnswerRepository;
 import umc6.tom.gpt.repository.ExampleRepository;
 import umc6.tom.user.model.User;
+import umc6.tom.user.repository.MajorsRepository;
 import umc6.tom.user.repository.UserRepository;
 import umc6.tom.user.service.UserServiceImpl;
 
@@ -34,6 +34,7 @@ public class MajorService {
     private final UserRepository userRepository;
     private final AnswerRepository answerRepository;
     private static final Logger log = LoggerFactory.getLogger(MajorService.class);
+    private final MajorsRepository majorsRepository;
     @Value("${gpt.model}")
     private String model;
 
@@ -66,9 +67,11 @@ public class MajorService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
+        Majors major = majorsRepository.findById(searchDto.getMajorId()).orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
+
 ////        GPT 기본 설정
         GptReq request = new GptReq(
-                model, searchDto, 1.5,2048,0.7,0,0, user);
+                model, searchDto, major , 1.5,2048,0.7,0,0, user);
         GptRes gptResponse = restTemplate.postForObject(
                 apiUrl
                 , request
@@ -80,13 +83,13 @@ public class MajorService {
         //GPT 답변 파싱  이후에 활성화하기 -> gptResponse.getChoices().get(0).getMessage().getContent();
         String responseText = gptResponse.getChoices().get(0).getMessage().getContent();
         log.info(responseText);
-        List<String> exampleKeywords = List.of("예시문제:", "예시 문제:", "예시 질문:", "예시질문:" , "예시문제 :", "예시 문제 :", "예시 질문 :", "예시질문 :");
+//        List<String> exampleKeywords = List.of("예시문제:", "예시 문제:", "예시 질문:", "예시질문:" , "예시문제 :", "예시 문제 :", "예시 질문 :", "예시질문 :");
         String answer = extractContent(responseText, "답변:");
         String exampleQuestion = extractContent(responseText, "예시문제:");
         String correctAnswer = extractContent(responseText, "정답:");
 
 //      이후에 활성화하기  answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
-            answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
+            answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user,major));
 
 //      이후에 활성화하기  return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer);
         return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer,responseText);
@@ -96,5 +99,14 @@ public class MajorService {
         Long exampleId = exampleRepository.save(ExampleConverter.toExampleEntity(exampleDto)).getId();
 
         return ExampleConverter.toDto2(exampleRepository.findById(exampleId).orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND)));
+    }
+
+    public List<MajorRes.getHome> getHome() {
+        List<Answer> answers = answerRepository.findAllByOrderByCreatedAtDesc();
+
+        return answers.stream()
+                .limit(2)
+                .map(ExampleConverter::getHome)
+                .toList();
     }
 }
