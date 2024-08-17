@@ -69,10 +69,9 @@ public class MajorService {
 
         Majors major = majorsRepository.findById(searchDto.getMajorId()).orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND));
 
-
 ////        GPT 기본 설정
         GptReq request = new GptReq(
-                model, searchDto, 1.5,2048,0.7,0,0, user);
+                model, searchDto, major , 1.5,2048,0.7,0,0, user);
         GptRes gptResponse = restTemplate.postForObject(
                 apiUrl
                 , request
