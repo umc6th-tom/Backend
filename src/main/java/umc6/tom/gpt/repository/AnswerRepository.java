@@ -11,4 +11,7 @@ import java.util.List;
 
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
 
+    Answer findAllBy();
+
+    List<Answer> findTop2ByOrderByCreatedAtDesc();
 }

@@ -190,4 +190,6 @@ public class BoardRestController {
         return ApiResponse.onSuccess(boardService.getBoardView(boardId, page, userId));
     }
 
+
+
 }

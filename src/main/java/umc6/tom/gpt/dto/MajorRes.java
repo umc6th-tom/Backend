@@ -1,8 +1,6 @@
 package umc6.tom.gpt.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 public class MajorRes {
 
@@ -15,6 +13,21 @@ public class MajorRes {
         private String questionTag;
         private String content;
         private String timer;
+
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class getHome{
+        private Long userId;
+        private Long answerId;
+        private Long majorId;
+        private String question;
+        private String content;
+        private String nickname;
+        private String major;
+        private String createdAt;
 
     }
 }

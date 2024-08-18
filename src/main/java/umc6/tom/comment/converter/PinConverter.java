@@ -41,6 +41,7 @@ public class PinConverter {
                 .board(board)
                 .user(user)
                 .comment(pinReq.getComment())
+                .report(0)
                 .build();
     }
 
