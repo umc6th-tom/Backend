@@ -49,11 +49,12 @@ public class ExampleConverter {
                 .build();
     }
 
-    public static Example toExampleEntity(MajorReq.exampleRegisterDto responseDto) {
+    public static Example toExampleEntity(String tag, Answer answerEntity, String problem, String answer) {
         return Example.builder()
-                .problem(responseDto.getExampleQuestion())
-                .answer(responseDto.getCorrectAnswer())
-                .tag(responseDto.getTag())
+                .problem(problem)
+                .answer(answer)
+                .tag(tag)
+                .answerId(answerEntity)
                 .build();
     }
 
@@ -99,4 +100,17 @@ public class ExampleConverter {
                 .tag(example.getTag())
                 .build();
     }
+
+    public static MajorRes.ExampleAndAnswerDto ExampleDto2(Example example){
+        return MajorRes.ExampleAndAnswerDto.builder()
+                .exampleId(example.getId())
+                .answerId(example.getAnswerId().getId())
+                .problem(example.getProblem())
+                .answer(example.getAnswer())
+                .tag(example.getTag())
+                .question(example.getAnswerId().getQuestion())
+                .content(example.getAnswerId().getContent())
+                .build();
+    }
+
 }

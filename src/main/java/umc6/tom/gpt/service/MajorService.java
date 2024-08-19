@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import umc6.tom.apiPayload.code.status.ErrorStatus;
+import umc6.tom.apiPayload.exception.handler.ExampleHandler;
 import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.common.model.Majors;
@@ -91,16 +92,18 @@ public class MajorService {
         String correctAnswer = extractContent(responseText, "정답:");
 
 //      이후에 활성화하기  answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user));
-            answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user,major));
+        Answer savedAnswer = answerRepository.save(ExampleConverter.toAnswerEntity(searchDto.getQuestion(), answer, user,major));
+        Long exampleId = exampleRepository.save(ExampleConverter.toExampleEntity(searchDto.getQuestion(), savedAnswer, exampleQuestion,correctAnswer)).getId();
 
 //      이후에 활성화하기  return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer);
-        return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer,responseText);
+        return new GptRes.responseText(searchDto.getQuestion(), answer,exampleQuestion,correctAnswer,responseText,exampleId, savedAnswer.getId());
     }
 
-    public ExampleDto exampleRegister(MajorReq.exampleRegisterDto exampleDto) {
-        Long exampleId = exampleRepository.save(ExampleConverter.toExampleEntity(exampleDto)).getId();
+    public MajorRes.ExampleAndAnswerDto exampleGet(Long exampleId) {
 
-        return ExampleConverter.toDto2(exampleRepository.findById(exampleId).orElseThrow(() -> new MajorHandler(ErrorStatus.MAJORS_NOR_FOUND)));
+        Example example = exampleRepository.findById(exampleId).orElseThrow(() -> new ExampleHandler(ErrorStatus.EXAMPLE_NOT_FOUND));
+
+        return ExampleConverter.ExampleDto2(example);
     }
 
     public List<MajorRes.getHome> getHome() {

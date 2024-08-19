@@ -75,10 +75,10 @@ public class MajorController {
     }
 
     //예제 보기
-    @PostMapping("/example")
-    public ApiResponse<ExampleDto> exampleRegister(@RequestBody MajorReq.exampleRegisterDto responseDto) {
+    @GetMapping("/example/{exampleId}")
+    public ApiResponse<MajorRes.ExampleAndAnswerDto> exampleGet(@PathVariable("exampleId") long exampleId) {
 
-        return ApiResponse.onSuccess(majorService.exampleRegister(responseDto));
+        return ApiResponse.onSuccess(majorService.exampleGet(exampleId));
     }
 
     //예제로 글 작성창 가기 , 예제 데이터 뿌려주기!

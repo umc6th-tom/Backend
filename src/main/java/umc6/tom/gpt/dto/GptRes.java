@@ -34,5 +34,7 @@ public class GptRes {
         private String exampleQuestion;
         private String correctAnswer;
         private String fullData;
+        private Long exampleId;
+        private Long answerId;
     }
 }

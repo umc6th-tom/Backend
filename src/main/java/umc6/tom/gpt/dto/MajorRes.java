@@ -76,4 +76,19 @@ public class MajorRes {
         private String tag;
 
     }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ExampleAndAnswerDto {
+
+        private Long exampleId;
+        private Long answerId;
+        private String problem;
+        private String answer;
+        private String tag;
+        private String question;
+        private String content;
+
+    }
 }

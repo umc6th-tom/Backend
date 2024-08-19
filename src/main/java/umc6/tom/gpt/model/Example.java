@@ -19,7 +19,7 @@ public class Example {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 1000)
     private String problem;
 
     @Column(nullable = false, length = 1000)
