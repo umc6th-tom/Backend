@@ -43,6 +43,9 @@ public class Answer extends BaseEntity {
     @JoinColumn(name = "majors_id")
     private Majors majors;
 
+    @OneToOne(mappedBy = "answerId", cascade = CascadeType.ALL)
+    private Example example;
+
     @PrePersist
     protected void onCreate() {
         if (this.timer == null) {

@@ -36,7 +36,7 @@ public class MajorController {
 
     //즐겨찾기 조회
     @GetMapping("/myfavorite")
-    public ApiResponse<List<ExampleDto>> getFindAllFavorite() {
+    public ApiResponse<List<MajorRes.ExampleResDto>> getFindAllFavorite() {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
         return ApiResponse.onSuccess(favoriteService.findAllFavorite(userId));

@@ -131,6 +131,17 @@ public class RootUserController {
     }
 
     /**
+     * 24.08.17 작성자 : 서정호
+     * 관리자 - 회원 정지 해제
+     */
+//    @PostMapping("/{userId}/reinstatement")
+//        public ApiResponse<UserDtoRes.suspensionDto> reinstatement(@PathVariable("userId") Long userId) {
+//
+////        Long userId = jwtTokenProvider.getUserIdFromToken();
+//        return ApiResponse.onSuccess(rootUserService.reinstatement(userId));
+//    }
+
+    /**
      * 24.08.13 작성자 : 서정호
      * 관리자 - 유저 신고된 글 조회
      */

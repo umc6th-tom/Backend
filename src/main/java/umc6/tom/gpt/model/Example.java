@@ -5,6 +5,9 @@ import lombok.*;
 import umc6.tom.common.BaseEntity;
 import umc6.tom.user.model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -25,4 +28,10 @@ public class Example {
     @Column(nullable = false, length = 40)
     private String tag;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "answer_id")
+    private Answer answerId;
+
+    @OneToMany(mappedBy = "example" ,cascade = CascadeType.ALL)
+    private List<ExampleFavorite> exampleFavoriteList = new ArrayList<>();
 }

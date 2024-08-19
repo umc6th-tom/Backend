@@ -442,4 +442,10 @@ public class RootUserServiceImpl implements RootUserService {
 
         return new PageImpl<>(dtos, adjustedPageable, allComplaints.size());
     }
+
+//    public UserDtoRes.suspensionDto reinstatement(Long userId){
+//        User user = findUser(userId);
+//
+//
+//    }
 }

@@ -1,6 +1,11 @@
 package umc6.tom.gpt.dto;
 
 import lombok.*;
+import umc6.tom.gpt.model.Answer;
+import umc6.tom.gpt.model.Example;
+import umc6.tom.gpt.model.ExampleFavorite;
+
+import java.util.List;
 
 public class MajorRes {
 
@@ -28,6 +33,47 @@ public class MajorRes {
         private String nickname;
         private String major;
         private String createdAt;
+
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ExampleResDto {
+
+        private Long exampleId;
+        private Long answerId;
+        private Long favoriteId;
+        private String problem;
+        private String answer;
+        private String tag;
+
+    }
+
+
+    @Getter
+    @Setter
+    public static class ExampleList {
+
+        private List<Example> exampleList;
+        private ExampleFavorite exampleFavorite;
+
+        public ExampleList(List<Example> allById, ExampleFavorite favorite) {
+            this.exampleList = allById;
+            this.exampleFavorite = favorite;
+        }
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class ExampleDto {
+
+        private Long id;
+        private Answer answerEntity;
+        private String problem;
+        private String answer;
+        private String tag;
 
     }
 }

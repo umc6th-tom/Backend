@@ -43,4 +43,6 @@ public interface RootUserService {
     Page<UserDtoRes.complaintAllResDto> complaintsBoard(Pageable adjustedPageable);
 
     Page<UserDtoRes.complaintAllResDto> complaintsComment(Pageable adjustedPageable);
+
+//    UserDtoRes.suspensionDto reinstatement(Long userId);
 }
