@@ -244,7 +244,7 @@ public class CommentService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentHandler(ErrorStatus.COMMENT_NOT_FOUND));
 
-        CommentLike likeEntity = commentLikeRepository.findByUser(user);
+        CommentLike likeEntity = commentLikeRepository.findByUserAndComment(user,comment);
         if(Objects.equals(user.getId(), comment.getUser().getId())){
             return ApiResponse.onFailure("COMMENT_LIKE_4010","자기 댓글에 좋아요를 누를 수 없습니다.", null);
         }else{
