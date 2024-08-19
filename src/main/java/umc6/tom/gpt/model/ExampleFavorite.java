@@ -21,13 +21,15 @@ public class ExampleFavorite {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "example_id")
     private Example example;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+
 
     public static ExampleFavorite createExampleFavorite(Example example, User user) {
         ExampleFavorite exampleFavorite = new ExampleFavorite();

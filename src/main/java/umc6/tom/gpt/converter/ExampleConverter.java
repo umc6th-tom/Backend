@@ -10,7 +10,10 @@ import umc6.tom.gpt.dto.MajorReq;
 import umc6.tom.gpt.dto.MajorRes;
 import umc6.tom.gpt.model.Answer;
 import umc6.tom.gpt.model.Example;
+import umc6.tom.gpt.model.ExampleFavorite;
 import umc6.tom.user.model.User;
+
+import java.util.List;
 
 @Slf4j
 @Component
@@ -18,7 +21,7 @@ import umc6.tom.user.model.User;
 public class ExampleConverter {
 
     //예제 조회
-    public ExampleDto toDto(Example entity){
+    public static ExampleDto toDto(Example entity){
         return ExampleDto.builder()
                 .id(entity.getId())
                 .problem(entity.getProblem())
@@ -46,11 +49,12 @@ public class ExampleConverter {
                 .build();
     }
 
-    public static Example toExampleEntity(MajorReq.exampleRegisterDto responseDto) {
+    public static Example toExampleEntity(String tag, Answer answerEntity, String problem, String answer) {
         return Example.builder()
-                .problem(responseDto.getExampleQuestion())
-                .answer(responseDto.getCorrectAnswer())
-                .tag(responseDto.getTag())
+                .problem(problem)
+                .answer(answer)
+                .tag(tag)
+                .answerId(answerEntity)
                 .build();
     }
 
@@ -75,4 +79,47 @@ public class ExampleConverter {
                 .createdAt(DateCalc.formatDate2(answer.getCreatedAt()))
                 .build();
     }
+
+    public static MajorRes.ExampleResDto favoriteDto(MajorRes.ExampleDto exampleDto, ExampleFavorite favorite){
+        return MajorRes.ExampleResDto.builder()
+                .exampleId(exampleDto.getId())
+                .favoriteId(favorite.getId())
+                .answerId(exampleDto.getAnswerEntity().getId())
+                .problem(exampleDto.getProblem())
+                .answer(exampleDto.getAnswer())
+                .tag(exampleDto.getTag())
+                .build();
+    }
+
+    public static MajorRes.ExampleDto ExampleDto(Example example){
+        return MajorRes.ExampleDto.builder()
+                .id(example.getId())
+                .answerEntity(example.getAnswerId())
+                .problem(example.getProblem())
+                .answer(example.getAnswer())
+                .tag(example.getTag())
+                .build();
+    }
+
+    public static MajorRes.ExampleAndAnswerDto ExampleDto2(Example example){
+        return MajorRes.ExampleAndAnswerDto.builder()
+                .exampleId(example.getId())
+                .answerId(example.getAnswerId().getId())
+                .problem(example.getProblem())
+                .answer(example.getAnswer())
+                .tag(example.getTag())
+                .question(example.getAnswerId().getQuestion())
+                .content(example.getAnswerId().getContent())
+                .build();
+    }
+
+    public static MajorRes.AnswerDto answerDto(Answer answer,Long exampleId){
+        return MajorRes.AnswerDto.builder()
+                .answerId(answer.getId())
+                .exampleId(exampleId)
+                .question(answer.getQuestion())
+                .content(answer.getContent())
+                .build();
+    }
+
 }

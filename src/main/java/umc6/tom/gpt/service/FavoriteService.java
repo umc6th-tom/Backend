@@ -9,6 +9,7 @@ import umc6.tom.apiPayload.exception.handler.MajorHandler;
 import umc6.tom.apiPayload.exception.handler.UserHandler;
 import umc6.tom.gpt.converter.ExampleConverter;
 import umc6.tom.gpt.dto.ExampleDto;
+import umc6.tom.gpt.dto.MajorRes;
 import umc6.tom.gpt.model.Example;
 import umc6.tom.gpt.model.ExampleFavorite;
 import umc6.tom.gpt.repository.AnswerRepository;
@@ -34,21 +35,28 @@ public class FavoriteService {
 
     //유저 ID로 즐겨찾기 조회해서 문제 ID 알아오기
     @Transactional
-    public List<ExampleDto> findAllFavorite(Long userId) {
+    public List<MajorRes.ExampleResDto> findAllFavorite(Long userId) {
         //매개변수를 통해 jwt 헤더 id값을 -> user id 바꾸기
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //user 값으로 즐겨찾기 리스트 가져오기
-        List<ExampleFavorite> exampleList = exampleFavoriteRepository.findExampleFavoritesByUserOrderByCreatedAtAsc(user);
+        List<ExampleFavorite> exampleFavorites = exampleFavoriteRepository.findExampleFavoritesByUserOrderByCreatedAtAsc(user);
 
-        List<Long> exampleId = exampleList.stream()
-                .map(ExampleFavorite -> ExampleFavorite.getExample().getId())
-                .collect(Collectors.toList());
+        List<MajorRes.ExampleResDto> favoriteDtos = exampleFavorites.stream()
+                .map(favorite -> new MajorRes.ExampleList(exampleRepository.findAllById(favorite.getExample().getId()), favorite))
 
-        List<Example> exampleEntity = exampleRepository.findAllById(exampleId);
+                .flatMap(exampleList -> {
+                    //exampleList 안에 있는 Example 처리
+                    List<MajorRes.ExampleDto> exampleDtos = exampleList.getExampleList().stream()
+                            .map(ExampleConverter::ExampleDto)
+                            .toList();
 
-        return exampleEntity.stream()
-                .map(exampleConverter::toDto)
-                .collect(Collectors.toList());
+                    return exampleDtos.stream()
+                            .map(exampleDto -> ExampleConverter.favoriteDto(exampleDto, exampleList.getExampleFavorite()));
+                })
+                .toList();
+
+        return favoriteDtos;
+
     }
 
 

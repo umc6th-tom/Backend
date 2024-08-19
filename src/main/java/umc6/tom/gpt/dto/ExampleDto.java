@@ -1,6 +1,7 @@
 package umc6.tom.gpt.dto;
 
 import lombok.*;
+import umc6.tom.gpt.model.Answer;
 
 @Getter
 @Setter
