@@ -134,7 +134,8 @@ public class BoardServiceImpl implements BoardService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         List<Board> boardMajorList = boardRepository.findTop5ByStatusAndMajorsOrderByCreatedAtDesc
                 (BoardStatus.ACTIVE, user.getMajors());
-        List<Board> boardhotList = boardRepository.findTop5ByStatusAndPopularAtNotNullOrderByCreatedAtDesc(BoardStatus.ACTIVE);
+        List<Board> boardhotList = boardRepository.findTop5ByStatusAndPopularAtNotNullAndMajorsOrderByCreatedAtDesc
+                (BoardStatus.ACTIVE, user.getMajors());
         List<Board> boardAllList = boardRepository.findTop5ByStatusOrderByCreatedAtDesc(BoardStatus.ACTIVE);
         BoardResponseDto.BoardMainViewListDto boardMainList = BoardConverter.toBoardMainListViewListDto
                 (boardMajorList, boardhotList, boardAllList);
