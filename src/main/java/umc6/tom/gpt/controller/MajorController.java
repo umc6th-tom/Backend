@@ -14,6 +14,7 @@ import umc6.tom.gpt.service.MajorService;
 import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.dto.UserDtoRes;
 
+import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -36,7 +37,7 @@ public class MajorController {
 
     //즐겨찾기 조회
     @GetMapping("/myfavorite")
-    public ApiResponse<List<ExampleDto>> getFindAllFavorite() {
+    public ApiResponse<List<MajorRes.ExampleResDto>> getFindAllFavorite() {
         Long userId = jwtTokenProvider.getUserIdFromToken();
 
         return ApiResponse.onSuccess(favoriteService.findAllFavorite(userId));
@@ -75,10 +76,10 @@ public class MajorController {
     }
 
     //예제 보기
-    @PostMapping("/example")
-    public ApiResponse<ExampleDto> exampleRegister(@RequestBody MajorReq.exampleRegisterDto responseDto) {
+    @GetMapping("/example/{exampleId}")
+    public ApiResponse<MajorRes.ExampleAndAnswerDto> exampleGet(@PathVariable("exampleId") long exampleId) {
 
-        return ApiResponse.onSuccess(majorService.exampleRegister(responseDto));
+        return ApiResponse.onSuccess(majorService.exampleGet(exampleId));
     }
 
     //예제로 글 작성창 가기 , 예제 데이터 뿌려주기!
@@ -95,5 +96,14 @@ public class MajorController {
     @GetMapping("/main")
     public ApiResponse<List<MajorRes.getHome>> getHome(){
         return ApiResponse.onSuccess(majorService.getHome());
+    }
+
+    /**
+     * 24.08.16 작성자 : 서정호
+     *  메인화면에서 질문글 보기
+     */
+    @GetMapping("/answer/{answerId}")
+    public ApiResponse<MajorRes.AnswerDto> getAnswer(@PathVariable("answerId") Long id){
+        return ApiResponse.onSuccess(majorService.getAnswer(id));
     }
 }

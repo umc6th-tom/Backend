@@ -26,7 +26,7 @@ public class Answer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 1000)
     private String question;
 
     @Column(nullable = false, length = 1000)
@@ -42,6 +42,9 @@ public class Answer extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "majors_id")
     private Majors majors;
+
+    @OneToOne(mappedBy = "answerId", cascade = CascadeType.ALL)
+    private Example example;
 
     @PrePersist
     protected void onCreate() {

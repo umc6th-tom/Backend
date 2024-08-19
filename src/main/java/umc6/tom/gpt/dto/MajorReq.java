@@ -19,8 +19,6 @@ public class MajorReq {
     @Getter
     @ToString
     public static class exampleRegisterDto {
-        private String tag;
-        private String exampleQuestion;
-        private String correctAnswer;
+        private Long exampleId;
     }
 }
