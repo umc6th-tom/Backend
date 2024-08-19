@@ -242,11 +242,11 @@ public class PinService {
     }
 
     //댓글 좋아요 추가/제거
-    public ApiResponse pinLikeSet(Long commentId, Long userId) {
+    public ApiResponse pinLikeSet(Long pinId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
-        Pin pin = pinRepository.findById(commentId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new PinHandler(ErrorStatus.PIN_NOT_FOUND));
 
-        PinLike likeEntity = pinLikeRepository.findByUser(user);
+        PinLike likeEntity = pinLikeRepository.findByUserAndPin(user,pin);
 
         if(Objects.equals(user.getId(), pin.getUser().getId())){
             return ApiResponse.onFailure("PIN_LIKE_4010","자기 댓글에 좋아요를 누를 수 없습니다.", null);
