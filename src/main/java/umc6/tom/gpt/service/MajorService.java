@@ -113,4 +113,11 @@ public class MajorService {
                 .map(ExampleConverter::getHome)
                 .toList();
     }
+
+    public MajorRes.AnswerDto getAnswer(Long id) {
+        Answer answer = answerRepository.findById(id).orElseThrow(() -> new ExampleHandler(ErrorStatus.EXAMPLE_NOT_FOUND));
+        Long exampleId = exampleRepository.findAllByAnswerId(answer).getId();
+
+        return ExampleConverter.answerDto(answer,exampleId);
+    }
 }

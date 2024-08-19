@@ -113,4 +113,13 @@ public class ExampleConverter {
                 .build();
     }
 
+    public static MajorRes.AnswerDto answerDto(Answer answer,Long exampleId){
+        return MajorRes.AnswerDto.builder()
+                .answerId(answer.getId())
+                .exampleId(exampleId)
+                .question(answer.getQuestion())
+                .content(answer.getContent())
+                .build();
+    }
+
 }

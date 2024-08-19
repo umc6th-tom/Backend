@@ -89,6 +89,16 @@ public class MajorRes {
         private String tag;
         private String question;
         private String content;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    public static class AnswerDto{
+        private Long answerId;
+        private Long exampleId;
+        private String question;
+        private String content;
 
     }
 }

@@ -14,6 +14,7 @@ import umc6.tom.gpt.service.MajorService;
 import umc6.tom.security.JwtTokenProvider;
 import umc6.tom.user.dto.UserDtoRes;
 
+import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
@@ -95,5 +96,14 @@ public class MajorController {
     @GetMapping("/main")
     public ApiResponse<List<MajorRes.getHome>> getHome(){
         return ApiResponse.onSuccess(majorService.getHome());
+    }
+
+    /**
+     * 24.08.16 작성자 : 서정호
+     *  메인화면에서 질문글 보기
+     */
+    @GetMapping("/answer/{answerId}")
+    public ApiResponse<MajorRes.AnswerDto> getAnswer(@PathVariable("answerId") Long id){
+        return ApiResponse.onSuccess(majorService.getAnswer(id));
     }
 }
