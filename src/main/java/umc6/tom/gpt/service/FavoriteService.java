@@ -39,6 +39,7 @@ public class FavoriteService {
         //매개변수를 통해 jwt 헤더 id값을 -> user id 바꾸기
         User user = userRepository.findById(userId).orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
         //user 값으로 즐겨찾기 리스트 가져오기
+
         List<ExampleFavorite> exampleFavorites = exampleFavoriteRepository.findExampleFavoritesByUserOrderByCreatedAtAsc(user);
 
         List<MajorRes.ExampleResDto> favoriteDtos = exampleFavorites.stream()
@@ -64,13 +65,7 @@ public class FavoriteService {
     @Transactional
     public ApiResponse<Integer> deleteById(long id) {
         try {
-            Optional<ExampleFavorite> exampleEntity = exampleFavoriteRepository.findById(id);
-            Long exampleId = exampleEntity.map(exampleFavorite -> exampleFavorite.getExample().getId())
-                    .orElseThrow(() -> new MajorHandler(ErrorStatus.EXAMPLE_NOT_FOUND));
-
             exampleFavoriteRepository.deleteById(id);
-            exampleRepository.deleteById(exampleId);
-
         } catch (Exception e) {
             throw new MajorHandler(ErrorStatus._INTERNAL_SERVER_ERROR);
         }
